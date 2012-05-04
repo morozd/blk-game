@@ -1,0 +1,3 @@
+[submodule "third_party/games-framework"]
+	path = third_party/games-framework
+	url = git@github.com:benvanik/games-framework.git

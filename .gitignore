@@ -1,27 +1,63 @@
+# ==============================================================================
+# Misc system junk
+# ==============================================================================
+
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+.com.apple.*
+Thumbs.db
+Desktop.ini
+
+# ==============================================================================
+# Projects/IDE files
+# ==============================================================================
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# VIM
+.*.sw[a-z]
+*.un~
+Session.vim
+
+# TextMate
+*.tmproj
+*.tmproject
+tmtags
+
+# Eclipse
+.project
+.metadata
+
+# ==============================================================================
+# Temp generated code
+# ==============================================================================
+
 *.py[co]
-
-# Packages
-*.egg
-*.egg-info
-dist
-build
-eggs
-parts
-bin
-var
-sdist
-develop-eggs
-.installed.cfg
-
-# Installer logs
-pip-log.txt
-
-# Unit test / coverage reports
 .coverage
-.tox
 
-#Translations
-*.mo
+# ==============================================================================
+# Logs and dumps
+# ==============================================================================
 
-#Mr Developer
-.mr.developer.cfg
+npm-debug.log
+
+# ==============================================================================
+# Build system output
+# ==============================================================================
+
+# npm/node
+.lock-wscript
+node_modules/**/build/
+node_modules/.bin/
+
+# coverage/etc
+scratch/
+
+.build-cache/
+build-out/
+build-gen/
+build-bin/
