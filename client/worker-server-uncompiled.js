@@ -14,4 +14,21 @@
  * limitations under the License.
  */
 
-goog.provide('blk');
+var global = this;
+
+global.CLOSURE_BASE_PATH = '../third_party/games-framework/third_party/closure-library/closure/goog/';
+
+global.importScripts(global.CLOSURE_BASE_PATH + 'bootstrap/webworkers.js');
+global.importScripts(global.CLOSURE_BASE_PATH + 'base.js');
+
+global.importScripts('../blk_js_uncompiled-deps.js');
+
+global.gf = {
+  SERVER: true,
+  NODE: false
+};
+goog.require('blk.server.start');
+
+blk.server.start(goog.global.location.toString(), {
+  // TODO(benvanik): options
+});

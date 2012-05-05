@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Google, Inc. All Rights Reserved.
+ * Copyright 2012 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,4 +14,10 @@
  * limitations under the License.
  */
 
-goog.provide('blk');
+/**
+ * You could place common definitions or mixins here.
+ * Place this file first in the source list to the compile task to ensure the
+ * other files see the definitions.
+ *
+ * @author benvanik@google.com (Ben Vanik)
+ */

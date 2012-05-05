@@ -35,7 +35,7 @@ goog.require('blk.ui.PlayerListing');
 goog.require('gf.Game');
 goog.require('gf.assets.AssetManager');
 goog.require('gf.audio.AudioManager');
-goog.require('gf.graphics.Display');
+goog.require('gf.dom.Display');
 goog.require('gf.graphics.GraphicsContext');
 goog.require('gf.graphics.SpriteBuffer');
 goog.require('gf.input.Data');
@@ -60,21 +60,12 @@ goog.require('goog.vec.Vec4');
  *
  * @constructor
  * @extends {gf.Game}
- * @param {!gf.Runtime} runtime Runtime instance.
+ * @param {!blk.client.LaunchOptions} launchOptions Launch options.
  * @param {!goog.dom.DomHelper} dom DOM helper.
  * @param {!gf.net.ClientSession} session Client session.
  */
-blk.client.ClientGame = function(runtime, dom, session) {
-  goog.base(this, runtime);
-
-  // Bind to runtime
-  runtime.setGame(this);
-
-  var launchOptions = /** @type {!blk.client.LaunchOptions} */ (
-      runtime.launchOptions);
-
-  // Replace clock with network clock
-  runtime.clock = session.clock;
+blk.client.ClientGame = function(launchOptions, dom, session) {
+  goog.base(this, launchOptions, session.clock);
 
   /**
    * DOM helper.
@@ -106,14 +97,14 @@ blk.client.ClientGame = function(runtime, dom, session) {
    * Asset manager.
    * @type {!gf.assets.AssetManager}
    */
-  this.assetManager = new gf.assets.AssetManager(runtime, dom);
+  this.assetManager = new gf.assets.AssetManager(this, dom);
   this.registerDisposable(this.assetManager);
 
   /**
    * Game display window.
-   * @type {!gf.graphics.Display}
+   * @type {!gf.dom.Display}
    */
-  this.display = new gf.graphics.Display(this.dom);
+  this.display = new gf.dom.Display(this.dom);
   this.registerDisposable(this.display);
 
   var attributes = /** @type {!WebGLContextAttributes} */ ({
@@ -150,7 +141,7 @@ blk.client.ClientGame = function(runtime, dom, session) {
    * @type {!blk.graphics.RenderState}
    */
   this.renderState = new blk.graphics.RenderState(
-      this.runtime, this.assetManager, this.graphicsContext);
+      this, this.assetManager, this.graphicsContext);
   this.registerDisposable(this.renderState);
 
   /**
@@ -164,7 +155,7 @@ blk.client.ClientGame = function(runtime, dom, session) {
    * Current game state.
    * @type {!blk.GameState}
    */
-  this.state = new blk.GameState(runtime, session, this.map);
+  this.state = new blk.GameState(this, session, this.map);
   this.registerDisposable(this.state);
 
   // Add all players currently in the session
@@ -179,7 +170,7 @@ blk.client.ClientGame = function(runtime, dom, session) {
    * @type {!blk.env.ChunkView}
    */
   this.localView = new blk.env.ChunkView(this.map,
-      2);//blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ);
+      blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ);
   this.map.addChunkView(this.localView);
 
   /**
@@ -197,10 +188,10 @@ blk.client.ClientGame = function(runtime, dom, session) {
    * Input manager.
    * @type {!gf.input.InputManager}
    */
-  this.input = new gf.input.InputManager(this.runtime,
+  this.input = new gf.input.InputManager(this,
       this.display.getInputElement());
   this.registerDisposable(this.input);
-  this.runtime.addComponent(this.input);
+  this.addComponent(this.input);
   this.input.keyboard.setFullScreenHandler(goog.bind(function() {
     var goingFullScreen = !this.display.isFullScreen;
     this.display.toggleFullScreen();
@@ -219,16 +210,16 @@ blk.client.ClientGame = function(runtime, dom, session) {
    * Audio manager.
    * @type {!gf.audio.AudioManager}
    */
-  this.audio = new gf.audio.AudioManager(this.runtime, this.dom);
+  this.audio = new gf.audio.AudioManager(this, this.dom);
   this.registerDisposable(this.audio);
-  this.runtime.addComponent(this.audio);
+  this.addComponent(this.audio);
 
   /**
    * Sound bank for game sounds.
    * @type {!gf.audio.SoundBank}
    */
   this.sounds = blk.assets.audio.Bank1.create(
-      this.runtime, this.assetManager, this.audio.context);
+      this, this.assetManager, this.audio.context);
   this.audio.loadSoundBank(this.sounds);
 
   /**
@@ -237,7 +228,7 @@ blk.client.ClientGame = function(runtime, dom, session) {
    * @type {!gf.audio.TrackList}
    */
   this.backgroundTracks_ = blk.assets.audio.Music.create(
-      this.runtime, this.assetManager, this.audio.context);
+      this, this.assetManager, this.audio.context);
   this.audio.loadTrackList(this.backgroundTracks_);
 
   /**
@@ -409,7 +400,7 @@ blk.client.ClientGame.prototype.update = function(frame) {
     this.console.log('disconnected!');
 
     this.sounds.playAmbient('player_leave');
-    this.runtime.stopTicking();
+    this.stopTicking();
   }
 
   // Update UI bits
@@ -613,7 +604,7 @@ blk.client.ClientGame.prototype.render = function(frame) {
     gf.log.write('network failure - movement backup');
     this.console.log('network failure');
     this.session.disconnect();
-    this.runtime.stopTicking();
+    this.stopTicking();
     return;
   }
 

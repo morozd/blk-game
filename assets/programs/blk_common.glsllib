@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Google, Inc. All Rights Reserved.
+ * Copyright 2012 Google, Inc All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,4 +14,13 @@
  * limitations under the License.
  */
 
-goog.provide('blk');
+//#name blk_common
+//#description Common BLK shader functions.
+
+
+//! COMMON
+
+/**
+ * World-view-projection matrix.
+ */
+uniform mat4 u_worldViewProjMatrix;

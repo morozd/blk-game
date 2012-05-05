@@ -22,7 +22,6 @@ goog.require('blk.net.packets');
 goog.require('blk.server.LaunchOptions');
 goog.require('blk.server.ServerGame');
 goog.require('gf');
-goog.require('gf.Runtime');
 goog.require('gf.io.node');
 goog.require('gf.net');
 goog.require('gf.net.AuthToken');
@@ -56,7 +55,6 @@ blk.server.start = function(uri, options) {
   }
 
   var launchOptions = new blk.server.LaunchOptions(uri, options['mapPath']);
-  var runtime = new gf.Runtime(launchOptions);
 
   // TODO(benvanik): authtoken/serverinfo
   var authToken = new gf.net.AuthToken();
@@ -73,13 +71,13 @@ blk.server.start = function(uri, options) {
     var mapStore = new blk.io.FileMapStore(mapPath);
     mapStore.setup().addCallbacks(
         function() {
-          blk.server.launchServer_(runtime, session, mapStore, deferred);
+          blk.server.launchServer_(launchOptions, session, mapStore, deferred);
         },
         function(arg) {
           // Fallback to no storage
           mapStore = new blk.io.MemoryMapStore();
           mapStore.setup();
-          blk.server.launchServer_(runtime, session, mapStore, deferred);
+          blk.server.launchServer_(launchOptions, session, mapStore, deferred);
         });
   }, function(arg) {
     deferred.errback(arg);
@@ -92,14 +90,15 @@ blk.server.start = function(uri, options) {
 /**
  * Launches a server game.
  * @private
- * @param {!gf.Runtime} runtime Runtime.
+ * @param {!blk.server.LaunchOptions} launchOptions Launch options.
  * @param {!gf.net.ServerSession} session Server session.
  * @param {!blk.io.MapStore} mapStore Map storage provider.
  * @param {!goog.async.Deferred} deferred Deferred to signal when ready.
  */
-blk.server.launchServer_ = function(runtime, session, mapStore, deferred) {
+blk.server.launchServer_ = function(launchOptions, session, mapStore,
+    deferred) {
   // Create game
-  var game = new blk.server.ServerGame(runtime, session, mapStore);
+  var game = new blk.server.ServerGame(launchOptions, session, mapStore);
 
   // HACK: debug root - useful for inspecting the game state
   if (goog.DEBUG) {

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>BLK (uncompiled)</title>
+    <link rel="stylesheet" href="../blk_css_debug_compiled.css"/>
+    <script>
+      window.CLOSURE_NO_DEPS = true;
+    </script>
+    <script src="../third_party/games-framework/third_party/closure-library/closure/goog/base.js"></script>
+    <script src="../blk_js_uncompiled-deps.js"></script>
+    <script src="../blk_css_debug_compiled.js"></script>
+    <script src="../src/blk/client/client.js"></script>
+  </head>
+  <body>
+    <script>
+      var uri = window.location.toString();
+      blk.client.start(uri, true, document, {
+        // Options
+      });
+    </script>
+  </body>
+</html>

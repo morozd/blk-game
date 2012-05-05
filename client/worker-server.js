@@ -14,4 +14,10 @@
  * limitations under the License.
  */
 
-goog.provide('blk');
+var global = this;
+
+global.importScripts('../blk_server_js_compiled.js');
+
+blk.server.start(global.location.toString(), {
+  // TODO(benvanik): options
+});

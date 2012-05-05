@@ -1,0 +1,101 @@
+/**
+ * Copyright 2012 Google, Inc All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+//#name blk_lighting
+//#description BLK lighting functions.
+
+
+//! VERTEX
+
+attribute vec3 a_normal;
+
+
+//! COMMON
+
+/**
+ * Normal matrix.
+ * Compute by:
+ *     goog.vec.Mat4.invert(worldMatrix, tmpMat4);
+ *     goog.vec.Mat4.transpose(tmpMat4, normalMatrix);
+ */
+uniform mat4 u_normalMatrix;
+
+
+/**
+ * Ambient color RGB.
+ */
+uniform vec3 u_ambientLightColor;
+
+
+/**
+ * Sun direction, normalized.
+ */
+uniform vec3 u_sunLightDirection;
+
+
+/**
+ * Sun color RGB.
+ */
+uniform vec3 u_sunLightColor;
+
+
+/**
+ * Lighting value used by {@see mixLighting}.
+ */
+varying vec3 v_lighting;
+
+
+/**
+ * Calculates the lighting varying for axis-aligned faces.
+ * Note that the normal matrix is not required for axis-aligned faces.
+ *
+ * Usage: vertex shader
+ * Uniforms: u_sunLightDirection, u_sunLightColor, u_ambientLightColor
+ * Attributes: a_normal
+ */
+void calculateLightingAA() {
+  float sunWeight = max(dot(a_normal, u_sunLightDirection), 0.0);
+  v_lighting = u_ambientLightColor + u_sunLightColor * sunWeight;
+}
+
+
+/**
+ * Calculates the lighting varying for generic faces.
+ *
+ * Usage: vertex shader
+ * Uniforms: u_sunLightDirection, u_sunLightColor, u_ambientLightColor,
+ *           u_normalMatrix
+ * Attributes: a_normal
+ */
+void calculateLighting() {
+  vec3 tn = (u_normalMatrix * vec4(a_normal, 1.0)).xyz;
+  float sunWeight = max(dot(tn, u_sunLightDirection), 0.0);
+  v_lighting = u_ambientLightColor + u_sunLightColor * sunWeight;
+}
+
+
+/**
+ * Mixes the lighting color into a fragment color.
+ *
+ * Usage: fragment shader
+ * Varyings: v_lighting
+ *
+ * @param fragColor Source fragment color.
+ * @return Fragment color after lighting has been applied.
+ */
+vec4 mixLighting(vec4 fragColor) {
+  return vec4(fragColor.rgb * v_lighting, fragColor.a);
+}

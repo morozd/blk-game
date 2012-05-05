@@ -21,6 +21,7 @@ goog.require('gf.assets.DataSource');
 goog.require('gf.graphics.BitmapFont');
 goog.require('gf.graphics.ImageInfo');
 goog.require('gf.graphics.TextureAtlas');
+goog.require('goog.webgl');
 
 
 
@@ -45,10 +46,11 @@ blk.assets.fonts.MonospaceFont = function(runtime, assetManager, context) {
   var atlas = new gf.graphics.TextureAtlas(
       assetManager,
       context,
-      gf.BIN_PATH + 'bin/assets/fonts/',
+      gf.BIN_PATH + 'assets/fonts',
       'monospace',
       imageInfo);
   atlas.setupSquareSlots(8);
+  atlas.setFilteringMode(goog.webgl.NEAREST, goog.webgl.NEAREST);
   atlas.load();
 
   // Really prepare the font

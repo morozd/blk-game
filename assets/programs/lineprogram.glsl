@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Google, Inc. All Rights Reserved.
+ * Copyright 2012 Google, Inc All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,4 +14,34 @@
  * limitations under the License.
  */
 
-goog.provide('blk');
+//#name LineProgram
+//#description Generic line program
+
+//! NAMESPACE=blk.assets.programs
+//! CLASS=LineProgram
+//! INCLUDE blk_precision.glsllib
+//! INCLUDE blk_common.glsllib
+//! INCLUDE blk_fog.glsllib
+
+
+//! COMMON
+
+varying vec4 v_color;
+
+
+//! VERTEX
+
+attribute vec3 a_position;
+attribute vec4 a_color;
+
+void main() {
+  gl_Position = u_worldViewProjMatrix * vec4(a_position, 1.0);
+  v_color = a_color;
+}
+
+
+//! FRAGMENT
+
+void main() {
+  gl_FragColor = mixFog(v_color);
+}

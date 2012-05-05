@@ -53,7 +53,7 @@ blk.physics.Movement = function(view) {
    * If not set then certain angles will be constrained (such as pitch).
    * @type {boolean}
    */
-  this.freeFloating = false;
+  this.freeFloating = true;
 };
 
 

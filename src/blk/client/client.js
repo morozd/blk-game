@@ -20,7 +20,6 @@ goog.require('blk.client.ClientGame');
 goog.require('blk.client.LaunchOptions');
 goog.require('blk.net.packets');
 goog.require('gf');
-goog.require('gf.Runtime');
 goog.require('gf.io');
 goog.require('gf.io.FileSystemType');
 goog.require('gf.log');
@@ -120,8 +119,7 @@ blk.client.start = function(uri, sourceMode, doc, options) {
   deferred.addCallbacks(function(session) {
     // Create game
     var dom = new goog.dom.DomHelper(doc);
-    var runtime = new gf.Runtime(launchOptions);
-    var game = new blk.client.ClientGame(runtime, dom, session);
+    var game = new blk.client.ClientGame(launchOptions, dom, session);
 
     // HACK: debug root - useful for inspecting the game state
     if (goog.DEBUG) {
@@ -150,13 +148,13 @@ blk.client.launchLocalServer_ = function(sourceMode, uri, authToken, userInfo) {
 
   // TODO(benvanik): name servers so there can be multiple/etc
   var serverId = goog.uri.utils.getDomain(uri);
-  var name = 'server-' + serverId + (sourceMode ? '-debug' : '');
+  var name = 'server-' + serverId + (sourceMode ? '-uncompiled' : '');
 
   // Launch worker
   // Attempt to create a shared worker if it's supported - otherwise go
   // dedicated so we at least work
   var workerUri = sourceMode ?
-      'worker-server-debug.js' :
+      'worker-server-uncompiled.js' :
       'worker-server.js';
   var worker;
   var port;

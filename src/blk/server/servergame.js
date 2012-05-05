@@ -43,22 +43,13 @@ goog.require('goog.vec.Vec3');
  *
  * @constructor
  * @extends {gf.Game}
- * @param {!gf.Runtime} runtime Runtime instance.
+ * @param {!blk.server.LaunchOptions} launchOptions Launch options.
  * @param {!gf.net.ServerSession} session Client session.
  * @param {!blk.io.MapStore} mapStore Map storage provider, ownership
  *     transferred.
  */
-blk.server.ServerGame = function(runtime, session, mapStore) {
-  goog.base(this, runtime);
-
-  // Bind to runtime
-  runtime.setGame(this);
-
-  var launchOptions = /** @type {!blk.server.LaunchOptions} */ (
-      runtime.launchOptions);
-
-  // Replace clock with network clock
-  runtime.clock = session.clock;
+blk.server.ServerGame = function(launchOptions, session, mapStore) {
+  goog.base(this, launchOptions, session.clock);
 
   /**
    * Server session.
@@ -94,7 +85,7 @@ blk.server.ServerGame = function(runtime, session, mapStore) {
    * Current game state.
    * @type {!blk.GameState}
    */
-  this.state = new blk.GameState(runtime, session, this.map);
+  this.state = new blk.GameState(this, session, this.map);
   this.registerDisposable(this.state);
 
   /**
@@ -174,7 +165,7 @@ blk.server.ServerGame.prototype.handleUserConnect = function(user) {
 
   // Create view - must be cleaned up on player disconnect
   var view = new blk.env.ChunkView(map,
-      2);//blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ);
+      blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ);
   map.addChunkView(view);
   player.view = view;
 

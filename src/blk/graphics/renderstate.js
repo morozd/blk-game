@@ -68,8 +68,9 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
    * @type {!gf.graphics.TextureAtlas}
    */
   this.blockAtlas = blk.assets.blocksets.test.create(
-      runtime, assetManager, graphicsContext);
+      assetManager, graphicsContext);
   this.registerDisposable(this.blockAtlas);
+  this.blockAtlas.setFilteringMode(goog.webgl.NEAREST, goog.webgl.NEAREST);
   this.blockAtlas.load();
 
   /**
@@ -77,7 +78,8 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
    * @type {!gf.graphics.TextureAtlas}
    */
   this.uiAtlas = blk.assets.textures.ui.create(
-      runtime, assetManager, graphicsContext);
+      assetManager, graphicsContext);
+  this.uiAtlas.setFilteringMode(goog.webgl.NEAREST, goog.webgl.NEAREST);
   this.registerDisposable(this.uiAtlas);
   this.uiAtlas.load();
 
@@ -86,7 +88,7 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
    * @type {!blk.assets.programs.LineProgram}
    */
   this.lineProgram = blk.assets.programs.LineProgram.create(
-      runtime, assetManager, graphicsContext);
+      assetManager, graphicsContext);
   this.registerDisposable(this.lineProgram);
   this.lineProgram.restore();
 
@@ -125,12 +127,10 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
    * @type {!blk.assets.programs.FaceProgram}
    */
   this.faceProgram = blk.assets.programs.FaceProgram.create(
-      runtime, assetManager, graphicsContext);
+      assetManager, graphicsContext);
   this.registerDisposable(this.faceProgram);
 
   this.faceProgram.load();
-
-  this.restore();
 };
 goog.inherits(blk.graphics.RenderState, gf.graphics.Resource);
 
@@ -358,7 +358,7 @@ blk.graphics.RenderState.prototype.setLighting = function(
 
   // Line program
   var lineProgram = this.lineProgram;
-  gl.useProgram(lineProgram.program);
+  gl.useProgram(lineProgram.handle);
   gl.uniform2f(lineProgram.u_fogInfo,
       fogNear, fogFar);
   gl.uniform3f(lineProgram.u_fogColor,
@@ -366,7 +366,7 @@ blk.graphics.RenderState.prototype.setLighting = function(
 
   // Face program
   var faceProgram = this.faceProgram;
-  gl.useProgram(faceProgram.program);
+  gl.useProgram(faceProgram.handle);
   gl.uniform3f(faceProgram.u_ambientLightColor,
       ambientLightColor[0],
       ambientLightColor[1],
@@ -402,11 +402,11 @@ blk.graphics.RenderState.prototype.beginChunkPass1 = function() {
   ctx.setDepthState(blk.graphics.RenderState.DEPTH_CHUNK_PASS1_);
 
   // Program
-  gl.useProgram(this.faceProgram.program);
+  gl.useProgram(this.faceProgram.handle);
 
   // Texture atlas
-  if (this.blockAtlas.texture) {
-    gl.bindTexture(goog.webgl.TEXTURE_2D, this.blockAtlas.texture);
+  if (this.blockAtlas.handle) {
+    gl.bindTexture(goog.webgl.TEXTURE_2D, this.blockAtlas.handle);
     gl.uniform2f(this.faceProgram.u_texSize,
         this.blockAtlas.width, this.blockAtlas.height);
   } else {
@@ -439,11 +439,11 @@ blk.graphics.RenderState.prototype.beginChunkPass2 = function() {
   ctx.setDepthState(blk.graphics.RenderState.DEPTH_CHUNK_PASS2_);
 
   // Program
-  gl.useProgram(this.faceProgram.program);
+  gl.useProgram(this.faceProgram.handle);
 
   // Texture atlas
-  if (this.blockAtlas.texture) {
-    gl.bindTexture(goog.webgl.TEXTURE_2D, this.blockAtlas.texture);
+  if (this.blockAtlas.handle) {
+    gl.bindTexture(goog.webgl.TEXTURE_2D, this.blockAtlas.handle);
     gl.uniform2f(this.faceProgram.u_texSize,
         this.blockAtlas.width, this.blockAtlas.height);
   } else {
@@ -476,7 +476,7 @@ blk.graphics.RenderState.prototype.beginLines = function() {
   ctx.setDepthState(blk.graphics.RenderState.DEPTH_LINES_);
 
   // Program
-  gl.useProgram(this.lineProgram.program);
+  gl.useProgram(this.lineProgram.handle);
 
   // TODO(benvanik): VAO
   gl.enableVertexAttribArray(0);
@@ -502,8 +502,8 @@ blk.graphics.RenderState.prototype.beginSprites = function(atlas, depthTest) {
       blk.graphics.RenderState.DEPTH_DISABLED_SPRITES_);
 
   // Texture atlas
-  if (atlas.texture) {
-    gl.bindTexture(goog.webgl.TEXTURE_2D, atlas.texture);
+  if (atlas.handle) {
+    gl.bindTexture(goog.webgl.TEXTURE_2D, atlas.handle);
   } else {
     gl.bindTexture(goog.webgl.TEXTURE_2D, null);
   }
