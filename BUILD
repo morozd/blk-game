@@ -241,6 +241,7 @@ file_set(
         glob(GF + '/third_party/abbrev/**/*.*') +
         glob(GF + '/third_party/nopt/**/*.*') +
         glob(GF + '/third_party/node-closure/**/*.*') +
+        glob(GF + '/third_party/options/**/*.*') +
         glob(GF + '/third_party/ws/**/*.*'))
 
 
