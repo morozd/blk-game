@@ -16,7 +16,7 @@
 
 goog.provide('blk.assets.fonts.MonospaceFont');
 
-goog.require('gm');
+goog.require('gf');
 goog.require('gf.assets.DataSource');
 goog.require('gf.graphics.BitmapFont');
 goog.require('gf.graphics.ImageInfo');

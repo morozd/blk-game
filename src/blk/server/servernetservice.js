@@ -20,7 +20,7 @@ goog.require('blk.net.packets.MapCreate');
 goog.require('blk.net.packets.Move');
 goog.require('blk.net.packets.RequestChunkData');
 goog.require('blk.net.packets.SetBlock');
-goog.require('gm');
+goog.require('gf');
 goog.require('gf.log');
 goog.require('gf.net.NetworkService');
 goog.require('gf.net.PacketWriter');

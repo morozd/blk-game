@@ -21,7 +21,7 @@ goog.require('blk.io.MemoryMapStore');
 goog.require('blk.net.packets');
 goog.require('blk.server.LaunchOptions');
 goog.require('blk.server.ServerGame');
-goog.require('gm');
+goog.require('gf');
 goog.require('gf.Runtime');
 goog.require('gf.io.node');
 goog.require('gf.net');

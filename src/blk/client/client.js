@@ -19,7 +19,7 @@ goog.provide('blk.client.start');
 goog.require('blk.client.ClientGame');
 goog.require('blk.client.LaunchOptions');
 goog.require('blk.net.packets');
-goog.require('gm');
+goog.require('gf');
 goog.require('gf.Runtime');
 goog.require('gf.io');
 goog.require('gf.io.FileSystemType');
