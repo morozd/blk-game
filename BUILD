@@ -75,17 +75,31 @@ copy_files(
 # Audio
 # ----------------------------------------------------------------------------------------------------------------------
 
+# All audio output
 file_set(
-    name='blk_audio_all',
+    name='blk_audio_uncompiled_all',
     srcs=[
         'assets/audio/bank1:bank1',
         'assets/audio/music:music',
         ])
-
 file_set(
-    name='blk_audio',
-    srcs=[':blk_audio_all'],
+    name='blk_audio_compiled_all',
+    srcs=[
+        'assets/audio/bank1:bank1_optimized',
+        'assets/audio/music:music_optimized',
+        ])
+
+# All non-code audio things
+file_set(
+    name='blk_audio_uncompiled',
+    srcs=[':blk_audio_uncompiled_all'],
     src_filter='*.wav|*.mp3|*.m4a|*.ogg|*.json')
+
+# Just the audio files
+file_set(
+    name='blk_audio_compiled',
+    srcs=[':blk_audio_compiled_all'],
+    src_filter='*.wav|*.mp3|*.m4a|*.ogg')
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -195,7 +209,6 @@ BLK_JS_SRCS=[
 BLK_CLIENT_JS_SRCS=BLK_JS_SRCS + [
     ':blk_css_compiled',
     ':blk_glsl',
-    ':blk_audio_all',
     #':blk_textures',
     ':blk_font_textures',
     ]
@@ -213,14 +226,18 @@ closure_js_library(
     name='blk_js_uncompiled',
     mode='UNCOMPILED',
     entry_points=['blk.client.start', 'blk.server.start',],
-    srcs=BLK_CLIENT_JS_SRCS,
+    srcs=BLK_CLIENT_JS_SRCS + [
+        ':blk_audio_uncompiled_all',
+        ],
     compiler_jar=JS_COMPILER_JAR)
 
 closure_js_library(
     name='blk_client_js_compiled',
     mode='ADVANCED',
     entry_points='blk.client.start',
-    srcs=BLK_CLIENT_JS_SRCS,
+    srcs=BLK_CLIENT_JS_SRCS + [
+        ':blk_audio_compiled_all',
+        ],
     externs=[GF + ':closure_externs'],
     compiler_jar=JS_COMPILER_JAR,
     compiler_flags=SHARED_JS_FLAGS + [
@@ -274,9 +291,10 @@ file_set(
 file_set(
     name='debug',
     srcs=[
+        GF + ':all_uncompiled_js',
         ':blk_client_static_uncompiled',
         ':blk_node_static_uncompiled',
-        ':blk_audio',
+        ':blk_audio_uncompiled',
         ':blk_images',
         ':blk_css_debug_compiled',
         ':blk_glsl_json',
@@ -289,7 +307,7 @@ file_set(
     srcs=[
         ':blk_client_static_compiled',
         ':blk_node_static_compiled',
-        ':blk_audio',
+        ':blk_audio_compiled',
         ':blk_images',
         ':blk_css_compiled_only',
         ':blk_client_js_compiled',
