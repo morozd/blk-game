@@ -228,7 +228,7 @@ blk.client.ClientGame = function(launchOptions, dom, session) {
    * @type {!gf.audio.TrackList}
    */
   this.backgroundTracks_ = blk.assets.audio.Music.create(
-      this, this.assetManager, this.audio.context);
+      this.assetManager, this.audio.context);
   this.audio.loadTrackList(this.backgroundTracks_);
 
   /**

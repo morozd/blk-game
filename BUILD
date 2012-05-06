@@ -72,6 +72,28 @@ copy_files(
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+# Audio
+# ----------------------------------------------------------------------------------------------------------------------
+
+# audio_soundbank(
+#     name='blk_audio_bank1',
+#     class_name='blk.assets.audio.Bank1',
+#     srcs=glob('assets/audio/bank1/**/*.wav'))
+
+file_set(
+    name='blk_audio_all',
+    srcs=[
+        #'assets/audio/bank1:bank1',
+        'assets/audio/music:music',
+        ])
+
+file_set(
+    name='blk_audio',
+    srcs=[':blk_audio_all'],
+    src_filter='*.wav|*.mp3|*.m4a|*.ogg|*.json')
+
+
+# ----------------------------------------------------------------------------------------------------------------------
 # Textures
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -178,6 +200,7 @@ BLK_JS_SRCS=[
 BLK_CLIENT_JS_SRCS=BLK_JS_SRCS + [
     ':blk_css_compiled',
     ':blk_glsl',
+    ':blk_audio_all',
     #':blk_textures',
     ':blk_font_textures',
     ]
@@ -258,6 +281,7 @@ file_set(
     srcs=[
         ':blk_client_static_uncompiled',
         ':blk_node_static_uncompiled',
+        ':blk_audio',
         ':blk_images',
         ':blk_css_debug_compiled',
         ':blk_glsl_json',
@@ -270,6 +294,7 @@ file_set(
     srcs=[
         ':blk_client_static_compiled',
         ':blk_node_static_compiled',
+        ':blk_audio',
         ':blk_images',
         ':blk_css_compiled_only',
         ':blk_client_js_compiled',
