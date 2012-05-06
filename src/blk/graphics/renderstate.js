@@ -65,7 +65,7 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
 
   /**
    * Block texture atlas.
-   * @type {!gf.graphics.TextureAtlas}
+   * @type {!gf.graphics.Texture}
    */
   this.blockAtlas = blk.assets.blocksets.test.create(
       assetManager, graphicsContext);
@@ -75,7 +75,7 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
 
   /**
    * UI texture atlas.
-   * @type {!gf.graphics.TextureAtlas}
+   * @type {!gf.graphics.Texture}
    */
   this.uiAtlas = blk.assets.textures.ui.create(
       assetManager, graphicsContext);
@@ -487,7 +487,7 @@ blk.graphics.RenderState.prototype.beginLines = function() {
 
 /**
  * Begins the sprite drawing mode.
- * @param {gf.graphics.TextureAtlas} atlas Texture atlas used for sprites.
+ * @param {gf.graphics.Texture} atlas Texture atlas used for sprites.
  * @param {boolean} depthTest True to enable depth testing.
  */
 blk.graphics.RenderState.prototype.beginSprites = function(atlas, depthTest) {

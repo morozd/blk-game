@@ -106,11 +106,11 @@ file_set(
 # Textures
 # ----------------------------------------------------------------------------------------------------------------------
 
-# TODO(benvaniK): atlases
-file_set(
+texture_set(
     name='blk_blocksets',
     namespace='blk.assets.blocksets',
-    srcs=glob('assets/blocksets/**/*.png'))
+    srcs=glob('assets/blocksets/**/*.png'),
+    slot_size='16x16')
 file_set(
     name='blk_blockset_images',
     srcs=':blk_blocksets',
@@ -119,7 +119,8 @@ file_set(
 texture_set(
     name='blk_textures',
     namespace='blk.assets.textures',
-    srcs=glob('assets/textures/**/*.*'))
+    srcs=glob('assets/textures/**/*.*'),
+    slot_size='16x16')
 file_set(
     name='blk_texture_images',
     srcs=':blk_textures',
@@ -209,7 +210,8 @@ BLK_JS_SRCS=[
 BLK_CLIENT_JS_SRCS=BLK_JS_SRCS + [
     ':blk_css_compiled',
     ':blk_glsl',
-    #':blk_textures',
+    ':blk_blocksets',
+    ':blk_textures',
     ':blk_font_textures',
     ]
 

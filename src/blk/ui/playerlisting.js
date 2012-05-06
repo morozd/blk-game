@@ -55,7 +55,7 @@ blk.ui.PlayerListing = function(graphicsContext, renderState, gameState) {
 
   /**
    * UI texture atlas.
-   * @type {!gf.graphics.TextureAtlas}
+   * @type {!gf.graphics.Texture}
    */
   this.uiAtlas = this.renderState.uiAtlas;
 

@@ -20,7 +20,7 @@ goog.require('gf');
 goog.require('gf.assets.DataSource');
 goog.require('gf.graphics.BitmapFont');
 goog.require('gf.graphics.ImageInfo');
-goog.require('gf.graphics.TextureAtlas');
+goog.require('gf.graphics.LoadableTexture');
 goog.require('goog.webgl');
 
 
@@ -43,13 +43,13 @@ blk.assets.fonts.MonospaceFont = function(runtime, assetManager, context) {
         'image/png',
         'monospace.png',
         1256)]]);
-  var atlas = new gf.graphics.TextureAtlas(
+  var atlas = new gf.graphics.LoadableTexture(
       assetManager,
       context,
       gf.BIN_PATH + 'assets/fonts',
       'monospace',
       imageInfo);
-  atlas.setupSquareSlots(8);
+  atlas.setupUniformSlots(8, 8);
   atlas.setFilteringMode(goog.webgl.NEAREST, goog.webgl.NEAREST);
   atlas.load();
 
