@@ -219,7 +219,7 @@ blk.client.ClientGame = function(launchOptions, dom, session) {
    * @type {!gf.audio.SoundBank}
    */
   this.sounds = blk.assets.audio.Bank1.create(
-      this, this.assetManager, this.audio.context);
+      this.assetManager, this.audio.context);
   this.audio.loadSoundBank(this.sounds);
 
   /**

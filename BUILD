@@ -75,15 +75,10 @@ copy_files(
 # Audio
 # ----------------------------------------------------------------------------------------------------------------------
 
-# audio_soundbank(
-#     name='blk_audio_bank1',
-#     class_name='blk.assets.audio.Bank1',
-#     srcs=glob('assets/audio/bank1/**/*.wav'))
-
 file_set(
     name='blk_audio_all',
     srcs=[
-        #'assets/audio/bank1:bank1',
+        'assets/audio/bank1:bank1',
         'assets/audio/music:music',
         ])
 
