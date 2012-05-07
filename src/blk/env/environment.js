@@ -32,34 +32,34 @@ blk.env.Environment = function() {
 
   /**
    * Current color of the sky.
-   * @type {!goog.vec.Vec3.Type}
+   * @type {!goog.vec.Vec3.Float32}
    */
   this.skyColor = goog.vec.Vec3.createFloat32FromValues(
       0, 191 / 255, 255 / 255);
 
   /**
    * Ambient lighting color.
-   * @type {!goog.vec.Vec3.Type}
+   * @type {!goog.vec.Vec3.Float32}
    */
   this.ambientLightColor = goog.vec.Vec3.createFloat32FromValues(
       110 / 255, 110 / 255, 110 / 255);
 
   /**
    * Normalized sun lighting direction vector.
-   * @type {!goog.vec.Vec3.Type}
+   * @type {!goog.vec.Vec3.Float32}
    */
   this.sunLightDirection = goog.vec.Vec3.createFloat32FromValues(1, 1, -0.5);
 
   /**
    * Sun lighting color.
-   * @type {!goog.vec.Vec3.Type}
+   * @type {!goog.vec.Vec3.Float32}
    */
   this.sunLightColor = goog.vec.Vec3.createFloat32FromValues(
       130 / 255, 130 / 255, 130 / 255);
 
   /**
    * Fog color.
-   * @type {!goog.vec.Vec3.Type}
+   * @type {!goog.vec.Vec3.Float32}
    */
   this.fogColor = goog.vec.Vec3.createFloat32FromValues(
       255 / 255, 255 / 255, 255 / 255);

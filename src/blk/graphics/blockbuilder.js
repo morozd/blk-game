@@ -298,7 +298,7 @@ blk.graphics.BlockBuilder.prototype.expand_ = function(opt_newCapacity) {
  * @param {number} x Chunk-relative block X.
  * @param {number} y Chunk-relative block Y.
  * @param {number} z Chunk-relative block Z.
- * @param {!goog.vec.Vec4.Type} texCoords Texture coordinates.
+ * @param {!goog.vec.Vec4.Float32} texCoords Texture coordinates.
  * @return {boolean} True if the face was added.
  */
 blk.graphics.BlockBuilder.prototype.addFace = function(face, x, y, z,

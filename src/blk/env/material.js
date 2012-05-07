@@ -71,7 +71,7 @@ blk.env.MaterialFlags = {
  * @param {number} flags Bitmask of flags from {@see blk.env.MaterialFlags}.
  * @param {string=} opt_actionCue Sound cue to play when modifying.
  * @param {string=} opt_stepCue Sound cue to play when stepped on.
- * @param {goog.vec.Vec4.Type=} opt_color Emission color.
+ * @param {goog.vec.Vec4.Float32=} opt_color Emission color.
  */
 blk.env.Material = function(flags, opt_actionCue, opt_stepCue, opt_color) {
   /**
@@ -94,7 +94,7 @@ blk.env.Material = function(flags, opt_actionCue, opt_stepCue, opt_color) {
 
   /**
    * Emission color, if the material is emissive.
-   * @type {!goog.vec.Vec4.Type}
+   * @type {!goog.vec.Vec4.Float32}
    */
   this.color = opt_color || goog.vec.Vec4.createFloat32();
 };

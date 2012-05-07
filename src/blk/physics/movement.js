@@ -423,7 +423,7 @@ blk.physics.Movement.Location_ = {
 /**
  * Classifies the current position of the player.
  * @private
- * @param {!goog.vec.Vec3.Type} position Position to test.
+ * @param {!goog.vec.Vec3.Float32} position Position to test.
  * @return {blk.physics.Movement.Location_} Position location type.
  */
 blk.physics.Movement.prototype.classifyPosition_ = function(position) {
@@ -444,9 +444,9 @@ blk.physics.Movement.prototype.classifyPosition_ = function(position) {
 /**
  * Collides against the map, adjusting the delta position.
  * @private
- * @param {!goog.vec.Vec3.Type} position Starting position on this frame.
- * @param {!goog.vec.Vec3.Type} deltaPos Position delta.
- * @param {!goog.vec.Vec3.Type} targetPos Target position - updated with
+ * @param {!goog.vec.Vec3.Float32} position Starting position on this frame.
+ * @param {!goog.vec.Vec3.Float32} deltaPos Position delta.
+ * @param {!goog.vec.Vec3.Float32} targetPos Target position - updated with
  *     collision value.
  * @return {blk.physics.Movement.Location_} Position location type.
  */
@@ -537,7 +537,7 @@ blk.physics.Movement.prototype.executeCommand = function(time, cmd) {
 /**
  * Temp vec3 for math.
  * @private
- * @type {!Array.<!goog.vec.Vec3.Type>}
+ * @type {!Array.<!goog.vec.Vec3.Float32>}
  */
 blk.physics.Movement.tmpVec3_ = [
   goog.vec.Vec3.createFloat32(),
@@ -551,7 +551,7 @@ blk.physics.Movement.tmpVec3_ = [
 /**
  * Temp vec4 for math.
  * @private
- * @type {!Array.<!goog.vec.Vec4.Type>}
+ * @type {!Array.<!goog.vec.Vec4.Float32>}
  */
 blk.physics.Movement.tmpVec4_ = [
   goog.vec.Vec4.createFloat32(),
@@ -563,7 +563,7 @@ blk.physics.Movement.tmpVec4_ = [
 /**
  * Temp mat4 for math.
  * @private
- * @type {!goog.vec.Vec3.Type}
+ * @type {!goog.vec.Vec3.Float32}
  */
 blk.physics.Movement.tmpMat4_ = goog.vec.Mat4.createFloat32();
 

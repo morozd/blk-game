@@ -19,7 +19,6 @@ goog.provide('blk.env.server.ChunkProvider');
 goog.require('blk.env.Chunk');
 goog.require('blk.env.gen.ChunkBuilder');
 goog.require('gf.math.Random');
-goog.require('gf.net.PacketReader');
 goog.require('goog.Disposable');
 goog.require('goog.asserts');
 
@@ -37,13 +36,6 @@ goog.require('goog.asserts');
  */
 blk.env.server.ChunkProvider = function(map, generator, mapStore) {
   goog.base(this);
-
-  /**
-   * Map.
-   * @private
-   * @type {!blk.env.server.ServerMap}
-   */
-  this.map_ = map;
 
   /**
    * Map generator.
@@ -226,11 +218,3 @@ blk.env.server.ChunkProvider.prototype.processGenerationQueue_ = function() {
     this.processingQueueId_ = null;
   }
 };
-
-
-/**
- * Shared packet reader.
- * @private
- * @type {!gf.net.PacketReader}
- */
-blk.env.server.ChunkProvider.packetReader_ = new gf.net.PacketReader();

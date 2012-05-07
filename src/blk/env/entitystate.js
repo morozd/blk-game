@@ -30,9 +30,9 @@ goog.require('goog.vec.Vec4');
  * @param {number=} opt_entityId Entity ID.
  * @param {number=} opt_time Game time of the update, in seconds.
  * @param {number=} opt_flags Flags.
- * @param {goog.vec.Vec3.Type=} opt_position Position.
- * @param {goog.vec.Vec4.Type=} opt_rotation Rotation.
- * @param {goog.vec.Vec3.Type=} opt_velocity Position velocity.
+ * @param {goog.vec.Vec3.Float32=} opt_position Position.
+ * @param {goog.vec.Vec4.Float32=} opt_rotation Rotation.
+ * @param {goog.vec.Vec3.Float32=} opt_velocity Position velocity.
  */
 blk.env.EntityState = function(opt_entityId, opt_time, opt_flags, opt_position,
     opt_rotation, opt_velocity) {
@@ -56,20 +56,20 @@ blk.env.EntityState = function(opt_entityId, opt_time, opt_flags, opt_position,
 
   /**
    * Position in world coordinates.
-   * @type {!goog.vec.Vec3.Type}
+   * @type {!goog.vec.Vec3.Float32}
    */
   this.position = opt_position || goog.vec.Vec3.createFloat32();
 
   /**
    * Rotation.
-   * @type {!goog.vec.Quaternion.Type}
+   * @type {!goog.vec.Quaternion.Float32}
    */
-  this.rotation = /** @type {!goog.vec.Quaternion.Type} */ (
+  this.rotation = /** @type {!goog.vec.Quaternion.Float32} */ (
       opt_rotation || goog.vec.Quaternion.createFloat32());
 
   /**
    * Velocity along each axis.
-   * @type {!goog.vec.Vec3.Type}
+   * @type {!goog.vec.Vec3.Float32}
    */
   this.velocity = opt_velocity || goog.vec.Vec3.createFloat32();
 };

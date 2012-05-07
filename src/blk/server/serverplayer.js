@@ -166,7 +166,7 @@ blk.server.ServerPlayer.prototype.processSendQueue_ = function(frame) {
 /**
  * Shared vec3 for math.
  * @private
- * @type {!goog.vec.Vec3.Type}
+ * @type {!goog.vec.Vec3.Float32}
  */
 blk.server.ServerPlayer.tmpVec3_ = goog.vec.Vec3.createFloat32();
 

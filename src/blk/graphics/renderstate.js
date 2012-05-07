@@ -320,7 +320,7 @@ blk.graphics.RenderState.prototype.restore = function() {
 /**
  * Resets all render state, such at the beginning of a frame.
  * @param {!gf.vec.Viewport} viewport Viewport instance.
- * @param {!goog.vec.Vec4.Type} clearColor RGBA color.
+ * @param {!goog.vec.Vec4.Float32} clearColor RGBA color.
  * @param {boolean} clear True to clear the color buffer.
  */
 blk.graphics.RenderState.prototype.reset = function(
@@ -342,13 +342,13 @@ blk.graphics.RenderState.prototype.reset = function(
 
 /**
  * Sets the lighting/fog parameters for the scene.
- * @param {!goog.vec.Vec3.Type} ambientLightColor Ambient lighting color.
- * @param {!goog.vec.Vec3.Type} sunLightDirection Normalized sun lighting
+ * @param {!goog.vec.Vec3.Float32} ambientLightColor Ambient lighting color.
+ * @param {!goog.vec.Vec3.Float32} sunLightDirection Normalized sun lighting
  *     direction vector.
- * @param {!goog.vec.Vec3.Type} sunLightColor Sun lighting color.
+ * @param {!goog.vec.Vec3.Float32} sunLightColor Sun lighting color.
  * @param {number} fogNear Fog near z value.
  * @param {number} fogFar Fog far z value.
- * @param {!goog.vec.Vec3.Type} fogColor Fog color.
+ * @param {!goog.vec.Vec3.Float32} fogColor Fog color.
  */
 blk.graphics.RenderState.prototype.setLighting = function(
     ambientLightColor,

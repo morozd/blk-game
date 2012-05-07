@@ -382,7 +382,7 @@ blk.ui.Console.tmpMat4_ = goog.vec.Mat4.createFloat32();
 /**
  * Shadow color modulator.
  * @private
- * @type {!goog.vec.Vec4.Type}
+ * @type {!goog.vec.Vec4.Float32}
  */
 blk.ui.Console.shadowColor_ =
     goog.vec.Vec4.createFloat32FromValues(0.5, 0.5, 0.5, 1);

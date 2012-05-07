@@ -142,9 +142,9 @@ blk.graphics.LineBuffer.prototype.addSegmentFromValues =
 
 /**
  * Adds a line segment.
- * @param {!goog.vec.Vec3.Type} pt0 Point 0.
+ * @param {!goog.vec.Vec3.Float32} pt0 Point 0.
  * @param {number} color0 Color 0, 32-bit ABGR.
- * @param {!goog.vec.Vec3.Type} pt1 Point 1.
+ * @param {!goog.vec.Vec3.Float32} pt1 Point 1.
  * @param {number} color1 Color 1, 32-bit ABGR.
  */
 blk.graphics.LineBuffer.prototype.addSegment =
@@ -157,8 +157,8 @@ blk.graphics.LineBuffer.prototype.addSegment =
 
 /**
  * Adds lines outlining an axis-aligned cube.
- * @param {!goog.vec.Vec3.Type} min Minimum point.
- * @param {!goog.vec.Vec3.Type} max Maximum point.
+ * @param {!goog.vec.Vec3.Float32} min Minimum point.
+ * @param {!goog.vec.Vec3.Float32} max Maximum point.
  * @param {number} color Color, 32-bit ABGR.
  */
 blk.graphics.LineBuffer.prototype.addCube = function(min, max, color) {

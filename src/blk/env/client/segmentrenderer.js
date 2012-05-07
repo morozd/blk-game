@@ -71,7 +71,7 @@ blk.env.client.SegmentRenderer = function(viewManager, renderState, chunk, by) {
 
   /**
    * Chunk center point, in world coordinates.
-   * @type {!goog.vec.Vec3.Type}
+   * @type {!goog.vec.Vec3.Float32}
    */
   this.centerCoordinates = goog.vec.Vec3.createFloat32FromValues(
       chunk.x + blk.env.client.SegmentRenderer.SIZE / 2,
@@ -80,7 +80,7 @@ blk.env.client.SegmentRenderer = function(viewManager, renderState, chunk, by) {
 
   /**
    * Rough bounding sphere for the segment.
-   * @type {!goog.vec.Vec4.Type}
+   * @type {!goog.vec.Vec4.Float32}
    */
   this.boundingSphere = goog.vec.Vec4.createFloat32FromValues(
       this.centerCoordinates[0],
@@ -465,7 +465,7 @@ blk.env.client.SegmentRenderer.prototype.renderDebug =
 /**
  * Temp vec4 for math.
  * @private
- * @type {!goog.vec.Vec4.Type}
+ * @type {!goog.vec.Vec4.Float32}
  */
 blk.env.client.SegmentRenderer.tmpVec4_ = goog.vec.Vec4.createFloat32();
 

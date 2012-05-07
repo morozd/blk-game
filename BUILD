@@ -201,6 +201,11 @@ closure_js_lint(
     namespaces=['goog', 'gf', 'blk',],
     srcs=[':blk_js_fixstyle'])
 
+closure_js_lint(
+    name='all_js_lint',
+    namespaces=['goog', 'gf', 'blk',],
+    srcs=[':all_js_fixstyle'])
+
 BLK_JS_SRCS=[
     GF + ':all_gf_js',
     ':all_js',

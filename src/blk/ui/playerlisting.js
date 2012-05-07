@@ -179,7 +179,7 @@ blk.ui.PlayerListing.prototype.render = function(frame, viewport) {
 /**
  * Temp vec4 for math.
  * @private
- * @type {!goog.vec.Vec4.Type}
+ * @type {!goog.vec.Vec4.Float32}
  */
 blk.ui.PlayerListing.tmpVec4_ = goog.vec.Vec4.createFloat32();
 
@@ -195,7 +195,7 @@ blk.ui.PlayerListing.tmpMat4_ = goog.vec.Mat4.createFloat32();
 /**
  * Shadow color modulator.
  * @private
- * @type {!goog.vec.Vec4.Type}
+ * @type {!goog.vec.Vec4.Float32}
  */
 blk.ui.PlayerListing.shadowColor_ =
     goog.vec.Vec4.createFloat32FromValues(0.5, 0.5, 0.5, 1);

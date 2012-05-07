@@ -89,7 +89,7 @@ blk.env.ChunkView = function(map, chunkRadiusXZ) {
    * update frequently (every frame if moving) and is used to derive the
    * view offset.
    *
-   * @type {!goog.vec.Vec3.Type}
+   * @type {!goog.vec.Vec3.Float32}
    */
   this.center = goog.vec.Vec3.createFloat32();
 
@@ -202,7 +202,8 @@ blk.env.ChunkView.prototype.removeObserver = function(observer) {
  * Initializes the view at startup.
  * This must be called after observers are registered and before any other
  * methods are called.
- * @param {!goog.vec.Vec3.Type} viewPosition Eye position, in world coordinates.
+ * @param {!goog.vec.Vec3.Float32} viewPosition Eye position, in
+ *     world coordinates.
  */
 blk.env.ChunkView.prototype.initialize = function(viewPosition) {
   goog.asserts.assert(!this.hasInitialized_);
@@ -218,7 +219,8 @@ blk.env.ChunkView.prototype.initialize = function(viewPosition) {
 /**
  * Updates the view and its contents.
  * @param {!gf.UpdateFrame} frame Current update frame.
- * @param {!goog.vec.Vec3.Type} viewPosition Eye position, in world coordinates.
+ * @param {!goog.vec.Vec3.Float32} viewPosition Eye position, in
+ *     world coordinates.
  */
 blk.env.ChunkView.prototype.update = function(frame, viewPosition) {
   goog.asserts.assert(this.hasInitialized_);
@@ -804,7 +806,7 @@ blk.env.ChunkView.prototype.drawBlocks = function(x0, y0, z0, x1, y1, z1,
 /**
  * Temporary vec3s for math.
  * @private
- * @type {!Array.<!goog.vec.Vec3.Type>}
+ * @type {!Array.<!goog.vec.Vec3.Float32>}
  */
 blk.env.ChunkView.tmpVec3_ = [
   goog.vec.Vec3.createFloat32(),

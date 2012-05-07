@@ -982,6 +982,6 @@ blk.client.ClientGame.tmpMat4_ = goog.vec.Mat4.createFloat32();
 /**
  * Temp vec4 for math.
  * @private
- * @type {!goog.vec.Vec4.Type}
+ * @type {!goog.vec.Vec4.Float32}
  */
 blk.client.ClientGame.tmpVec4_ = goog.vec.Vec4.createFloat32();

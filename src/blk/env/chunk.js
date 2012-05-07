@@ -478,7 +478,7 @@ blk.env.Chunk.prototype.intersectBlock = function(ray) {
 /**
  * Sorts a list of chunks by distance from the given point.
  * @param {!Array.<!blk.env.Chunk>} list Chunk list.
- * @param {!goog.vec.Vec3.Type} point Point.
+ * @param {!goog.vec.Vec3.Float32} point Point.
  */
 blk.env.Chunk.sortByDistanceFromPoint = function(list, point) {
   var chunkCenter = blk.env.Chunk.tmpVec3_[0];
@@ -507,7 +507,7 @@ blk.env.Chunk.sortByDistanceFromPoint = function(list, point) {
 /**
  * Temp vec3s for math.
  * @private
- * @type {!Array.<!goog.vec.Vec3.Type>}
+ * @type {!Array.<!goog.vec.Vec3.Float32>}
  */
 blk.env.Chunk.tmpVec3_ = [
   goog.vec.Vec3.createFloat32(),

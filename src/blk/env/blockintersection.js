@@ -16,6 +16,8 @@
 
 goog.provide('blk.env.BlockIntersection');
 
+goog.require('goog.asserts');
+
 
 
 /**
@@ -28,7 +30,7 @@ goog.provide('blk.env.BlockIntersection');
  * @param {number} blockZ Block Z.
  * @param {number} blockData Block data.
  * @param {number} distance Distance from ray origin to block.
- * @param {!goog.vec.Vec3.Type} point Point on block ray intersected.
+ * @param {!goog.vec.Vec3.Float32} point Point on block ray intersected.
  *     Not cloned.
  */
 blk.env.BlockIntersection = function(
@@ -69,9 +71,11 @@ blk.env.BlockIntersection = function(
    */
   this.distance = distance;
 
+  goog.asserts.assert(point);
+
   /**
    * Point, in world space, the ray intersected the block.
-   * @type {!goog.vec.Vec3.Type}
+   * @type {!goog.vec.Vec3.Float32}
    */
   this.point = point;
 };

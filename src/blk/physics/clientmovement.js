@@ -527,6 +527,6 @@ blk.physics.ClientMovement.prototype.predictMovement = function(frame) {
 /**
  * Temporary vec3 for math.
  * @private
- * @type {!goog.vec.Vec3.Type}
+ * @type {!goog.vec.Vec3.Float32}
  */
 blk.physics.ClientMovement.tmpVec3_ = goog.vec.Vec3.createFloat32();

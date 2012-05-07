@@ -79,7 +79,7 @@ blk.physics.MoveCommand = function() {
 
   /**
    * Viewport rotation quaternion at the time the command was generated.
-   * @type {!goog.vec.Vec4.Type}
+   * @type {!goog.vec.Vec4.Float32}
    */
   this.viewRotation = goog.vec.Vec4.createFloat32();
 
