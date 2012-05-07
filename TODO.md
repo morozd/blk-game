@@ -1,9 +1,3 @@
-ASAP
-================================================================================
-
-* prime sound system on start
-    * generated empty buffer/playback node?
-
 Before Release
 ================================================================================
 
@@ -58,6 +52,10 @@ M5: Performance Tuning
         * concurrent writes
             * on HTML use a queue (chained deferreds)
         * optimized reader resets (just update extents)
+
+* prime sound system on start
+    * may not matter anymore?
+    * generated empty buffer/playback node?
 
 M6: Physics
 ================================================================================

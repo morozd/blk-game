@@ -54,11 +54,13 @@ blk.server.start = function(uri, options) {
     endpoint = /** @type {gf.net.Endpoint} */ (goog.global);
   }
 
-  var launchOptions = new blk.server.LaunchOptions(uri, options['mapPath']);
+  var launchOptions = new blk.server.LaunchOptions(uri,
+      options['mapPath'], Number(options['userCount']));
 
   // TODO(benvanik): authtoken/serverinfo
   var authToken = new gf.net.AuthToken();
   var serverInfo = new gf.net.ServerInfo();
+  serverInfo.maximumUsers = launchOptions.userCount;
 
   var listenDeferred = gf.net.listen(
       endpoint,

@@ -27,8 +27,9 @@ goog.require('gf.LaunchOptions');
  * @extends {gf.LaunchOptions}
  * @param {string} uri Source app URI string.
  * @param {string} mapPath Map path.
+ * @param {number} userCount Maximum number of simultaneous users.
  */
-blk.server.LaunchOptions = function(uri, mapPath) {
+blk.server.LaunchOptions = function(uri, mapPath, userCount) {
   goog.base(this, uri);
 
   /**
@@ -36,5 +37,20 @@ blk.server.LaunchOptions = function(uri, mapPath) {
    * @type {string}
    */
   this.mapPath = mapPath || '/maps/map01/';
+
+  /**
+   * Maximum simultaneous user count.
+   * @type {number}
+   */
+  this.userCount = userCount || blk.server.LaunchOptions.DEFAULT_USER_COUNT_;
 };
 goog.inherits(blk.server.LaunchOptions, gf.LaunchOptions);
+
+
+/**
+ * Default number of users allowed to connect.
+ * @private
+ * @const
+ * @type {number}
+ */
+blk.server.LaunchOptions.DEFAULT_USER_COUNT_ = 8;

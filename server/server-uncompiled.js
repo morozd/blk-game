@@ -30,7 +30,9 @@ var opts = nopt({
   // Filesystem root path
   'filesystem': [String, '/tmp/blk/'],
   // Map path in the file system
-  'map': [String, 'maps/map_dev/']
+  'map': [String, 'maps/map_dev/'],
+  // Maximum users that can connect
+  'users': [Number, 8]
 }, {
   'p': '--port',
   'f': '--filesystem',
@@ -55,6 +57,7 @@ var port = opts['port'] || 1337;
 var infoPort = opts['info_port'] || null;
 var fileSystemPath = opts['filesystem'] || '/tmp/blk/';
 var mapPath = opts['map'] || 'maps/map_dev/';
+var userCount = opts['users'] || 8;
 
 // TODO(benvanik): some sensible URI from command line args
 var uri = 'http://127.0.0.1:' + port + '/node/';
@@ -63,6 +66,7 @@ var uri = 'http://127.0.0.1:' + port + '/node/';
 blk.server.start(uri, {
   port: port,
   mapPath: mapPath,
+  userCount: userCount,
   persistentRoot: path.join(fileSystemPath, 'persistent/'),
   temporaryRoot: path.join(fileSystemPath, 'temporary/')
 }).addCallbacks(function(game) {

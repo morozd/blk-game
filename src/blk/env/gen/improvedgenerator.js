@@ -16,6 +16,8 @@
 
 goog.provide('blk.env.gen.ImprovedGenerator');
 
+goog.require('blk.env.Chunk');
+goog.require('blk.env.blocks.BlockID');
 goog.require('blk.env.gen.Generator');
 goog.require('gf.math.Random');
 goog.require('gf.math.SimplexNoise');
