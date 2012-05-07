@@ -101,3 +101,29 @@ blk.env.gen.ChunkBuilder.prototype.setBlock = function(x, y, z, value) {
   var bo = bx + bz * blk.env.Chunk.STRIDE_Z + by * blk.env.Chunk.STRIDE_Y;
   this.blockData[bo] = value;
 };
+
+
+/**
+ * Sets the full 2-byte block data value for a partial column of blocks.
+ * @param {number} x Block X, in world coordinates.
+ * @param {number} y0 Starting block Y, in world coordinates.
+ * @param {number} y1 Ending block Y, in world coordinates.
+ * @param {number} z Block Z, in world coordinates.
+ * @param {number} value Raw 2-byte block data.
+ */
+blk.env.gen.ChunkBuilder.prototype.setBlockColumn =
+    function(x, y0, y1, z, value) {
+  var bx = x & blk.env.Chunk.MASK_XZ;
+  var by0 = y0 & blk.env.Chunk.MASK_Y;
+  var by1 = y1 & blk.env.Chunk.MASK_Y;
+  var bz = z & blk.env.Chunk.MASK_XZ;
+  if (by0 > by1) {
+    var t = by0;
+    by0 = by1;
+    by1 = t;
+  }
+  var bo = bx + bz * blk.env.Chunk.STRIDE_Z + by0 * blk.env.Chunk.STRIDE_Y;
+  for (var y = by0; y <= by1; y++, bo += blk.env.Chunk.STRIDE_Y) {
+    this.blockData[bo] = value;
+  }
+};

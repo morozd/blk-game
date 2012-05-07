@@ -61,26 +61,25 @@ blk.env.gen.ImprovedGenerator.prototype.fillChunk =
     function(random, chunkX, chunkY, chunkZ, chunkBuilder) {
   var noise = this.noise_;
 
-  // var py = blk.env.gen.ImprovedGenerator.PLANE_Y_;
-  // var minx = chunkX;
-  // var maxx = chunkX + blk.env.Chunk.SIZE_XZ;
-  // var minz = chunkZ;
-  // var maxz = chunkZ + blk.env.Chunk.SIZE_XZ;
-  // var dirtBlock = blk.env.blocks.BlockID.DIRT << 8;
+  var scalar = blk.env.Chunk.SIZE_Y / 5;
+  var dirtBlock = blk.env.blocks.BlockID.DIRT << 8;
+  var grassBlock = (blk.env.blocks.BlockID.DIRT << 8) | 1;
 
-  // for (var ix = minx; ix < maxx; ix++) {
-  //   for (var iz = minz; iz < maxz; iz++) {
-  //     var v = noise.sampleTileable(ix + 1000, iz + 1000,
-  //         blk.env.Chunk.SIZE_XZ);
-  //     var ty = Math.max(0, Math.min(15, (v / 1000) | 0));
-  //     for (var iy = 0; iy <= py + ty; iy++) {
-  //       var blockData = dirtBlock;
-  //       if (iy >= py + ty) {
-  //         // Add grass
-  //         blockData |= 1;
-  //       }
-  //       chunkBuilder.setBlock(ix, iy, iz, blockData);
-  //     }
-  //   }
-  // }
+  for (var ix = 0; ix < blk.env.Chunk.SIZE_XZ; ix++) {
+    var bx = chunkX + ix;
+    for (var iz = 0; iz < blk.env.Chunk.SIZE_XZ; iz++) {
+      var bz = chunkZ + iz;
+
+      var n = noise.sample(bx * 0.001, bz * 0.001) * 0.5;
+      n += noise.sample((bx + 100) * 0.002, bz * 0.002) * 0.25;
+      n += noise.sample((bx + 100) * 0.01, bz * 0.01) * 0.25;
+      var top = (n * scalar + blk.env.gen.ImprovedGenerator.PLANE_Y_) | 0;
+      if (top < 1) {
+        top = 1;
+      }
+
+      chunkBuilder.setBlock(ix, top, iz, grassBlock);
+      chunkBuilder.setBlockColumn(ix, 0, top - 1, iz, dirtBlock);
+    }
+  }
 };
