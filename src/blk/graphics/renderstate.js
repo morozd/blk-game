@@ -16,7 +16,7 @@
 
 goog.provide('blk.graphics.RenderState');
 
-goog.require('blk.assets.blocksets.test');
+goog.require('blk.assets.blocksets.simple');
 goog.require('blk.assets.fonts.MonospaceFont');
 goog.require('blk.assets.programs.FaceProgram');
 goog.require('blk.assets.programs.LineProgram');
@@ -67,7 +67,7 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
    * Block texture atlas.
    * @type {!gf.graphics.Texture}
    */
-  this.blockAtlas = blk.assets.blocksets.test.create(
+  this.blockAtlas = blk.assets.blocksets.simple.create(
       assetManager, graphicsContext);
   this.registerDisposable(this.blockAtlas);
   this.blockAtlas.setFilteringMode(goog.webgl.NEAREST, goog.webgl.NEAREST);

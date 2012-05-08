@@ -1,10 +1,7 @@
 Before Release
 ================================================================================
 
-* new block textures
 * new sounds
-* new font
-    * http://www.dafont.com/volter-goldfish.font
 
 M3: Infinite Maps
 ================================================================================
@@ -29,10 +26,6 @@ M4: UI
 
 * better error propagation
     * error types?
-
-* client dialogs
-    * connecting...
-    * disconnected
 
 M5: Performance Tuning
 ================================================================================

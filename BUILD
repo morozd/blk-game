@@ -120,7 +120,7 @@ file_set(
 texture_set(
     name='blk_blocksets',
     namespace='blk.assets.blocksets',
-    srcs=glob('assets/blocksets/**/*.png'),
+    srcs=glob('assets/blocksets/*.png'),
     slot_size='16x16')
 file_set(
     name='blk_blockset_images',
