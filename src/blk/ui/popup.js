@@ -20,6 +20,7 @@ goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.async.Deferred');
 goog.require('goog.dom');
+goog.require('goog.dom.TagName');
 goog.require('goog.dom.classes');
 goog.require('goog.events.EventHandler');
 goog.require('goog.events.EventType');
@@ -39,7 +40,7 @@ goog.require('goog.soy');
  * @param {goog.dom.DomHelper=} opt_domHelper The DOM helper used to
  *     create DOM nodes; defaults to {@code goog.dom.getDomHelper}.
  */
-blk.ui.Popup = function(template, data, opt_domHelper) {
+blk.ui.Popup = function(template, opt_templateData, opt_domHelper) {
   goog.base(this);
 
   /**
@@ -56,19 +57,26 @@ blk.ui.Popup = function(template, data, opt_domHelper) {
   this.registerDisposable(this.eh_);
 
   /**
+   * @private
+   * @type {!Element}
+   */
+  this.inputMask_ = this.dom_.createElement(goog.dom.TagName.DIV);
+  goog.dom.classes.set(this.inputMask_, goog.getCssName('blkInputMask'));
+
+  /**
    * Root rendered document fragment.
    * @private
-   * @type {Node}
+   * @type {Element}
    */
-  this.root_ = goog.soy.renderAsFragment(
-      template, data, undefined, this.dom_);
+  this.root_ = /** @type {Element} */ (goog.soy.renderAsFragment(
+      template, opt_templateData, undefined, this.dom_));
 
   /**
    * A deferred fulfilled when the dialog has closed.
    * Succesful callbacks receive the button ID as their only argument.
    * @type {!goog.async.Deferred}
    */
-  this.deferred = new goog.async.Deferred();
+  this.deferred = new goog.async.Deferred(this.canceller_, this);
 
   this.enterDocument_();
 };
@@ -85,11 +93,21 @@ blk.ui.Popup.prototype.disposeInternal = function() {
 
 
 /**
+ * Handles deferred cancellation requests.
+ * @private
+ */
+blk.ui.Popup.prototype.canceller_ = function() {
+  goog.dispose(this);
+};
+
+
+/**
  * Adds the popup to the DOM.
  * @private
  */
 blk.ui.Popup.prototype.enterDocument_ = function() {
   var body = this.dom_.getDocument().body;
+  this.dom_.appendChild(body, this.inputMask_);
   this.dom_.appendChild(body, this.root_);
 
   var buttonEls = this.dom_.getElementsByClass(
@@ -124,6 +142,7 @@ blk.ui.Popup.prototype.enterDocument_ = function() {
 blk.ui.Popup.prototype.exitDocument_ = function() {
   this.eh_.removeAll();
   this.dom_.removeNode(this.root_);
+  this.dom_.removeNode(this.inputMask_);
   this.root_ = null;
 };
 
@@ -140,7 +159,7 @@ blk.ui.Popup.prototype.exitDocument_ = function() {
  *     closed. If the dialog is cancelled the deferred fails, otherwise success
  *     is called with a value of the button pressed.
  */
-blk.ui.Popup.show = function(template, data, opt_domHelper) {
-  var popup = new blk.ui.Popup(template, data, opt_domHelper);
+blk.ui.Popup.show = function(template, opt_templateData, opt_domHelper) {
+  var popup = new blk.ui.Popup(template, opt_templateData, opt_domHelper);
   return popup.deferred;
 };

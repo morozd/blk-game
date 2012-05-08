@@ -45,7 +45,9 @@
  */
 {template .alertFooter_ private="true"}
   <div class="{css blkAlertFooter}">
-    {$buttons|noAutoescape}
+    {if $buttons}
+      {$buttons|noAutoescape}
+    {/if}
   </div>
 {/template}
 
@@ -115,6 +117,26 @@
     {call .alertBody_ data="all" /}
     {call .alertFooter_ data="all" /}
   </div>
+{/template}
+
+
+/**
+ * A 'connecting...' dialog to use when initially connecting.
+ * @param server_name Server host name the user is connecting to.
+ */
+{template .connecting}
+  {call .simpleAlert_ data="all"}
+    {param header}
+      {msg desc="User is connecting to the server."}
+        Connecting...
+      {/msg}
+    {/param}
+    {param body}
+      {msg desc="Attempting to connect to the given remote server."}
+        Trying to connect to {$server_name}
+      {/msg}
+    {/param}
+  {/call}
 {/template}
 
 

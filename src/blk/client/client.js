@@ -55,6 +55,7 @@ blk.client.ENABLE_SHARED_WORKERS_ = false;
  */
 blk.client.start = function(uri, sourceMode, doc, options) {
   goog.asserts.assert(!gf.SERVER);
+  var dom = new goog.dom.DomHelper(doc);
 
   var launchOptions = new blk.client.LaunchOptions(uri);
 
@@ -72,6 +73,11 @@ blk.client.start = function(uri, sourceMode, doc, options) {
   if (!userInfo.displayName.length) {
     userInfo.displayName = 'User';
   }
+
+  // Show connecting dialog
+  var connectDialog = blk.ui.Popup.show(blk.ui.alerts.connecting, {
+    server_name: launchOptions.host
+  }, dom);
 
   var deferred = null;
   switch (goog.uri.utils.getScheme(launchOptions.host)) {
@@ -118,8 +124,9 @@ blk.client.start = function(uri, sourceMode, doc, options) {
   goog.asserts.assert(deferred);
 
   // Wait for the connection...
-  var dom = new goog.dom.DomHelper(doc);
   deferred.addCallbacks(function(session) {
+    connectDialog.cancel();
+
     // Create game
     var game = new blk.client.ClientGame(launchOptions, dom, session);
 
@@ -128,6 +135,8 @@ blk.client.start = function(uri, sourceMode, doc, options) {
       goog.global['blk_client'] = game;
     }
   }, function(arg) {
+    connectDialog.cancel();
+
     gf.log.write('error:', arg);
 
     var d = blk.ui.Popup.show(blk.ui.alerts.connectionFailed, {
