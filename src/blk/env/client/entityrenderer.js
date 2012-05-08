@@ -94,6 +94,7 @@ blk.env.client.EntityRenderer = function(renderState, entity) {
   entity.renderData = this;
 
   this.restore();
+  this.spriteBuffer_.restore();
 };
 goog.inherits(blk.env.client.EntityRenderer, blk.env.client.BaseRenderer);
 
