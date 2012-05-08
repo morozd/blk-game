@@ -15,5 +15,5 @@ audio_soundbank(
 audio_soundbank(
     name='bank1_optimized',
     class_name='blk.assets.audio.Bank1',
-    formats=['audio/wav', 'audio/ogg', 'audio/mpeg', 'audio/mp4',],
+    formats=['audio/wav', 'audio/ogg', 'audio/mpeg',],
     srcs=glob('*.wav'))

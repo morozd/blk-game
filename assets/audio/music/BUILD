@@ -15,5 +15,5 @@ audio_tracklist(
 audio_tracklist(
     name='music_optimized',
     class_name='blk.assets.audio.Music',
-    formats=['audio/ogg', 'audio/mpeg', 'audio/mp4',],
+    formats=['audio/ogg', 'audio/mpeg',],
     srcs=glob('*.ogg'))
