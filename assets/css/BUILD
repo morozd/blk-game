@@ -9,4 +9,6 @@ file_set(
     srcs=[
         'common.gss',
         'font-monospace.gss',
+        'alert-assets.gss',
+        'alerts.gss',
         ])

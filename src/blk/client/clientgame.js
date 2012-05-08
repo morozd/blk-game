@@ -32,6 +32,8 @@ goog.require('blk.net.packets.SetBlock');
 goog.require('blk.physics.ClientMovement');
 goog.require('blk.ui.Console');
 goog.require('blk.ui.PlayerListing');
+goog.require('blk.ui.Popup');
+goog.require('blk.ui.alerts');
 goog.require('gf.Game');
 goog.require('gf.assets.AssetManager');
 goog.require('gf.audio.AudioManager');
@@ -401,6 +403,18 @@ blk.client.ClientGame.prototype.update = function(frame) {
 
     this.sounds.playAmbient('player_leave');
     this.stopTicking();
+
+    var d = blk.ui.Popup.show(blk.ui.alerts.disconnected, {
+      reason: this.session.disconnectReason
+    }, this.dom);
+    d.addCallback(
+        function(buttonId) {
+          if (buttonId == 'reload') {
+            window.location.reload(false);
+          } else {
+            window.location.href = 'http://google.com';
+          }
+        });
   }
 
   // Update UI bits
@@ -585,6 +599,10 @@ blk.client.ClientGame.prototype.updateEntityPosition = function(
  * @override
  */
 blk.client.ClientGame.prototype.render = function(frame) {
+  if (this.session.state == gf.net.SessionState.DISCONNECTED) {
+    return;
+  }
+
   var graphicsContext = this.graphicsContext;
   var renderState = this.renderState;
   var map = this.state.map;

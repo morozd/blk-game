@@ -1,0 +1,235 @@
+/**
+ * Copyright 2012 Google, Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+{namespace blk.ui.alerts}
+
+
+/**
+ * Header.
+ * @param header Header value.
+ */
+{template .alertHeader_ private="true"}
+  <div class="{css blkAlertHeader}">
+    {$header}
+  </div>
+{/template}
+
+
+/**
+ * Body.
+ * @param body Body value.
+ */
+{template .alertBody_ private="true"}
+  <div class="{css blkAlertBody}">
+    {$body|noAutoescape}
+  </div>
+{/template}
+
+
+/**
+ * Footer bar.
+ * @param buttons Buttons.
+ */
+{template .alertFooter_ private="true"}
+  <div class="{css blkAlertFooter}">
+    {$buttons|noAutoescape}
+  </div>
+{/template}
+
+
+/**
+ * A dialog button.
+ * @param id Data ID used to identify the button.
+ * @param label Label text displayed in the button.
+ * @param focusDefault True if the button is default.
+ */
+{template .alertButton_ private="true"}
+  <div class="{css blkAlertButton}
+    {if $focusDefault}
+      {sp}{css blkAlertButtonDefault}
+    {/if}
+    " data-id="{$id}">
+    <a class="{css blkAlertButtonLabel}">{$label}</a>
+  </div>
+{/template}
+
+
+/**
+ * 'Close' button.
+ * @param focusDefault True if the button is default.
+ */
+{template .alertButtonClose_ private="true"}
+  {call .alertButton_ data="all"}
+    {param id}
+      close
+    {/param}
+    {param label}
+      {msg desc="Close the browser tab"}
+        Close
+      {/msg}
+    {/param}
+  {/call}
+{/template}
+
+
+/**
+ * 'Reload' button.
+ * @param focusDefault True if the button is default.
+ */
+{template .alertButtonReload_ private="true"}
+  {call .alertButton_ data="all"}
+    {param id}
+      reload
+    {/param}
+    {param label}
+      {msg desc="Reloads the browser tab"}
+        Reload
+      {/msg}
+    {/param}
+  {/call}
+{/template}
+
+
+/**
+ * A simple dialog.
+ * @param header Header contents.
+ * @param body Body contents.
+ * @param buttons Footer button bar contents.
+ */
+{template .simpleAlert_ private="true"}
+  <div class="{css blkAlert}">
+    {call .alertHeader_ data="all" /}
+    {call .alertBody_ data="all" /}
+    {call .alertFooter_ data="all" /}
+  </div>
+{/template}
+
+
+/**
+ * A 'connection failed' dialog to use when initially connecting.
+ * @param reason Reason code from gf.net.DisconnectReason.
+ */
+{template .connectionFailed}
+  {call .simpleAlert_ data="all"}
+    {param header}
+      {msg desc="The user could not connect to the server."}
+        Connection Failed
+      {/msg}
+    {/param}
+    {param body}
+      {switch $reason}
+        {case 2}
+          {msg desc="The client or server is too old."}
+            Version mismatch - reload and try again.
+          {/msg}
+        {case 3}
+          {msg desc="Invalid data was detected on the network."}
+            Invalid/broken packet.
+          {/msg}
+        {case 4}
+          {msg desc="User does not have access to the server."}
+            Access denied.
+          {/msg}
+        {case 6}
+          {msg desc="User has been banned by an administrator."}
+            Banned by an administrator! Go away!
+          {/msg}
+        {case 7}
+          {msg desc="Server is over capacity and the user cannot join yet."}
+            Server is full. Try again later.
+          {/msg}
+        {default}
+          {msg desc="User's network has gone down or is too slow."}
+            Unable to contact the server or a timeout occurred while connecting.
+            Check your network settings and try again, or contact the server
+            admin.
+          {/msg}
+      {/switch}
+    {/param}
+    {param buttons}
+      {call .alertButtonReload_}
+        {param focusDefault: true /}
+      {/call}
+      {call .alertButtonClose_ /}
+    {/param}
+  {/call}
+{/template}
+
+
+/**
+ * A user disconnection dialog to display when the user loses connection to the
+ * server.
+ * @param reason Reason code from gf.net.DisconnectReason.
+ */
+{template .disconnected}
+  {call .simpleAlert_ data="all"}
+    {param header}
+      {msg desc="The user's connection to the server was lost."}
+        Connection Lost
+      {/msg}
+    {/param}
+    {param body}
+      {switch $reason}
+        {case 1}
+          {msg desc="User's network has gone down or is too slow."}
+            Timeout while communicating with the server. Check your connection
+            and try again.
+          {/msg}
+        {case 2}
+          {msg desc="The client or server is too old."}
+            Version mismatch - reload and try again.
+          {/msg}
+        {case 3}
+          {msg desc="Invalid data was detected on the network."}
+            Invalid/broken packet.
+          {/msg}
+        {case 4}
+          {msg desc="User does not have access to the server."}
+            Access denied.
+          {/msg}
+        {case 5}
+          {msg desc="User has been kicked by an administrator."}
+            Kicked by an administrator!
+          {/msg}
+        {case 6}
+          {msg desc="User has been banned by an administrator."}
+            Banned by an administrator!
+          {/msg}
+        {case 7}
+          {msg desc="Server is over capacity and the user cannot join yet."}
+            Server is full. Try again later.
+          {/msg}
+        {default}
+          {msg desc="Something bad happened, but not sure what."}
+            Whoops.
+          {/msg}
+      {/switch}
+    {/param}
+    {param buttons}
+      {switch $reason}
+        {case 4, 5, 6}
+          {call .alertButtonClose_}
+            {param focusDefault: true /}
+          {/call}
+        {default}
+          {call .alertButtonReload_}
+            {param focusDefault: true /}
+          {/call}
+          {call .alertButtonClose_ /}
+      {/switch}
+    {/param}
+  {/call}
+{/template}

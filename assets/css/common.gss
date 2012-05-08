@@ -21,3 +21,26 @@
  *
  * @author benvanik@google.com (Ben Vanik)
  */
+
+@defmixin noSelect() {
+  /* @alternate */ -moz-user-select: none;
+  /* @alternate */ -ms-user-select: none;
+  /* @alternate */ -webkit-user-select: none;
+}
+
+@defmixin bitDropShadow() {
+  box-shadow: 0 0 5px #888;
+  /* @alternate */ -moz-box-shadow: 0 0 5px #888;
+  /* @alternate */ -webkit-box-shadow: 0 0 5px #888;
+}
+
+@defmixin bitFont() {
+  font-family: monospace-8bit;
+  font-size: 16px;
+  color: white;
+  text-shadow: #888 1px 1px;
+}
+
+body {
+  background-color: #EEE;
+}

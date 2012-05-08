@@ -19,6 +19,8 @@ goog.provide('blk.client.start');
 goog.require('blk.client.ClientGame');
 goog.require('blk.client.LaunchOptions');
 goog.require('blk.net.packets');
+goog.require('blk.ui.Popup');
+goog.require('blk.ui.alerts');
 goog.require('gf');
 goog.require('gf.io');
 goog.require('gf.io.FileSystemType');
@@ -116,9 +118,9 @@ blk.client.start = function(uri, sourceMode, doc, options) {
   goog.asserts.assert(deferred);
 
   // Wait for the connection...
+  var dom = new goog.dom.DomHelper(doc);
   deferred.addCallbacks(function(session) {
     // Create game
-    var dom = new goog.dom.DomHelper(doc);
     var game = new blk.client.ClientGame(launchOptions, dom, session);
 
     // HACK: debug root - useful for inspecting the game state
@@ -127,6 +129,18 @@ blk.client.start = function(uri, sourceMode, doc, options) {
     }
   }, function(arg) {
     gf.log.write('error:', arg);
+
+    var d = blk.ui.Popup.show(blk.ui.alerts.connectionFailed, {
+      reason: arg
+    }, dom);
+    d.addCallback(
+        function(buttonId) {
+          if (buttonId == 'reload') {
+            window.location.reload(false);
+          } else {
+            window.location.href = 'http://google.com';
+          }
+        });
   });
 };
 

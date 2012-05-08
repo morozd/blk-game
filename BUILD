@@ -6,6 +6,7 @@ __author__ = 'benvanik@google.com (Ben Vanik)'
 
 GF = 'third_party/games-framework'
 GSS_COMPILER_JAR=GF + ':closure_stylesheets_jar'
+SOY_COMPILER_JAR=GF + ':closure_templates_jar'
 JS_COMPILER_JAR=GF + ':closure_compiler_jar'
 GLSL_COMPILER_JS=GF + ':glsl_compiler_js'
 include_rules(glob(GF + '/anvil_rules/**/*_rules.py'))
@@ -30,6 +31,16 @@ file_set(
     name='blk_css_compiled_only',
     srcs=':blk_css_compiled',
     src_filter='*.css')
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Soy Templates
+# ----------------------------------------------------------------------------------------------------------------------
+
+closure_soy_library(
+    name='blk_soy_js',
+    srcs=glob('src/**/*.soy'),
+    compiler_jar=SOY_COMPILER_JAR)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -214,6 +225,7 @@ BLK_JS_SRCS=[
 
 BLK_CLIENT_JS_SRCS=BLK_JS_SRCS + [
     ':blk_css_compiled',
+    ':blk_soy_js',
     ':blk_glsl',
     ':blk_blocksets',
     ':blk_textures',
