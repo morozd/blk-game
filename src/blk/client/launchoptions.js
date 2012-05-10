@@ -39,9 +39,9 @@ blk.client.LaunchOptions = function(uri) {
 
   /**
    * User name for multiplayer.
-   * @type {string}
+   * @type {string?}
    */
-  this.userName = this.getString('userName', null) || 'User';
+  this.userName = this.getString('userName', null) || null;
 
   /**
    * Host endpoint for connections.

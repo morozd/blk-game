@@ -18,6 +18,7 @@ goog.provide('blk.client.start');
 
 goog.require('blk.client.ClientGame');
 goog.require('blk.client.LaunchOptions');
+goog.require('blk.client.UserSettings');
 goog.require('blk.net.packets');
 goog.require('blk.ui.Popup');
 goog.require('blk.ui.alerts');
@@ -58,6 +59,8 @@ blk.client.start = function(uri, sourceMode, doc, options) {
   var dom = new goog.dom.DomHelper(doc);
 
   var launchOptions = new blk.client.LaunchOptions(uri);
+  var settings = new blk.client.UserSettings(dom);
+  settings.load();
 
   //launchOptions.host = 'ws://127.0.0.1:1337';
   //launchOptions.host = 'local://blk-0';
@@ -67,9 +70,18 @@ blk.client.start = function(uri, sourceMode, doc, options) {
   // TODO(benvanik): setup userinfo/authtoken
 
   // Pull or query user info
+  if (launchOptions.userName) {
+    // Override settings (and save back)
+    var userName = goog.string.normalizeSpaces(goog.string.normalizeWhitespace(
+        goog.string.trim(launchOptions.userName)));
+    if (userName.length) {
+      settings.userName = userName;
+      settings.save();
+    }
+  }
   userInfo.displayName =
       goog.string.normalizeSpaces(goog.string.normalizeWhitespace(
-          goog.string.trim(launchOptions.userName)));
+          goog.string.trim(settings.userName)));
   if (!userInfo.displayName.length) {
     userInfo.displayName = 'User';
   }
@@ -128,7 +140,7 @@ blk.client.start = function(uri, sourceMode, doc, options) {
     connectDialog.cancel();
 
     // Create game
-    var game = new blk.client.ClientGame(launchOptions, dom, session);
+    var game = new blk.client.ClientGame(launchOptions, settings, dom, session);
 
     // HACK: debug root - useful for inspecting the game state
     if (goog.DEBUG) {

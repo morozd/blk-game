@@ -18,6 +18,7 @@ goog.provide('blk.ui.Settings');
 
 goog.require('blk.ui.Popup');
 goog.require('blk.ui.alerts');
+goog.require('goog.asserts');
 
 
 
@@ -55,6 +56,14 @@ goog.inherits(blk.ui.Settings, blk.ui.Popup);
  */
 blk.ui.Settings.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
+
+  var settings = this.game_.settings;
+
+  var userNameInput = /** @type {HTMLInputElement} */ (
+      this.dom.getElementByClass(
+          goog.getCssName('blkSettingsNameValue'), this.root));
+  goog.asserts.assert(userNameInput);
+  userNameInput.value = settings.userName;
 
   // var buttonEls = this.dom_.getElementsByClass(
   //     goog.getCssName('blkAlertButton'), this.root_);

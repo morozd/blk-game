@@ -64,10 +64,11 @@ goog.require('goog.vec.Vec4');
  * @constructor
  * @extends {gf.Game}
  * @param {!blk.client.LaunchOptions} launchOptions Launch options.
+ * @param {!blk.client.UserSettings} settings User settings.
  * @param {!goog.dom.DomHelper} dom DOM helper.
  * @param {!gf.net.ClientSession} session Client session.
  */
-blk.client.ClientGame = function(launchOptions, dom, session) {
+blk.client.ClientGame = function(launchOptions, settings, dom, session) {
   goog.base(this, launchOptions, session.clock);
 
   /**
@@ -75,6 +76,12 @@ blk.client.ClientGame = function(launchOptions, dom, session) {
    * @type {!goog.dom.DomHelper}
    */
   this.dom = dom;
+
+  /**
+   * User settings.
+   * @type {!blk.client.UserSettings}
+   */
+  this.settings = settings;
 
   /**
    * Client session.
@@ -196,6 +203,7 @@ blk.client.ClientGame = function(launchOptions, dom, session) {
       this.display.getInputElement());
   this.registerDisposable(this.input);
   this.addComponent(this.input);
+  this.input.mouse.setSensitivity(this.settings.mouseSensitivity);
   this.input.keyboard.setFullScreenHandler(goog.bind(function() {
     var goingFullScreen = !this.display.isFullScreen;
     this.display.toggleFullScreen();
@@ -217,6 +225,7 @@ blk.client.ClientGame = function(launchOptions, dom, session) {
   this.audio = new gf.audio.AudioManager(this, this.dom);
   this.registerDisposable(this.audio);
   this.addComponent(this.audio);
+  this.audio.setMuted(this.settings.audioMuted);
 
   /**
    * Sound bank for game sounds.
@@ -804,6 +813,10 @@ blk.client.ClientGame.prototype.handleInput_ = function(frame) {
     var d = blk.ui.Settings.show(this, this.dom, this.display.mainFrame);
     d.addCallback(
         function(buttonId) {
+          // user name
+          // view distance
+          this.input.mouse.setSensitivity(this.settings.mouseSensitivity);
+          this.audio.setMuted(this.settings.audioMuted);
           this.input.setEnabled(true);
         }, this);
   }
