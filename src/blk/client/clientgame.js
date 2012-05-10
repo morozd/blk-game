@@ -755,10 +755,32 @@ blk.client.ClientGame.prototype.drawBlockTypes_ = function(frame) {
       2, 0, 0, 0,
       0, 2, 0, 0,
       0, 0, 1, 0,
-      viewport.width / 2 - width, viewport.height - height - 18, 0, 1);
+      viewport.width / 2 - width, viewport.height - height * 2 - 2, 0, 1);
 
   this.renderState.beginSprites(blockAtlas, false);
   this.spriteBuffer_.draw(viewport.orthoMatrix, worldMatrix);
+};
+
+
+/**
+ * Hit tests the block type UI.
+ * @private
+ * @param {!gf.input.MouseData} mouseData Mouse input data.
+ * @return {number|undefined} Block index selected or undefined if non clicked.
+ */
+blk.client.ClientGame.prototype.hitTestBlockTypes_ = function(mouseData) {
+  var scale = 2;
+  var itemSize = (16 + 1) * scale;
+  var width = this.blockTypes_.length * itemSize;
+  var height = 16 * scale;
+  if (mouseData.clientY >= this.viewport.height - height - 2) {
+    var left = this.viewport.width / 2 - width / 2;
+    var right = this.viewport.width / 2 + width / 2;
+    if (mouseData.clientX >= left && mouseData.clientX <= right) {
+      return Math.floor((mouseData.clientX - left) / itemSize);
+    }
+  }
+  return undefined;
 };
 
 
@@ -802,6 +824,13 @@ blk.client.ClientGame.prototype.handleInput_ = function(frame) {
     didSwitchBlock = true;
     this.blockIndex_ = 4;
   }
+  if (mouseData.buttonsUp & gf.input.MouseButton.LEFT) {
+    var clickedIndex = this.hitTestBlockTypes_(mouseData);
+    if (goog.isDef(clickedIndex)) {
+      didSwitchBlock = true;
+      this.blockIndex_ = clickedIndex;
+    }
+  }
   if (didSwitchBlock) {
     this.sounds.playAmbient('click');
   }
@@ -825,9 +854,11 @@ blk.client.ClientGame.prototype.handleInput_ = function(frame) {
     this.viewManager.setDebugVisuals(!this.viewManager.debugVisuals);
   }
 
-  // Actions
-  if (this.getLocalEntity()) {
-    this.handleInputActions_(frame);
+  // Actions - only if no other input event has eaten the input
+  if (!didSwitchBlock) {
+    if (this.getLocalEntity()) {
+      this.handleInputActions_(frame);
+    }
   }
 };
 

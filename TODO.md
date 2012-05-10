@@ -16,8 +16,6 @@ M3: Infinite Maps
 M4: UI
 ================================================================================
 
-* click on block types to switch
-
 * settings ui:
     * escape to toggle + ui button?
     * user name -> packet for name change

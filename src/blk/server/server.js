@@ -107,6 +107,9 @@ blk.server.launchServer_ = function(launchOptions, session, mapStore,
     goog.global['blk_server'] = game;
   }
 
+  // Start ticking
+  game.startTicking();
+
   // TODO(benvanik): wait until loaded, etc
   deferred.callback(game);
 };
