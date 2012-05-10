@@ -34,9 +34,9 @@
   /* @alternate */ -webkit-box-shadow: 0 0 5px #888;
 }
 
-@defmixin bitFont() {
+@defmixin bitFont(FONT_SIZE) {
   font-family: monospace-8bit;
-  font-size: 16px;
+  font-size: FONT_SIZE;
   color: white;
   text-shadow: #888 1px 1px;
 }

@@ -33,6 +33,7 @@ goog.require('blk.physics.ClientMovement');
 goog.require('blk.ui.Console');
 goog.require('blk.ui.PlayerListing');
 goog.require('blk.ui.Popup');
+goog.require('blk.ui.Settings');
 goog.require('blk.ui.alerts');
 goog.require('gf.Game');
 goog.require('gf.assets.AssetManager');
@@ -796,6 +797,16 @@ blk.client.ClientGame.prototype.handleInput_ = function(frame) {
   var mouseData = this.inputData.mouse;
 
   // TODO(benvanik): track goog.events.KeyCodes.PAUSE to pause update loop
+
+  // Show settings
+  if (keyboardData.didKeyGoDown(goog.events.KeyCodes.O)) {
+    this.input.setEnabled(false);
+    var d = blk.ui.Settings.show(this, this.dom, this.display.mainFrame);
+    d.addCallback(
+        function(buttonId) {
+          this.input.setEnabled(true);
+        }, this);
+  }
 
   // Block switching
   var didSwitchBlock = false;

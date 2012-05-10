@@ -34,7 +34,7 @@
   background-position-y: BLK_ALERT_HEADER_HEIGHT;
 
   @mixin bitDropShadow();
-  @mixin bitFont();
+  @mixin bitFont(16px);
   @mixin blkAlertBackground();
 }
 
@@ -79,3 +79,24 @@
 
   @mixin blkAlertButtonDefaultBackground();
 }
+
+.blkSettingsRow {
+  margin-top: 15px;
+}
+
+.blkSettingsLabel {
+}
+
+.blkSettingsValue {
+  margin-left: 20px;
+}
+
+.blkSettingsInput {
+  font-family: monospace-8bit;
+  font-size: 1em;
+  background-color: #EEEEEE;
+  color: black;
+  border: 1px solid black;
+}
+
+.blkSettingsNameValue {}

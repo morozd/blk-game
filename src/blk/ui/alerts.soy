@@ -79,7 +79,7 @@
       close
     {/param}
     {param label}
-      {msg desc="Close the browser tab"}
+      {msg desc="Close the browser tab."}
         Close
       {/msg}
     {/param}
@@ -97,8 +97,26 @@
       reload
     {/param}
     {param label}
-      {msg desc="Reloads the browser tab"}
+      {msg desc="Reloads the browser tab."}
         Reload
+      {/msg}
+    {/param}
+  {/call}
+{/template}
+
+
+/**
+ * 'Save' button.
+ * @param focusDefault True if the button is default.
+ */
+{template .alertButtonSave_ private="true"}
+  {call .alertButton_ data="all"}
+    {param id}
+      save
+    {/param}
+    {param label}
+      {msg desc="Saves the changes made in the dialog."}
+        Save
       {/msg}
     {/param}
   {/call}
@@ -252,6 +270,72 @@
           {/call}
           {call .alertButtonClose_ /}
       {/switch}
+    {/param}
+  {/call}
+{/template}
+
+
+/**
+ * The settings dialog used for controlling user settings.
+ * @param server_name Current server name.
+ */
+{template .settings}
+  {call .simpleAlert_ data="all"}
+    {param header}
+      {msg desc="Settings and configuration header label."}
+        Settings
+      {/msg}
+    {/param}
+    {param body}
+      <div>
+        Server: {$server_name}
+      </div>
+      <div class="{css blkSettingsRow}">
+        <div class="{css blkSettingsLabel}">
+          {msg desc="User name settings header."}
+            Name:
+          {/msg}
+        </div>
+        <div class="{css blkSettingsValue}">
+          <input class="{css blkSettingsInput} {css blkSettingsNameValue}" type="text"/>
+        </div>
+      </div>
+      <div class="{css blkSettingsRow}">
+        <div class="{css blkSettingsLabel}">
+          {msg desc="Sensitivity of the mouse adjustment settings header."}
+            Mouse Sensitivity:
+          {/msg}
+        </div>
+        <div class="{css blkSettingsValue}">
+          //slider
+        </div>
+      </div>
+      <div class="{css blkSettingsRow}">
+        <div class="{css blkSettingsLabel}">
+          {msg desc="View distance (how far the user can see) settings header."}
+            View Distance:
+          {/msg}
+        </div>
+        <div class="{css blkSettingsValue}">
+          low / high
+        </div>
+      </div>
+      <div class="{css blkSettingsRow}">
+        <div class="{css blkSettingsLabel}">
+          {msg desc="Audio/music settings header."}
+            Audio:
+          {/msg}
+        </div>
+        <div class="{css blkSettingsValue}">
+          on / off
+        </div>
+      </div>
+    {/param}
+    {param buttons}
+      {call .alertButtonSave_}
+        {param focusDefault: true /}
+      {/call}
+      {call .alertButtonClose_ /}
     {/param}
   {/call}
 {/template}
