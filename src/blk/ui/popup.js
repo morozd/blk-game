@@ -39,37 +39,45 @@ goog.require('goog.soy');
  * @param {Object=} opt_templateData The data for the template.
  * @param {goog.dom.DomHelper=} opt_domHelper The DOM helper used to
  *     create DOM nodes; defaults to {@code goog.dom.getDomHelper}.
+ * @param {Element=} opt_parent Parent DOM element to render into.
  */
-blk.ui.Popup = function(template, opt_templateData, opt_domHelper) {
+blk.ui.Popup = function(template, opt_templateData, opt_domHelper, opt_parent) {
   goog.base(this);
 
   /**
-   * @private
+   * @protected
    * @type {!goog.dom.DomHelper}
    */
-  this.dom_ = opt_domHelper || goog.dom.getDomHelper();
+  this.dom = opt_domHelper || goog.dom.getDomHelper();
 
   /**
-   * @private
+   * Parent DOM element to render into.
+   * @protected
+   * @type {Element}
+   */
+  this.parentElement = opt_parent || this.dom.getDocument().body;
+
+  /**
+   * @protected
    * @type {!goog.events.EventHandler}
    */
-  this.eh_ = new goog.events.EventHandler(this);
-  this.registerDisposable(this.eh_);
+  this.eh = new goog.events.EventHandler(this);
+  this.registerDisposable(this.eh);
 
   /**
    * @private
    * @type {!Element}
    */
-  this.inputMask_ = this.dom_.createElement(goog.dom.TagName.DIV);
+  this.inputMask_ = this.dom.createElement(goog.dom.TagName.DIV);
   goog.dom.classes.set(this.inputMask_, goog.getCssName('blkInputMask'));
 
   /**
    * Root rendered document fragment.
-   * @private
+   * @protected
    * @type {Element}
    */
-  this.root_ = /** @type {Element} */ (goog.soy.renderAsFragment(
-      template, opt_templateData, undefined, this.dom_));
+  this.root = /** @type {Element} */ (goog.soy.renderAsFragment(
+      template, opt_templateData, undefined, this.dom));
 
   /**
    * A deferred fulfilled when the dialog has closed.
@@ -77,8 +85,6 @@ blk.ui.Popup = function(template, opt_templateData, opt_domHelper) {
    * @type {!goog.async.Deferred}
    */
   this.deferred = new goog.async.Deferred(this.canceller_, this);
-
-  this.enterDocument_();
 };
 goog.inherits(blk.ui.Popup, goog.Disposable);
 
@@ -87,7 +93,7 @@ goog.inherits(blk.ui.Popup, goog.Disposable);
  * @override
  */
 blk.ui.Popup.prototype.disposeInternal = function() {
-  this.exitDocument_();
+  this.exitDocument();
   goog.base(this, 'disposeInternal');
 };
 
@@ -103,15 +109,14 @@ blk.ui.Popup.prototype.canceller_ = function() {
 
 /**
  * Adds the popup to the DOM.
- * @private
+ * @protected
  */
-blk.ui.Popup.prototype.enterDocument_ = function() {
-  var body = this.dom_.getDocument().body;
-  this.dom_.appendChild(body, this.inputMask_);
-  this.dom_.appendChild(body, this.root_);
+blk.ui.Popup.prototype.enterDocument = function() {
+  this.dom.appendChild(this.parentElement, this.inputMask_);
+  this.dom.appendChild(this.parentElement, this.root);
 
-  var buttonEls = this.dom_.getElementsByClass(
-      goog.getCssName('blkAlertButton'), this.root_);
+  var buttonEls = this.dom.getElementsByClass(
+      goog.getCssName('blkAlertButton'), this.root);
   goog.array.forEach(buttonEls,
       function(buttonEl) {
         var buttonId = buttonEl.getAttribute('data-id');
@@ -126,7 +131,7 @@ blk.ui.Popup.prototype.enterDocument_ = function() {
         }
 
         // Bind events/make clickable/etc
-        this.eh_.listen(buttonEl, goog.events.EventType.CLICK,
+        this.eh.listen(buttonEl, goog.events.EventType.CLICK,
             function() {
               goog.dispose(this);
               this.deferred.callback(buttonId);
@@ -137,13 +142,13 @@ blk.ui.Popup.prototype.enterDocument_ = function() {
 
 /**
  * Removes the popup from the DOM.
- * @private
+ * @protected
  */
-blk.ui.Popup.prototype.exitDocument_ = function() {
-  this.eh_.removeAll();
-  this.dom_.removeNode(this.root_);
-  this.dom_.removeNode(this.inputMask_);
-  this.root_ = null;
+blk.ui.Popup.prototype.exitDocument = function() {
+  this.eh.removeAll();
+  this.dom.removeNode(this.root);
+  this.dom.removeNode(this.inputMask_);
+  this.root = null;
 };
 
 
@@ -155,11 +160,15 @@ blk.ui.Popup.prototype.exitDocument_ = function() {
  * @param {Object=} opt_templateData The data for the template.
  * @param {goog.dom.DomHelper=} opt_domHelper The DOM helper used to
  *     create DOM nodes; defaults to {@code goog.dom.getDomHelper}.
+ * @param {Element=} opt_parent Parent DOM element to render into.
  * @return {!goog.async.Deferred} A deferred fulfilled when the dialog has
- *     closed. If the dialog is cancelled the deferred fails, otherwise success
- *     is called with a value of the button pressed.
+ *     closed. Successful callbacks receive the ID of the button as their only
+ *     parameter.
  */
-blk.ui.Popup.show = function(template, opt_templateData, opt_domHelper) {
-  var popup = new blk.ui.Popup(template, opt_templateData, opt_domHelper);
+blk.ui.Popup.show = function(template, opt_templateData, opt_domHelper,
+    opt_parent) {
+  var popup = new blk.ui.Popup(template, opt_templateData, opt_domHelper,
+      opt_parent);
+  popup.enterDocument();
   return popup.deferred;
 };

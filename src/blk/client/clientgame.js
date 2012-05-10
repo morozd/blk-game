@@ -407,7 +407,7 @@ blk.client.ClientGame.prototype.update = function(frame) {
 
     var d = blk.ui.Popup.show(blk.ui.alerts.disconnected, {
       reason: this.session.disconnectReason
-    }, this.dom);
+    }, this.dom, this.display.mainFrame);
     d.addCallback(
         function(buttonId) {
           if (buttonId == 'reload') {
