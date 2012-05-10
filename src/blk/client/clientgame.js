@@ -172,6 +172,7 @@ blk.client.ClientGame = function(launchOptions, dom, session) {
    * @type {!blk.env.ChunkView}
    */
   this.localView = new blk.env.ChunkView(this.map,
+      //blk.env.ChunkView.HIGH_CHUNK_RADIUS_XZ);
       blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ);
   this.map.addChunkView(this.localView);
 

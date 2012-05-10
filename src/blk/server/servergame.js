@@ -161,10 +161,11 @@ blk.server.ServerGame.prototype.handleUserConnect = function(user) {
   this.chat.join(user, 'main');
 
   // Pick a spawn position
-  var spawnPosition = goog.vec.Vec3.createFloat32FromValues(0, 70, 0);
+  var spawnPosition = goog.vec.Vec3.createFloat32FromValues(0, 80, 0);
 
   // Create view - must be cleaned up on player disconnect
   var view = new blk.env.ChunkView(map,
+      //blk.env.ChunkView.HIGH_CHUNK_RADIUS_XZ);
       blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ);
   map.addChunkView(view);
   player.view = view;

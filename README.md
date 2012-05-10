@@ -11,9 +11,7 @@ Everything not listed below was authored by [Ben Vanik](http://noxa.org).
 
 #### Audio
 
-Various artists from [freesound](http://www.freesound.org), including:
-
-* [S_Dij](http://www.freesound.org/people/S_Dij/)
+Clicking sound: [S_Dij](http://www.freesound.org/people/S_Dij/)
 
 #### Fonts
 
