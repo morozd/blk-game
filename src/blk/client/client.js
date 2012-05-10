@@ -134,6 +134,9 @@ blk.client.start = function(uri, sourceMode, doc, options) {
     if (goog.DEBUG) {
       goog.global['blk_client'] = game;
     }
+
+    // Start the game
+    game.startTicking();
   }, function(arg) {
     connectDialog.cancel();
 
