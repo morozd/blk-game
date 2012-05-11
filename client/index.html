@@ -3,6 +3,9 @@
   <head>
     <title>BLK (info)</title>
     <link rel="stylesheet" href="index.css"/>
+    <script>
+      var DEFAULT_HOST = 'ws://localhost:1337';
+    </script>
   </head>
   <body>
     <div id="column">
@@ -50,8 +53,9 @@
           <li>1-6 keys or mouse wheel to change the current block type
           <li>Left click to place a block of the current type
           <li>Right click or ctrl-click to remove a block
-          <li>Alt-enter to toggle fullscreen mode
+          <li>Alt-enter to toggle fullscreen mode/mouse lock
           <li>T to chat
+          <li>M to play some music
         </ul>
         If you run the demo with no arguments you'll be connected to your own
         server. If running in a browser that supports SharedWorkers (such as
@@ -262,31 +266,35 @@
 
         var nameBox = document.getElementById('name');
         function loadName() {
-          if (!window.localStorage) {
-            return;
+          var value = null;
+          var parts = document.cookie.split(';');
+          for (var n = 0; n < parts.length; n++) {
+            var part = parts[n];
+            part = part.replace(/^[\s\xa0]+|[\s\xa0]+$/g, '');
+            if (part.indexOf('s_un=') == 0) {
+              value = part.substr(part.indexOf('=') + 1);
+              value = decodeURIComponent(value.replace(/\+/g, ' '));
+              break;
+            }
           }
-          var name = window.localStorage.getItem('blk_user');
-          if (name && name.length) {
-            nameBox.value = name;
+          if (value && value.length) {
+            nameBox.value = value;
           } else {
             nameBox.value = 'User';
           }
         }
         function saveName() {
-          if (!window.localStorage) {
-            return;
+          // Not very strong verification here - the game will do it
+          var value = nameBox.value;
+          if (!value || !value.length) {
+            value = 'User';
           }
-          var name = nameBox.value;
-          if (!name || !name.length) {
-            name = 'User';
-          }
-          window.localStorage.setItem('blk_user', name);
+          document.cookie = 's_un=' + encodeURIComponent(value);
         }
         loadName();
         function updateLink() {
           var joinLink = document.getElementById('joinLink');
-          joinLink.href = 'game.html?host=ws://173.160.235.109:1338&userName=' +
-              nameBox.value;
+          joinLink.href = 'game.html?host=' + DEFAULT_HOST;
           saveName();
         }
         updateLink();
