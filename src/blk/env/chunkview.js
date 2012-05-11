@@ -57,8 +57,8 @@ blk.env.ChunkView = function(map, chunkRadiusXZ) {
    * @type {number}
    */
   this.chunkRadiusXZ_ = goog.math.clamp(
-      Math.floor(chunkRadiusXZ), // TODO(benvanik): round up to next POT?
-      2,
+      Math.floor(chunkRadiusXZ),
+      blk.env.ChunkView.MIN_CHUNK_RADIUS_XZ,
       blk.env.ChunkView.MAX_CHUNK_RADIUS_XZ);
 
   /**

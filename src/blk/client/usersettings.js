@@ -48,8 +48,8 @@ blk.client.UserSettings = function(dom) {
 
   /**
    * View distance setting, in chunk units.
-   * Automatically clamped between {@see blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ}
-   * and {@see blk.env.ChunkView.HIGH_CHUNK_RADIUS_XZ}.
+   * Automatically clamped between {@see blk.env.ChunkView.MIN_CHUNK_RADIUS_XZ}
+   * and {@see blk.env.ChunkView.MAX_CHUNK_RADIUS_XZ}.
    * @type {number}
    */
   this.viewDistance = blk.client.UserSettings.DEFAULT_VIEW_DISTANCE_;
@@ -83,7 +83,8 @@ blk.client.UserSettings.DEFAULT_MOUSE_SENSITIVITY_ = 1;
  * @const
  * @type {number}
  */
-blk.client.UserSettings.DEFAULT_VIEW_DISTANCE_ = 8;
+blk.client.UserSettings.DEFAULT_VIEW_DISTANCE_ =
+    blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ;
 
 
 /**
@@ -137,7 +138,7 @@ blk.client.UserSettings.prototype.load = function() {
   }
   this.viewDistance =
       Number(cookies.get('s_vd', String(this.viewDistance))) | 0;
-  if (this.viewDistance <= blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ ||
+  if (this.viewDistance <= blk.env.ChunkView.MIN_CHUNK_RADIUS_XZ ||
       this.viewDistance > blk.env.ChunkView.MAX_CHUNK_RADIUS_XZ) {
     this.viewDistance = blk.client.UserSettings.DEFAULT_VIEW_DISTANCE_;
   }

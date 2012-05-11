@@ -179,9 +179,7 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
    * Local chunk view.
    * @type {!blk.env.ChunkView}
    */
-  this.localView = new blk.env.ChunkView(this.map,
-      //blk.env.ChunkView.HIGH_CHUNK_RADIUS_XZ);
-      blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ);
+  this.localView = new blk.env.ChunkView(this.map, this.settings.viewDistance);
   this.map.addChunkView(this.localView);
 
   /**
@@ -801,18 +799,24 @@ blk.client.ClientGame.prototype.hitTestBlockTypes_ = function(mouseData) {
 blk.client.ClientGame.prototype.showSettings_ = function() {
   this.input.setEnabled(false);
 
+  // TODO(benvanik): proper dynamic view adjustment
+  var oldViewDistance = this.settings.viewDistance;
+
   var d = blk.ui.Settings.show(this, this.dom, this.display.mainFrame);
   d.addCallback(
       function(buttonId) {
         if (buttonId == 'save') {
+          // HACK: reload with new settings if view distance changed
+          if (this.settings.viewDistance != oldViewDistance) {
+            window.location.reload();
+            return;
+          }
+
           var user = this.session.getLocalUser();
           goog.asserts.assert(user);
           var userInfo = user.info.clone();
           userInfo.displayName = this.settings.userName;
           this.session.updateUserInfo(userInfo);
-
-          // TODO(benvanik): adjust view distance
-          //settings.viewDistance
 
           this.input.mouse.setSensitivity(this.settings.mouseSensitivity);
           this.audio.setMuted(this.settings.audioMuted);

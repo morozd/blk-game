@@ -194,7 +194,7 @@ blk.server.ServerGame.prototype.handleUserConnect = function(user) {
   map.addEntity(entity);
   goog.vec.Vec3.setFromArray(entity.state.position, spawnPosition);
 
-  // Entagle entity and user
+  // Entangle entity and user
   entity.flags = blk.env.Entity.Flags.USER_CONTROLLED;
   entity.player = player;
   player.entity = entity;
