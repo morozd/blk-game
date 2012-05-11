@@ -32,7 +32,6 @@ goog.require('gf.net.UserInfo');
 goog.require('goog.asserts');
 goog.require('goog.async.Deferred');
 goog.require('goog.dom.DomHelper');
-goog.require('goog.string');
 goog.require('goog.uri.utils');
 goog.require('goog.userAgent.product');
 
@@ -72,19 +71,11 @@ blk.client.start = function(uri, sourceMode, doc, options) {
   // Pull or query user info
   if (launchOptions.userName) {
     // Override settings (and save back)
-    var userName = goog.string.normalizeSpaces(goog.string.normalizeWhitespace(
-        goog.string.trim(launchOptions.userName)));
-    if (userName.length) {
-      settings.userName = userName;
-      settings.save();
-    }
+    var userName = gf.net.UserInfo.sanitizeDisplayName(launchOptions.userName);
+    settings.userName = userName;
+    settings.save();
   }
-  userInfo.displayName =
-      goog.string.normalizeSpaces(goog.string.normalizeWhitespace(
-          goog.string.trim(settings.userName)));
-  if (!userInfo.displayName.length) {
-    userInfo.displayName = 'User';
-  }
+  userInfo.displayName = gf.net.UserInfo.sanitizeDisplayName(settings.userName);
 
   // Show connecting dialog
   var connectDialog = blk.ui.Popup.show(blk.ui.alerts.connecting, {

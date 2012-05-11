@@ -120,6 +120,13 @@ blk.client.ClientNetService.prototype.userDisconnected = function(user) {
 
 
 /**
+ * @override
+ */
+blk.client.ClientNetService.prototype.userUpdated = function(user) {
+};
+
+
+/**
  * Handles map info packets.
  * @private
  * @param {!gf.net.Packet} packet Packet.

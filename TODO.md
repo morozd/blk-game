@@ -18,7 +18,6 @@ M4: UI
 
 * settings ui:
     * escape to toggle + ui button?
-    * user name -> packet for name change
     * mouse sensitivity
     * view distance -> send packets to adjust view
 

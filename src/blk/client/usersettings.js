@@ -130,16 +130,19 @@ blk.client.UserSettings.prototype.load = function() {
   if (this.userName.length < 1) {
     this.userName = blk.client.UserSettings.DEFAULT_USER_NAME_;
   }
-  this.mouseSensitivity = Number(cookies.get('s_ms', this.mouseSensitivity));
+  this.mouseSensitivity =
+      Number(cookies.get('s_ms', String(this.mouseSensitivity)));
   if (this.mouseSensitivity <= 0.0 || this.mouseSensitivity > 10) {
     this.mouseSensitivity = blk.client.UserSettings.DEFAULT_MOUSE_SENSITIVITY_;
   }
-  this.viewDistance = Number(cookies.get('s_vd', this.viewDistance)) | 0;
+  this.viewDistance =
+      Number(cookies.get('s_vd', String(this.viewDistance))) | 0;
   if (this.viewDistance <= blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ ||
       this.viewDistance > blk.env.ChunkView.MAX_CHUNK_RADIUS_XZ) {
     this.viewDistance = blk.client.UserSettings.DEFAULT_VIEW_DISTANCE_;
   }
-  this.audioMuted = Boolean(cookies.get('s_am', this.audioMuted));
+  this.audioMuted =
+      Boolean(cookies.get('s_am', String(this.audioMuted)));
 };
 
 
@@ -150,7 +153,7 @@ blk.client.UserSettings.prototype.load = function() {
 blk.client.UserSettings.prototype.save = function() {
   var cookies = new goog.net.Cookies(this.dom_.getDocument());
   cookies.set('s_un', goog.string.urlEncode(this.userName));
-  cookies.set('s_ms', this.mouseSensitivity);
-  cookies.set('s_vd', this.viewDistance);
-  cookies.set('s_am', this.audioMuted);
+  cookies.set('s_ms', String(this.mouseSensitivity));
+  cookies.set('s_vd', String(this.viewDistance));
+  cookies.set('s_am', String(this.audioMuted));
 };

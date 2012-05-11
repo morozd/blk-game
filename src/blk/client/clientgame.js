@@ -795,6 +795,34 @@ blk.client.ClientGame.prototype.hitTestBlockTypes_ = function(mouseData) {
 
 
 /**
+ * Shows the settings dialog.
+ * @private
+ */
+blk.client.ClientGame.prototype.showSettings_ = function() {
+  this.input.setEnabled(false);
+
+  var d = blk.ui.Settings.show(this, this.dom, this.display.mainFrame);
+  d.addCallback(
+      function(buttonId) {
+        if (buttonId == 'save') {
+          var user = this.session.getLocalUser();
+          goog.asserts.assert(user);
+          var userInfo = user.info.clone();
+          userInfo.displayName = this.settings.userName;
+          this.session.updateUserInfo(userInfo);
+
+          // view distance
+
+          this.input.mouse.setSensitivity(this.settings.mouseSensitivity);
+          this.audio.setMuted(this.settings.audioMuted);
+        }
+
+        this.input.setEnabled(true);
+      }, this);
+};
+
+
+/**
  * Handles local user input.
  * @private
  * @param {!gf.RenderFrame} frame Current frame.
@@ -809,16 +837,8 @@ blk.client.ClientGame.prototype.handleInput_ = function(frame) {
 
   // Show settings
   if (keyboardData.didKeyGoDown(goog.events.KeyCodes.O)) {
-    this.input.setEnabled(false);
-    var d = blk.ui.Settings.show(this, this.dom, this.display.mainFrame);
-    d.addCallback(
-        function(buttonId) {
-          // user name
-          // view distance
-          this.input.mouse.setSensitivity(this.settings.mouseSensitivity);
-          this.audio.setMuted(this.settings.audioMuted);
-          this.input.setEnabled(true);
-        }, this);
+    this.showSettings_();
+    return;
   }
 
   // Block switching

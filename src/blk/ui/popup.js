@@ -133,6 +133,7 @@ blk.ui.Popup.prototype.enterDocument = function() {
         // Bind events/make clickable/etc
         this.eh.listen(buttonEl, goog.events.EventType.CLICK,
             function() {
+              this.beforeClose(buttonId);
               goog.dispose(this);
               this.deferred.callback(buttonId);
             });
@@ -150,6 +151,14 @@ blk.ui.Popup.prototype.exitDocument = function() {
   this.dom.removeNode(this.inputMask_);
   this.root = null;
 };
+
+
+/**
+ * Handles any pre-close action.
+ * @protected
+ * @param {string} buttonId Button ID.
+ */
+blk.ui.Popup.prototype.beforeClose = goog.nullFunction;
 
 
 /**

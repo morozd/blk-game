@@ -18,6 +18,7 @@ goog.provide('blk.ui.Settings');
 
 goog.require('blk.ui.Popup');
 goog.require('blk.ui.alerts');
+goog.require('gf.net.UserInfo');
 goog.require('goog.asserts');
 
 
@@ -28,7 +29,7 @@ goog.require('goog.asserts');
  * TODO(benvanik): key input override to support esc/enter/etc
  *
  * @constructor
- * @extends {goog.Disposable}
+ * @extends {blk.ui.Popup}
  * @param {!blk.client.ClientGame} game Client game.
  * @param {goog.dom.DomHelper=} opt_domHelper The DOM helper used to
  *     create DOM nodes; defaults to {@code goog.dom.getDomHelper}.
@@ -64,29 +65,28 @@ blk.ui.Settings.prototype.enterDocument = function() {
           goog.getCssName('blkSettingsNameValue'), this.root));
   goog.asserts.assert(userNameInput);
   userNameInput.value = settings.userName;
+};
 
-  // var buttonEls = this.dom_.getElementsByClass(
-  //     goog.getCssName('blkAlertButton'), this.root_);
-  // goog.array.forEach(buttonEls,
-  //     function(buttonEl) {
-  //       var buttonId = buttonEl.getAttribute('data-id');
-  //       var isDefault = goog.dom.classes.has(
-  //           buttonEl, goog.getCssName('blkAlertButtonDefault'));
 
-  //       // TODO(benvanik): save off buttons for key input/etc
+/**
+ * @override
+ */
+blk.ui.Settings.prototype.beforeClose = function(buttonId) {
+  if (buttonId != 'save') {
+    return;
+  }
 
-  //       // Focus the default button
-  //       if (isDefault) {
-  //         buttonEl.focus();
-  //       }
+  var settings = this.game_.settings;
 
-  //       // Bind events/make clickable/etc
-  //       this.eh_.listen(buttonEl, goog.events.EventType.CLICK,
-  //           function() {
-  //             goog.dispose(this);
-  //             this.deferred.callback(buttonId);
-  //           });
-  //     }, this);
+  var userNameInput = /** @type {HTMLInputElement} */ (
+      this.dom.getElementByClass(
+          goog.getCssName('blkSettingsNameValue'), this.root));
+  goog.asserts.assert(userNameInput);
+  var userName = userNameInput.value;
+  userName = gf.net.UserInfo.sanitizeDisplayName(userName);
+  settings.userName = userName;
+
+  settings.save();
 };
 
 

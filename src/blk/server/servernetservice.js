@@ -96,6 +96,14 @@ blk.server.ServerNetService.prototype.userDisconnected = function(user) {
 
 
 /**
+ * @override
+ */
+blk.server.ServerNetService.prototype.userUpdated = function(user) {
+  gf.log.write('user ' + user + ' changed name');
+};
+
+
+/**
  * Handles map create packets.
  * @private
  * @param {!gf.net.Packet} packet Packet.
