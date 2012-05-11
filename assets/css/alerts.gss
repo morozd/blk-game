@@ -82,6 +82,9 @@
 
 .blkSettingsRow {
   margin-top: 15px;
+  overflow: auto;
+  width: 100%;
+  clear: both;
 }
 
 .blkSettingsLabel {
@@ -99,4 +102,23 @@
   border: 1px solid black;
 }
 
+.blkSettingsSlider {
+}
+
 .blkSettingsNameValue {}
+.blkSettingsSensitivityValue {
+  float: left;
+}
+.blkSettingsSensitivityLabel {
+  float: left;
+  width: 50px;
+  margin-left: 15px;
+}
+.blkSettingsSensitivityReset {
+  float: left;
+
+  text-decoration: underline;
+  cursor: pointer;
+
+  @mixin noSelect();
+}

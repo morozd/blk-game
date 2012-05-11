@@ -307,7 +307,15 @@
           {/msg}
         </div>
         <div class="{css blkSettingsValue}">
-          //slider
+          <input class="{css blkSettingsSlider} {css blkSettingsSensitivityValue}"
+              type="range" min="1" max="100" />
+          <div class="{css blkSettingsSensitivityLabel}"></div>
+          {sp}
+          <div class="{css blkSettingsSensitivityReset}">
+            {msg desc="Reset the value to the default."}
+              reset
+            {/msg}
+          </div>
         </div>
       </div>
       <div class="{css blkSettingsRow}">
@@ -320,7 +328,7 @@
           low / high
         </div>
       </div>
-      <div class="{css blkSettingsRow}">
+      <!--<div class="{css blkSettingsRow}">
         <div class="{css blkSettingsLabel}">
           {msg desc="Audio/music settings header."}
             Audio:
@@ -329,7 +337,7 @@
         <div class="{css blkSettingsValue}">
           on / off
         </div>
-      </div>
+      </div>-->
     {/param}
     {param buttons}
       {call .alertButtonSave_}

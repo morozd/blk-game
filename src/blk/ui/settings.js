@@ -20,6 +20,8 @@ goog.require('blk.ui.Popup');
 goog.require('blk.ui.alerts');
 goog.require('gf.net.UserInfo');
 goog.require('goog.asserts');
+goog.require('goog.events.EventType');
+goog.require('goog.string');
 
 
 
@@ -65,6 +67,34 @@ blk.ui.Settings.prototype.enterDocument = function() {
           goog.getCssName('blkSettingsNameValue'), this.root));
   goog.asserts.assert(userNameInput);
   userNameInput.value = settings.userName;
+
+  var sensitivityInput = /** @type {HTMLInputElement} */ (
+      this.dom.getElementByClass(
+          goog.getCssName('blkSettingsSensitivityValue'), this.root));
+  goog.asserts.assert(sensitivityInput);
+  sensitivityInput.value = String(settings.mouseSensitivity * 50);
+
+  var sensitivityLabel = /** @type {Element} */ (
+      this.dom.getElementByClass(
+          goog.getCssName('blkSettingsSensitivityLabel'), this.root));
+  goog.asserts.assert(sensitivityLabel);
+
+  function updateLabel() {
+    var value = Number(sensitivityInput.value) / 50;
+    sensitivityLabel.innerHTML = goog.string.padNumber(value, 1, 2);
+  };
+  updateLabel();
+  this.eh.listen(sensitivityInput, goog.events.EventType.CHANGE, updateLabel);
+
+  var sensitivityReset = /** @type {Element} */ (
+      this.dom.getElementByClass(
+          goog.getCssName('blkSettingsSensitivityReset'), this.root));
+  goog.asserts.assert(sensitivityReset);
+  this.eh.listen(sensitivityReset, goog.events.EventType.CLICK,
+      function() {
+        sensitivityInput.value = String(50);
+        updateLabel();
+      });
 };
 
 
@@ -85,6 +115,13 @@ blk.ui.Settings.prototype.beforeClose = function(buttonId) {
   var userName = userNameInput.value;
   userName = gf.net.UserInfo.sanitizeDisplayName(userName);
   settings.userName = userName;
+
+  var sensitivityInput = /** @type {HTMLInputElement} */ (
+      this.dom.getElementByClass(
+          goog.getCssName('blkSettingsSensitivityValue'), this.root));
+  goog.asserts.assert(sensitivityInput);
+  var sensitivity = Number(sensitivityInput.value) / 50;
+  settings.mouseSensitivity = sensitivity;
 
   settings.save();
 };
