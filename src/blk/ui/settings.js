@@ -68,33 +68,86 @@ blk.ui.Settings.prototype.enterDocument = function() {
   goog.asserts.assert(userNameInput);
   userNameInput.value = settings.userName;
 
-  var sensitivityInput = /** @type {HTMLInputElement} */ (
-      this.dom.getElementByClass(
-          goog.getCssName('blkSettingsSensitivityValue'), this.root));
-  goog.asserts.assert(sensitivityInput);
-  sensitivityInput.value = String(settings.mouseSensitivity * 50);
+  this.setupSlider_(
+      goog.getCssName('blkSettingsSensitivitySlider'),
+      1, 100, 50, settings.mouseSensitivity * 50,
+      function(sliderValue) {
+        return goog.string.padNumber(sliderValue / 50, 1, 2);
+      });
 
-  var sensitivityLabel = /** @type {Element} */ (
-      this.dom.getElementByClass(
-          goog.getCssName('blkSettingsSensitivityLabel'), this.root));
-  goog.asserts.assert(sensitivityLabel);
+  this.setupSlider_(
+      goog.getCssName('blkSettingsDistanceSlider'),
+      blk.env.ChunkView.MIN_CHUNK_RADIUS_XZ,
+      blk.env.ChunkView.MAX_CHUNK_RADIUS_XZ,
+      blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ,
+      settings.viewDistance,
+      function(sliderValue) {
+        return goog.string.padNumber(sliderValue, 1);
+      });
+};
+
+
+/**
+ * Sets up a slider group for control/updating.
+ * @private
+ * @param {string} className, Slider root CSS class name.
+ * @param {number} minValue Minimum value.
+ * @param {number} maxValue Maximum value.
+ * @param {number} defaultValue Default value.
+ * @param {number} initialValue Initial value.
+ * @param {(function(number):string)} toStringCallback Function that converts
+ *     a slider value into a string for display.
+ */
+blk.ui.Settings.prototype.setupSlider_ = function(
+    className,
+    minValue, maxValue, defaultValue, initialValue,
+    toStringCallback) {
+  var root = /** @type {Element} */ (this.dom.getElementByClass(className));
+  goog.asserts.assert(root);
+
+  var slider = /** @type {HTMLInputElement} */ (this.dom.getElementByClass(
+      goog.getCssName('blkSettingsSlider'), root));
+  goog.asserts.assert(slider);
+  slider.min = String(minValue);
+  slider.max = String(maxValue);
+  slider.value = String(initialValue);
+
+  var label = /** @type {Element} */ (this.dom.getElementByClass(
+      goog.getCssName('blkSettingsSliderLabel'), root));
+  goog.asserts.assert(label);
 
   function updateLabel() {
-    var value = Number(sensitivityInput.value) / 50;
-    sensitivityLabel.innerHTML = goog.string.padNumber(value, 1, 2);
+    label.innerHTML = toStringCallback(Number(slider.value));
   };
   updateLabel();
-  this.eh.listen(sensitivityInput, goog.events.EventType.CHANGE, updateLabel);
+  this.eh.listen(slider, goog.events.EventType.CHANGE, updateLabel);
 
-  var sensitivityReset = /** @type {Element} */ (
-      this.dom.getElementByClass(
-          goog.getCssName('blkSettingsSensitivityReset'), this.root));
-  goog.asserts.assert(sensitivityReset);
-  this.eh.listen(sensitivityReset, goog.events.EventType.CLICK,
+  var reset = /** @type {Element} */ (this.dom.getElementByClass(
+      goog.getCssName('blkSettingsSliderReset'), root));
+  goog.asserts.assert(reset);
+  this.eh.listen(reset, goog.events.EventType.CLICK,
       function() {
-        sensitivityInput.value = String(50);
+        slider.value = String(defaultValue);
         updateLabel();
       });
+};
+
+
+/**
+ * Gets the current value of a slider.
+ * @private
+ * @param {string} className, Slider root CSS class name.
+ * @return {number} Slider value.
+ */
+blk.ui.Settings.prototype.getSliderValue_ = function(className) {
+  var root = /** @type {Element} */ (this.dom.getElementByClass(className));
+  goog.asserts.assert(root);
+
+  var slider = /** @type {HTMLInputElement} */ (this.dom.getElementByClass(
+      goog.getCssName('blkSettingsSlider'), root));
+  goog.asserts.assert(slider);
+
+  return Number(slider.value);
 };
 
 
@@ -116,12 +169,14 @@ blk.ui.Settings.prototype.beforeClose = function(buttonId) {
   userName = gf.net.UserInfo.sanitizeDisplayName(userName);
   settings.userName = userName;
 
-  var sensitivityInput = /** @type {HTMLInputElement} */ (
-      this.dom.getElementByClass(
-          goog.getCssName('blkSettingsSensitivityValue'), this.root));
-  goog.asserts.assert(sensitivityInput);
-  var sensitivity = Number(sensitivityInput.value) / 50;
+  var sensitivity =
+      this.getSliderValue_(goog.getCssName('blkSettingsSensitivitySlider'));
+  sensitivity = sensitivity / 50;
   settings.mouseSensitivity = sensitivity;
+
+  var viewDistance =
+      this.getSliderValue_(goog.getCssName('blkSettingsDistanceSlider'));
+  settings.viewDistance = viewDistance;
 
   settings.save();
 };

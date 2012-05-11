@@ -300,32 +300,38 @@
           <input class="{css blkSettingsInput} {css blkSettingsNameValue}" type="text"/>
         </div>
       </div>
-      <div class="{css blkSettingsRow}">
+      <div class="{css blkSettingsRow} {css blkSettingsSensitivitySlider}">
         <div class="{css blkSettingsLabel}">
           {msg desc="Sensitivity of the mouse adjustment settings header."}
             Mouse Sensitivity:
           {/msg}
         </div>
         <div class="{css blkSettingsValue}">
-          <input class="{css blkSettingsSlider} {css blkSettingsSensitivityValue}"
-              type="range" min="1" max="100" />
-          <div class="{css blkSettingsSensitivityLabel}"></div>
+          <input class="{css blkSettingsSlider}" type="range" min="1" max="100" />
+          <div class="{css blkSettingsSliderLabel}"></div>
           {sp}
-          <div class="{css blkSettingsSensitivityReset}">
+          <div class="{css blkSettingsSliderReset}">
             {msg desc="Reset the value to the default."}
               reset
             {/msg}
           </div>
         </div>
       </div>
-      <div class="{css blkSettingsRow}">
+      <div class="{css blkSettingsRow} {css blkSettingsDistanceSlider}">
         <div class="{css blkSettingsLabel}">
           {msg desc="View distance (how far the user can see) settings header."}
             View Distance:
           {/msg}
         </div>
         <div class="{css blkSettingsValue}">
-          low / high
+          <input class="{css blkSettingsSlider}" type="range" min="1" max="100" />
+          <div class="{css blkSettingsSliderLabel}"></div>
+          {sp}
+          <div class="{css blkSettingsSliderReset}">
+            {msg desc="Reset the value to the default."}
+              reset
+            {/msg}
+          </div>
         </div>
       </div>
       <!--<div class="{css blkSettingsRow}">

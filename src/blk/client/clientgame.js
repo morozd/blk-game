@@ -811,7 +811,8 @@ blk.client.ClientGame.prototype.showSettings_ = function() {
           userInfo.displayName = this.settings.userName;
           this.session.updateUserInfo(userInfo);
 
-          // view distance
+          // TODO(benvanik): adjust view distance
+          //settings.viewDistance
 
           this.input.mouse.setSensitivity(this.settings.mouseSensitivity);
           this.audio.setMuted(this.settings.audioMuted);

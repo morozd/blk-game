@@ -152,6 +152,14 @@ blk.env.ChunkView.HIGH_CHUNK_RADIUS_XZ = 16;
 
 
 /**
+ * Minimum number of chunks on either side of the player, for XZ.
+ * @const
+ * @type {number}
+ */
+blk.env.ChunkView.MIN_CHUNK_RADIUS_XZ = 1;
+
+
+/**
  * Maximum number of chunks on either side of the player, for XZ.
  * @const
  * @type {number}

@@ -103,18 +103,14 @@
 }
 
 .blkSettingsSlider {
-}
-
-.blkSettingsNameValue {}
-.blkSettingsSensitivityValue {
   float: left;
 }
-.blkSettingsSensitivityLabel {
+.blkSettingsSliderLabel {
   float: left;
   width: 50px;
   margin-left: 15px;
 }
-.blkSettingsSensitivityReset {
+.blkSettingsSliderReset {
   float: left;
 
   text-decoration: underline;
@@ -122,3 +118,7 @@
 
   @mixin noSelect();
 }
+
+.blkSettingsNameValue {}
+.blkSettingsSensitivitySlider {}
+.blkSettingsDistanceSlider {}
