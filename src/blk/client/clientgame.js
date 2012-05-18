@@ -327,11 +327,9 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
   this.console.log('wsad / click drag to move');
   this.console.log('left click to place blocks');
   this.console.log('ctrl-left / right click to remove blocks');
-  this.console.log('1-' + this.blockTypes_.length +
-      ' / mouse wheel to change block type');
-  this.console.log('m to toggle music');
   this.console.log('alt-enter for fullscreen/mouse lock');
   this.console.log('t to chat');
+  this.console.log('o for options');
   this.console.log('don\'t be an ass!');
 
   // Simulated latency
