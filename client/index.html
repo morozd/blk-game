@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>BLK (info)</title>
+    <title>BLK, a voxel world tech demo</title>
     <link rel="stylesheet" href="index.css"/>
     <script>
       var DEFAULT_HOST = 'ws://localhost:1337';
@@ -14,9 +14,10 @@
       <div class="break"/>
       <br/>
       <div id="about">
-        This is a little tech demo built to show off a high-fidelity native
-        Javascript gaming experience and, as a side-effect, develop a low-level
-        framework for web games - no C/Java/etc-to-JS here - it's pure JS!
+        THIS IS NOT MINECRAFT. This is my 20% project attempt at creating a fully
+        modifiable multiplayer voxel world in JS that can run efficiently in the
+        browser and learning what the pain points are in doing a project of this scale.
+        It's a tech demo of a high-fidelity 100% JavaScript game. Enjoy it for what it is!
       </div>
       <br/>
       <br/>
@@ -50,255 +51,224 @@
         <ul>
           <li>WSAD keys to move around (QZ to change elevation)
           <li>Click and drag the mouse to change the view
-          <li>1-6 keys or mouse wheel to change the current block type
+          <li>1-5 keys or mouse wheel to change the current block type
           <li>Left click to place a block of the current type
           <li>Right click or ctrl-click to remove a block
           <li>Alt-enter to toggle fullscreen mode/mouse lock
+          <li>O to change options (like your name)
           <li>T to chat
           <li>M to play some music
         </ul>
-        If you run the demo with no arguments you'll be connected to your own
-        server. If running in a browser that supports SharedWorkers (such as
-        the latest Chrome) you can even open multiple tabs and play in the same
-        world.
-        <br/>
-        <br/>
-        Append <span class="command">?host={some address}</span> to connect to a
-        remote server. For example, <span class="command">?host=ws://127.0.0.1:1337</span>
-        to connect to a local node.js server over WebSockets.
+        For the best controls, run in Chrome dev channel or
+        <a href="http://tools.google.com/dlpage/chromesxs" target="_blank">Canary</a> and
+        turn on 'Enable Pointer Lock' in about:flags. Restart, run the game,
+        and use alt-enter to get FPS gaming goodness!
       </div>
       <br/>
       <br/>
-      <div id="tech">
-        <span class="section">Game Library</span>
+      <div id="why">
+        <span class="section">Why?!</span>
         <br/>
         <br/>
-        Underlying this demo is a highly modularized library that sits atop
-        <a href="http://code.google.com/closure/">Google Closure</a>, using the
-        Closure Library as a base and the Closure Compiler to build the tiny
-        output Javascript files. Designed to be a set of tools to enable rapid
-        high-quality games, it's not an engine (like Unity) or scene graph (like
-        three.js), but more like XNA or SDL. Pick what you need, get started
-        quickly, and spend timing writing game code vs. platform abstractions.
+        I wanted to do something productive with my 20% time at Google. I've been
+        preaching that the web is finally ready for real games, so I figured I'd
+        try to make one. This is the result.
+        <br/>
+        <br/>
+        All of the code for this project, including the voxel world client and server,
+        the game framework, and the build system used to produce the final output are
+        all open sourced (or will be soon). I'll be continuing to develop the game
+        framework and build system, and if I have time throw some more features into
+        this demo (like real gameplay, for example). Feel free to fork! Have fun!
+        <!--<br/>
+        <br/>
+        <a href="">Interested in the tech?</a>-->
       </div>
       <br/>
-      <div id="features">
-        <span class="section">Game Library Features</span>
-        <ul>
-          <li>Runtime
-            <ul>
-              <li>Robust game loop management
-              <li>Idle state/hidden tab tracking
-            </ul>
-          <li>Audio
-            <ul>
-              <li>3D positional sound via <a href="https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html">Web Audio API</a>
-              <li>Efficient sound bank representation (single file transfer) +
-                  tools for creation
-              <li>Efficient music playback
-            </ul>
-          <li>Graphics
-            <ul>
-              <li>Display supporting orientation changes, fullscreen mode, etc
-              <li>WebGL context loss/restore handling
-              <li>Texture atlases and sprite batch rendering
-              <li>WebGL shader program abstraction
-              <li>Bitmap fonts with kerning and layout
-            </ul>
-          <li>Input abstraction layer
-            <ul>
-              <li><a href="http://dvcs.w3.org/hg/webevents/raw-file/default/mouse-lock.html">Mouse Lock</a> support
-              <li>(coming soon) on-screen dpad and accelerometer
-              <li>(coming soon) <a href="http://dvcs.w3.org/hg/webevents/raw-file/default/gamepad.html">gamepad</a> support
-              <li>(coming soon) input action map/normalization
-            </ul>
-          <li>Multiplayer networking
-            <ul>
-              <li>Client/server session management
-              <li>Full client-side input prediction and entity interpolation
-              <li>Synchronized clocks
-              <li>Localhost server via Web Workers
-              <li>SharedWorker for multi-tab local networking
-              <li>node.js server via WebSockets (100% shared code)
-              <li>Efficient network binary representation
-              <li>(coming soon) authentication via ID providers
-            </ul>
-          <li>Math and Utilities
-            <ul>
-              <li>Axis-aligned bounding box
-              <li>Octree
-              <li>Quaternion, ray, vec enhancements
-              <li>Seedable PRNG
-            </ul>
-        </ul>
-      </div>
-      <div>
-        <span class="section">Why Closure?</span>
-        <ul>
-          <li>Closure Compiler generates some of the smallest Javascript out there
-          <li>Off-the-shelf dependency tracking and build system
-          <li>Compiler inlining can drastically help performance (and can only get better)
-          <li>Closure Library contains a lot of useful functionality
-            <ul>
-              <li>Localization/i18n
-              <li>Array, object, and string extensions
-              <li>Data structures
-              <li>DOM/CSS/etc templating and abstractions
-              <li>Rich and efficient vector math library (one of the fastest!)
-              <li>Well tested and maintained
-            </ul>
-          <li>Native Javascript - no plugins or extensions required to get the functionality
-        <ul>
+      <br/>
+      <div id="who">
+        <span class="section">Who</span>
+        <br/>
+        <br/>
+        This demo was conceptualized and coded by <a href="http://noxa.org" target="_blank">benvanik</a>
+        as a 20% project at Google, and is all copyright Google, Inc 2012.
+        <br/>
+        <br/>
+        The font comes is <a href="http://www.dafont.com/volter-goldfish.font" target="_blank">Volter (Goldfish)</a>.
+        The bitmaped font used in the game itself is <a href="http://dwarffortresswiki.org/images/a/ae/LN_EGA8x8.png" target="_blank">Lord Nightmare/IBM's EGA Font</a> (from <a href="http://dwarffortresswiki.org/index.php/Tileset_repository" target="_blank">The Dwarf Fortress Wiki</a>).
+        <br/>
+        <br/>
+        Textures are from <a href="http://painterlypack.net" target="_blank">The Painterly Pack</a>.
+        <br/>
+        <br/>
+        The awesome music is Knuck Beatz's <a href="http://soundcloud.com/casesensative/knuck-beatz-so-many-blocks-so" target="_blank">So Many Blocks, So Little Time (Minecraft Soundtrack)</a>.
+        <br/>
+        <br/>
+        TODO: audio files
       </div>
       <br/>
+      <br/>
+      <div id="code">
+        <span class="section">Code</span>
+        <br/>
+        <br/>
+        Coming soon, patience please! I've already got the build system I'm writing
+        that all of this is produced with available here:
+        <a href="https://github.com/benvanik/anvil-build">anvil-build</a>.
+        The rest will be coming ASAP!
       </div>
-      <script>
-        function makeWarnings(div) {
-          function testWebGL() {
-            var canvas = document.createElement('canvas');
-            if (canvas) {
-              var names = ['webgl', 'experimental-webgl'];
-              for (var n = 0; n < names.length; n++) {
-                var gl = canvas.getContext(names[n]);
-                if (gl) {
-                  return true;
-                }
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+    </div>
+    <script>
+      function makeWarnings(div) {
+        function testWebGL() {
+          var canvas = document.createElement('canvas');
+          if (canvas) {
+            var names = ['webgl', 'experimental-webgl'];
+            for (var n = 0; n < names.length; n++) {
+              var gl = canvas.getContext(names[n]);
+              if (gl) {
+                return true;
               }
             }
-            return false;
           }
-          function testWebAudio() {
-            return !!window.webkitAudioContext || !!window.AudioContext;
+          return false;
+        }
+        function testWebAudio() {
+          return !!window.webkitAudioContext || !!window.AudioContext;
+        }
+        function testMouseLock() {
+          return !!window.navigator.pointer ||
+              !!window.navigator.mozPointer ||
+              !!window.navigator.webkitPointer;
+        }
+        function testWebSockets() {
+          return !!window.WebSocket;
+        }
+        function testFileSystem() {
+          return !!window.webkitStorageInfo && !!window.webkitRequestFileSystem;
+        }
+        function testWebWorker() {
+          return !!window.Worker;
+        }
+        function testSharedWorker() {
+          // Only supported in Chrome
+          if (window.navigator.userAgent.indexOf('Chrome') != -1) {
+            return !!window.SharedWorker;
           }
-          function testMouseLock() {
-            return !!window.navigator.pointer ||
-                !!window.navigator.mozPointer ||
-                !!window.navigator.webkitPointer;
-          }
-          function testWebSockets() {
-            return !!window.WebSocket;
-          }
-          function testFileSystem() {
-            return !!window.webkitStorageInfo && !!window.webkitRequestFileSystem;
-          }
-          function testWebWorker() {
-            return !!window.Worker;
-          }
-          function testSharedWorker() {
-            // Only supported in Chrome
-            if (window.navigator.userAgent.indexOf('Chrome') != -1) {
-              return !!window.SharedWorker;
+          return false;
+        }
+
+        function addStatusLine(ul, feature, critical, supportFunc, info) {
+          var supported = false;
+          try {
+            supported = supportFunc();
+          } catch (e) {
+            if (window.console) {
+              window.console.log(e);
             }
-            return false;
           }
 
-          function addStatusLine(ul, feature, critical, supportFunc, info) {
-            var supported = false;
-            try {
-              supported = supportFunc();
-            } catch (e) {
-              if (window.console) {
-                window.console.log(e);
-              }
-            }
-
-            var li = document.createElement('li');
-            li.appendChild(document.createTextNode(feature + ': '));
-            var statusSpan = document.createElement('span');
-            if (supported) {
-              statusSpan.className = 'status-info';
-              statusSpan.appendChild(document.createTextNode('supported'));
+          var li = document.createElement('li');
+          li.appendChild(document.createTextNode(feature + ': '));
+          var statusSpan = document.createElement('span');
+          if (supported) {
+            statusSpan.className = 'status-info';
+            statusSpan.appendChild(document.createTextNode('supported'));
+            li.appendChild(statusSpan);
+          } else {
+            if (critical) {
+              var statusSpan = document.createElement('span');
+              statusSpan.className = 'status-error';
+            statusSpan.appendChild(document.createTextNode('unsupported'));
               li.appendChild(statusSpan);
             } else {
-              if (critical) {
-                var statusSpan = document.createElement('span');
-                statusSpan.className = 'status-error';
+              var statusSpan = document.createElement('span');
+              statusSpan.className = 'status-warning';
               statusSpan.appendChild(document.createTextNode('unsupported'));
-                li.appendChild(statusSpan);
-              } else {
-                var statusSpan = document.createElement('span');
-                statusSpan.className = 'status-warning';
-                statusSpan.appendChild(document.createTextNode('unsupported'));
-                li.appendChild(statusSpan);
-              }
-              if (info) {
-                var infoSpan = document.createElement('span');
-                infoSpan.className = 'info';
-                infoSpan.appendChild(document.createTextNode(' (' + info + ')'));
-                li.appendChild(infoSpan);
-              }
+              li.appendChild(statusSpan);
             }
-            ul.appendChild(li);
-          }
-
-          var ul = document.createElement('ul');
-          div.appendChild(ul);
-
-          addStatusLine(ul,
-              'WebGL', true,
-              testWebGL,
-              'nothing will work!');
-          addStatusLine(ul,
-              'WebSockets', false,
-              testWebSockets,
-              'no multiplayer');
-          addStatusLine(ul,
-              'Web Workers', false,
-              testWebWorker,
-              'no local play');
-          addStatusLine(ul,
-              'SharedWorker', false,
-              testSharedWorker,
-              'no local multiplayer');
-          addStatusLine(ul,
-              'File System', false,
-              testFileSystem,
-              'no local saving');
-          addStatusLine(ul,
-              'Web Audio API', false,
-              testWebAudio,
-              'no sounds');
-          addStatusLine(ul,
-              'Mouse Lock', false,
-              testMouseLock);
-        }
-        makeWarnings(document.getElementById('warnings'));
-
-        var nameBox = document.getElementById('name');
-        function loadName() {
-          var value = null;
-          var parts = document.cookie.split(';');
-          for (var n = 0; n < parts.length; n++) {
-            var part = parts[n];
-            part = part.replace(/^[\s\xa0]+|[\s\xa0]+$/g, '');
-            if (part.indexOf('s_un=') == 0) {
-              value = part.substr(part.indexOf('=') + 1);
-              value = decodeURIComponent(value.replace(/\+/g, ' '));
-              break;
+            if (info) {
+              var infoSpan = document.createElement('span');
+              infoSpan.className = 'info';
+              infoSpan.appendChild(document.createTextNode(' (' + info + ')'));
+              li.appendChild(infoSpan);
             }
           }
-          if (value && value.length) {
-            nameBox.value = value;
-          } else {
-            nameBox.value = 'User';
+          ul.appendChild(li);
+        }
+
+        var ul = document.createElement('ul');
+        div.appendChild(ul);
+
+        addStatusLine(ul,
+            'WebGL', true,
+            testWebGL,
+            'nothing will work!');
+        addStatusLine(ul,
+            'WebSockets', false,
+            testWebSockets,
+            'no multiplayer');
+        addStatusLine(ul,
+            'Web Workers', false,
+            testWebWorker,
+            'no local play');
+        addStatusLine(ul,
+            'SharedWorker', false,
+            testSharedWorker,
+            'no local multiplayer');
+        addStatusLine(ul,
+            'File System', false,
+            testFileSystem,
+            'no local saving');
+        addStatusLine(ul,
+            'Web Audio API', false,
+            testWebAudio,
+            'no sounds');
+        addStatusLine(ul,
+            'Mouse Lock', false,
+            testMouseLock);
+      }
+      makeWarnings(document.getElementById('warnings'));
+
+      var nameBox = document.getElementById('name');
+      function loadName() {
+        var value = null;
+        var parts = document.cookie.split(';');
+        for (var n = 0; n < parts.length; n++) {
+          var part = parts[n];
+          part = part.replace(/^[\s\xa0]+|[\s\xa0]+$/g, '');
+          if (part.indexOf('s_un=') == 0) {
+            value = part.substr(part.indexOf('=') + 1);
+            value = decodeURIComponent(value.replace(/\+/g, ' '));
+            break;
           }
         }
-        function saveName() {
-          // Not very strong verification here - the game will do it
-          var value = nameBox.value;
-          if (!value || !value.length) {
-            value = 'User';
-          }
-          document.cookie = 's_un=' + encodeURIComponent(value);
+        if (value && value.length) {
+          nameBox.value = value;
+        } else {
+          nameBox.value = 'User';
         }
-        loadName();
-        function updateLink() {
-          var joinLink = document.getElementById('joinLink');
-          joinLink.href = 'game.html?host=' + DEFAULT_HOST;
-          saveName();
+      }
+      function saveName() {
+        // Not very strong verification here - the game will do it
+        var value = nameBox.value;
+        if (!value || !value.length) {
+          value = 'User';
         }
-        updateLink();
-        nameBox.addEventListener('change', updateLink, false);
-      </script>
+        document.cookie = 's_un=' + encodeURIComponent(value);
+      }
+      loadName();
+      function updateLink() {
+        var joinLink = document.getElementById('joinLink');
+        joinLink.href = 'game.html?host=' + DEFAULT_HOST;
+        saveName();
+      }
+      updateLink();
+      nameBox.addEventListener('change', updateLink, false);
+    </script>
   </body>
 </html>
