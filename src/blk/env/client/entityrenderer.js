@@ -83,12 +83,13 @@ blk.env.client.EntityRenderer = function(renderState, entity) {
       renderState.graphicsContext);
   this.registerDisposable(this.spriteBuffer_);
 
-  if (entity.title) {
-    var font = this.renderState.font;
-    var wh = font.measureString(entity.title);
-    font.prepareString(this.spriteBuffer_, entity.title, 0xFFFFFFFF,
-        -wh[0] / 2 , 0);
-  }
+  /**
+   * Current title string, if any.
+   * @private
+   * @type {string|null}
+   */
+  this.cachedTitle_ = null;
+  this.updateTitle_();
 
   // Entangle with entity
   entity.renderData = this;
@@ -160,6 +161,28 @@ blk.env.client.EntityRenderer.prototype.restore = function() {
 
   goog.base(this, 'restore');
 };
+
+
+/**
+ * Updates the entity title adorner if required.
+ * @private
+ */
+blk.env.client.EntityRenderer.prototype.updateTitle_ = function() {
+  var title = this.entity.title;
+  if (title == this.cachedTitle_) {
+    return;
+  }
+  this.cachedTitle_ = title;
+
+  this.spriteBuffer_.clear();
+
+  if (title && title.length) {
+    var font = this.renderState.font;
+    var wh = font.measureString(title);
+    font.prepareString(this.spriteBuffer_, title, 0xFFFFFFFF,
+        -wh[0] / 2 , 0);
+  }
+}
 
 
 /**
@@ -241,18 +264,22 @@ blk.env.client.EntityRenderer.prototype.renderDebug =
  */
 blk.env.client.EntityRenderer.prototype.renderAdorners =
     function(frame, viewport) {
-  var state = this.entity.state;
-  var scale = 1 / 16;
-  var scaleMatrix = blk.env.client.EntityRenderer.tmpMat4_[0];
-  goog.vec.Mat4.makeScale(scaleMatrix, scale, -scale, 1);
-  var worldMatrix = blk.env.client.EntityRenderer.tmpMat4_[1];
-  viewport.makeBillboard(worldMatrix);
-  goog.vec.Mat4.multMat(worldMatrix, scaleMatrix, worldMatrix);
-  worldMatrix[12] = state.position[0];
-  worldMatrix[13] = state.position[1] + 1.5;
-  worldMatrix[14] = state.position[2];
+  this.updateTitle_();
 
-  this.spriteBuffer_.draw(viewport.viewProjMatrix, worldMatrix);
+  if (this.cachedTitle_ && this.cachedTitle_.length) {
+    var state = this.entity.state;
+    var scale = 1 / 16;
+    var scaleMatrix = blk.env.client.EntityRenderer.tmpMat4_[0];
+    goog.vec.Mat4.makeScale(scaleMatrix, scale, -scale, 1);
+    var worldMatrix = blk.env.client.EntityRenderer.tmpMat4_[1];
+    viewport.makeBillboard(worldMatrix);
+    goog.vec.Mat4.multMat(worldMatrix, scaleMatrix, worldMatrix);
+    worldMatrix[12] = state.position[0];
+    worldMatrix[13] = state.position[1] + 1.5;
+    worldMatrix[14] = state.position[2];
+
+    this.spriteBuffer_.draw(viewport.viewProjMatrix, worldMatrix);
+  }
 };
 
 

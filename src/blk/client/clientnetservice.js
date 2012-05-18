@@ -123,6 +123,10 @@ blk.client.ClientNetService.prototype.userDisconnected = function(user) {
  * @override
  */
 blk.client.ClientNetService.prototype.userUpdated = function(user) {
+  var player = this.game.state.getPlayerBySessionId(user.sessionId);
+  if (player && player.entity) {
+    player.entity.title = user.info.displayName;
+  }
 };
 
 

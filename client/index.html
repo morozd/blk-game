@@ -31,11 +31,11 @@
       <br/>
       <br/>
       <div id="browser-line">
-        <div class="browser-logo chrome-icon"></div> Use Chrome 17+ or <a href="http://tools.google.com/dlpage/chromesxs" target="_blank">Canary</a> for the full experience!
+        <div class="browser-logo chrome-icon"></div> Use Chrome 18+ or <a href="http://tools.google.com/dlpage/chromesxs" target="_blank">Canary</a> for the full experience!
         <br/>
         <br/>
         <div style="clear: both"/>
-        <div class="browser-logo firefox-icon"></div> Firefox 8+ works too!
+        <div class="browser-logo firefox-icon"></div> Firefox 12+ works too! (a bit)
         <br/>
         <br/>
         <div style="clear: both"/>
@@ -176,7 +176,7 @@
                 !!window.navigator.webkitPointer;
           }
           function testWebSockets() {
-            return !!window.WebSocket || !!window.MozWebSocket;
+            return !!window.WebSocket;
           }
           function testFileSystem() {
             return !!window.webkitStorageInfo && !!window.webkitRequestFileSystem;
