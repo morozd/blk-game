@@ -19,37 +19,37 @@ quickly, and spend timing writing game code vs. platform abstractions.
 ### Game Library Features
 
 * Runtime
-** Robust game loop management
-** Idle state/hidden tab tracking
+  * Robust game loop management
+  * Idle state/hidden tab tracking
 * Audio
-** 3D positional sound via <a href="https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html">Web Audio API</a>
-** Efficient sound bank representation (single file transfer) + tools for creation
-** Efficient music playback
+  * 3D positional sound via <a href="https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html">Web Audio API</a>
+  * Efficient sound bank representation (single file transfer) + tools for creation
+  * Efficient music playback
 * Graphics
-** Display supporting orientation changes, fullscreen mode, etc
-** WebGL context loss/restore handling
-** Texture atlases and sprite batch rendering
-** WebGL shader program abstraction
-** Bitmap fonts with kerning and layout
+  * Display supporting orientation changes, fullscreen mode, etc
+  * WebGL context loss/restore handling
+  * Texture atlases and sprite batch rendering
+  * WebGL shader program abstraction
+  * Bitmap fonts with kerning and layout
 * Input abstraction layer
-** <a href="http://dvcs.w3.org/hg/webevents/raw-file/default/mouse-lock.html">Mouse Lock</a> support
-** (coming soon) on-screen dpad and accelerometer
-** (coming soon) <a href="http://dvcs.w3.org/hg/webevents/raw-file/default/gamepad.html">gamepad</a> support
-** (coming soon) input action map/normalization
+  * <a href="http://dvcs.w3.org/hg/webevents/raw-file/default/mouse-lock.html">Mouse Lock</a> support
+  * (coming soon) on-screen dpad and accelerometer
+  * (coming soon) <a href="http://dvcs.w3.org/hg/webevents/raw-file/default/gamepad.html">gamepad</a> support
+  * (coming soon) input action map/normalization
 * Multiplayer networking
-** Client/server session management
-** Full client-side input prediction and entity interpolation
-** Synchronized clocks
-** Localhost server via Web Workers
-** SharedWorker for multi-tab local networking
-** node.js server via WebSockets (100% shared code)
-** Efficient network binary representation
-** (coming soon) authentication via ID providers
+  * Client/server session management
+  * Full client-side input prediction and entity interpolation
+  * Synchronized clocks
+  * Localhost server via Web Workers
+  * SharedWorker for multi-tab local networking
+  * node.js server via WebSockets (100% shared code)
+  * Efficient network binary representation
+  * (coming soon) authentication via ID providers
 * Math and Utilities
-** Axis-aligned bounding box
-** Octree
-** Quaternion, ray, vec enhancements
-** Seedable PRNG
+  * Axis-aligned bounding box
+  * Octree
+  * Quaternion, ray, vec enhancements
+  * Seedable PRNG
 
 
 ### Why Closure?
@@ -59,12 +59,12 @@ quickly, and spend timing writing game code vs. platform abstractions.
 * Compiler inlining can drastically help performance (and can only get better)
 * Native Javascript - no plugins or extensions required to get the functionality
 * Closure Library contains a lot of useful functionality
-** Localization/i18n
-** Array, object, and string extensions
-** Data structures
-** DOM/CSS/etc templating and abstractions
-** Rich and efficient vector math library (one of the fastest!)
-** Well tested and maintained
+  * Localization/i18n
+  * Array, object, and string extensions
+  * Data structures
+  * DOM/CSS/etc templating and abstractions
+  * Rich and efficient vector math library (one of the fastest!)
+  * Well tested and maintained
 
 
 Credits
