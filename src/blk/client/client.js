@@ -43,7 +43,7 @@ goog.require('goog.userAgent.product');
  * @const
  * @type {boolean}
  */
-blk.client.ENABLE_SHARED_WORKERS_ = false;
+blk.client.ENABLE_SHARED_WORKERS_ = true;
 
 
 /**

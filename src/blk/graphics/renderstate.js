@@ -29,6 +29,7 @@ goog.require('gf.graphics.RasterizerState');
 goog.require('gf.graphics.Resource');
 goog.require('gf.graphics.SpriteBuffer');
 goog.require('goog.asserts');
+goog.require('goog.vec.Vec3');
 goog.require('goog.webgl');
 
 
@@ -56,6 +57,12 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
   this.mode = blk.graphics.RenderState.Mode.UNKNOWN;
 
   /**
+   * Scene lighting information utility.
+   * @type {!blk.graphics.RenderState.LightingInfo}
+   */
+  this.lightingInfo = new blk.graphics.RenderState.LightingInfo();
+
+  /**
    * Font.
    * @type {!blk.assets.fonts.MonospaceFont}
    */
@@ -71,7 +78,6 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
       assetManager, graphicsContext);
   this.registerDisposable(this.blockAtlas);
   this.blockAtlas.setFilteringMode(goog.webgl.NEAREST, goog.webgl.NEAREST);
-  this.blockAtlas.load();
 
   /**
    * UI texture atlas.
@@ -81,7 +87,6 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
       assetManager, graphicsContext);
   this.uiAtlas.setFilteringMode(goog.webgl.NEAREST, goog.webgl.NEAREST);
   this.registerDisposable(this.uiAtlas);
-  this.uiAtlas.load();
 
   /**
    * Line program.
@@ -90,7 +95,6 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
   this.lineProgram = blk.assets.programs.LineProgram.create(
       assetManager, graphicsContext);
   this.registerDisposable(this.lineProgram);
-  this.lineProgram.restore();
 
   /**
    * Sprite program.
@@ -99,7 +103,6 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
   this.spriteProgram = blk.assets.programs.SpriteProgram.create(
       assetManager, graphicsContext);
   this.registerDisposable(this.spriteProgram);
-  this.spriteProgram.restore();
 
   /**
    * Shared index buffer used for drawing sprites.
@@ -129,8 +132,6 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
   this.faceProgram = blk.assets.programs.FaceProgram.create(
       assetManager, graphicsContext);
   this.registerDisposable(this.faceProgram);
-
-  this.faceProgram.load();
 };
 goog.inherits(blk.graphics.RenderState, gf.graphics.Resource);
 
@@ -338,7 +339,7 @@ blk.graphics.RenderState.prototype.restore = function() {
 blk.graphics.RenderState.prototype.reset = function(
     viewport, clearColor, clear) {
   var ctx = this.graphicsContext;
-  var gl = ctx.gl;
+  var gl = ctx.getGL();
 
   ctx.setRasterizerState(blk.graphics.RenderState.RASTERIZER_STATE_);
 
@@ -353,55 +354,6 @@ blk.graphics.RenderState.prototype.reset = function(
 
 
 /**
- * Sets the lighting/fog parameters for the scene.
- * @param {!goog.vec.Vec3.Float32} ambientLightColor Ambient lighting color.
- * @param {!goog.vec.Vec3.Float32} sunLightDirection Normalized sun lighting
- *     direction vector.
- * @param {!goog.vec.Vec3.Float32} sunLightColor Sun lighting color.
- * @param {number} fogNear Fog near z value.
- * @param {number} fogFar Fog far z value.
- * @param {!goog.vec.Vec3.Float32} fogColor Fog color.
- */
-blk.graphics.RenderState.prototype.setLighting = function(
-    ambientLightColor,
-    sunLightDirection, sunLightColor,
-    fogNear, fogFar, fogColor) {
-  var ctx = this.graphicsContext;
-  var gl = ctx.gl;
-
-  // TODO(benvanik): stash and set on first use
-
-  // Line program
-  var lineProgram = this.lineProgram;
-  ctx.setProgram(lineProgram);
-  gl.uniform2f(lineProgram.u_fogInfo,
-      fogNear, fogFar);
-  gl.uniform3f(lineProgram.u_fogColor,
-      fogColor[0], fogColor[1], fogColor[2]);
-
-  // Face program
-  var faceProgram = this.faceProgram;
-  ctx.setProgram(faceProgram);
-  gl.uniform3f(faceProgram.u_ambientLightColor,
-      ambientLightColor[0],
-      ambientLightColor[1],
-      ambientLightColor[2]);
-  gl.uniform3f(faceProgram.u_sunLightDirection,
-      sunLightDirection[0],
-      sunLightDirection[1],
-      sunLightDirection[2]);
-  gl.uniform3f(faceProgram.u_sunLightColor,
-      sunLightColor[0],
-      sunLightColor[1],
-      sunLightColor[2]);
-  gl.uniform2f(faceProgram.u_fogInfo,
-      fogNear, fogFar);
-  gl.uniform3f(faceProgram.u_fogColor,
-      fogColor[0], fogColor[1], fogColor[2]);
-};
-
-
-/**
  * Begins the chunk drawing pass 1 mode.
  */
 blk.graphics.RenderState.prototype.beginChunkPass1 = function() {
@@ -411,12 +363,13 @@ blk.graphics.RenderState.prototype.beginChunkPass1 = function() {
   this.mode = blk.graphics.RenderState.Mode.CHUNK_PASS1;
 
   var ctx = this.graphicsContext;
-  var gl = ctx.gl;
+  var gl = ctx.getGL();
 
   ctx.setBlendState(blk.graphics.RenderState.BLEND_CHUNK_PASS1_);
   ctx.setDepthState(blk.graphics.RenderState.DEPTH_CHUNK_PASS1_);
 
   ctx.setProgram(this.faceProgram);
+  this.lightingInfo.setFaceUniforms(gl, this.faceProgram);
 
   // Texture atlas
   ctx.setTexture(0, this.blockAtlas);
@@ -443,12 +396,13 @@ blk.graphics.RenderState.prototype.beginChunkPass2 = function() {
   this.mode = blk.graphics.RenderState.Mode.CHUNK_PASS2;
 
   var ctx = this.graphicsContext;
-  var gl = ctx.gl;
+  var gl = ctx.getGL();
 
   ctx.setBlendState(blk.graphics.RenderState.BLEND_CHUNK_PASS2_);
   ctx.setDepthState(blk.graphics.RenderState.DEPTH_CHUNK_PASS2_);
 
   ctx.setProgram(this.faceProgram);
+  this.lightingInfo.setFaceUniforms(gl, this.faceProgram);
 
   // Texture atlas
   ctx.setTexture(0, this.blockAtlas);
@@ -475,12 +429,13 @@ blk.graphics.RenderState.prototype.beginLines = function() {
   this.mode = blk.graphics.RenderState.Mode.LINES;
 
   var ctx = this.graphicsContext;
-  var gl = ctx.gl;
+  var gl = ctx.getGL();
 
   ctx.setBlendState(blk.graphics.RenderState.BLEND_LINES_);
   ctx.setDepthState(blk.graphics.RenderState.DEPTH_LINES_);
 
   ctx.setProgram(this.lineProgram);
+  this.lightingInfo.setLineUniforms(gl, this.lineProgram);
 
   // TODO(benvanik): VAO
   gl.enableVertexAttribArray(0);
@@ -498,7 +453,7 @@ blk.graphics.RenderState.prototype.beginSprites = function(atlas, depthTest) {
   this.mode = blk.graphics.RenderState.Mode.SPRITES;
 
   var ctx = this.graphicsContext;
-  var gl = ctx.gl;
+  var gl = ctx.getGL();
 
   ctx.setBlendState(blk.graphics.RenderState.BLEND_SPRITES_);
   ctx.setDepthState(depthTest ?
@@ -515,4 +470,162 @@ blk.graphics.RenderState.prototype.beginSprites = function(atlas, depthTest) {
   gl.enableVertexAttribArray(0);
   gl.enableVertexAttribArray(1);
   gl.enableVertexAttribArray(2);
+};
+
+
+
+/**
+ * Lighting information.
+ * @constructor
+ */
+blk.graphics.RenderState.LightingInfo = function() {
+  /**
+   * @type {!goog.vec.Vec3.Float32}
+   */
+  this.ambientLightColor = goog.vec.Vec3.createFloat32();
+
+  /**
+   * @type {!goog.vec.Vec3.Float32}
+   */
+  this.sunLightDirection = goog.vec.Vec3.createFloat32();
+
+  /**
+   * @type {!goog.vec.Vec3.Float32}
+   */
+  this.sunLightColor = goog.vec.Vec3.createFloat32();
+
+  /**
+   * @type {number}
+   */
+  this.fogNear = 0;
+
+  /**
+   * @type {number}
+   */
+  this.fogFar = 0;
+
+  /**
+   * @type {!goog.vec.Vec3.Float32}
+   */
+  this.fogColor = goog.vec.Vec3.createFloat32();
+
+  /**
+   * @private
+   * @type {boolean}
+   */
+  this.lineUniformsDirty_ = true;
+
+  /**
+   * @private
+   * @type {boolean}
+   */
+  this.faceUniformsDirty_ = true;
+};
+
+
+/**
+ * Sets the lighting/fog parameters for the scene.
+ * @param {!goog.vec.Vec3.Float32} ambientLightColor Ambient lighting color.
+ * @param {!goog.vec.Vec3.Float32} sunLightDirection Normalized sun lighting
+ *     direction vector.
+ * @param {!goog.vec.Vec3.Float32} sunLightColor Sun lighting color.
+ * @param {number} fogNear Fog near z value.
+ * @param {number} fogFar Fog far z value.
+ * @param {!goog.vec.Vec3.Float32} fogColor Fog color.
+ */
+blk.graphics.RenderState.LightingInfo.prototype.update = function(
+    ambientLightColor,
+    sunLightDirection, sunLightColor,
+    fogNear, fogFar, fogColor) {
+  var dirty = false;
+
+  if (!goog.vec.Vec3.equals(this.ambientLightColor, ambientLightColor)) {
+    goog.vec.Vec3.setFromArray(this.ambientLightColor, ambientLightColor);
+    dirty = true;
+  }
+
+  if (!goog.vec.Vec3.equals(this.sunLightDirection, sunLightDirection) ||
+      !goog.vec.Vec3.equals(this.sunLightColor, sunLightColor)) {
+    goog.vec.Vec3.setFromArray(this.sunLightDirection, sunLightDirection);
+    goog.vec.Vec3.setFromArray(this.sunLightColor, sunLightColor);
+    dirty = true;
+  }
+
+  if (this.fogNear != fogNear ||
+      this.fogFar != fogFar ||
+      !goog.vec.Vec3.equals(this.fogColor, fogColor)) {
+    this.fogNear = fogNear;
+    this.fogFar = fogFar;
+    goog.vec.Vec3.setFromArray(this.fogColor, fogColor);
+    dirty = true;
+  }
+
+  if (dirty) {
+    this.lineUniformsDirty_ = this.faceUniformsDirty_ = true;
+  }
+};
+
+
+/**
+ * Sets the uniforms on the line program, if required.
+ * Assumes the program has already been set on the context.
+ * @param {!WebGLRenderingContext} gl WebGL context.
+ * @param {!blk.assets.programs.LineProgram} program Line program.
+ */
+blk.graphics.RenderState.LightingInfo.prototype.setLineUniforms =
+    function(gl, program) {
+  if (!this.lineUniformsDirty_) {
+    return;
+  }
+  this.lineUniformsDirty_ = false;
+
+  gl.uniform2f(
+      program.u_fogInfo,
+      this.fogNear,
+      this.fogFar);
+  gl.uniform3f(
+      program.u_fogColor,
+      this.fogColor[0],
+      this.fogColor[1],
+      this.fogColor[2]);
+};
+
+
+/**
+ * Sets the uniforms on the face program, if required.
+ * Assumes the program has already been set on the context.
+ * @param {!WebGLRenderingContext} gl WebGL context.
+ * @param {!blk.assets.programs.FaceProgram} program Face program.
+ */
+blk.graphics.RenderState.LightingInfo.prototype.setFaceUniforms =
+    function(gl, program) {
+  if (!this.faceUniformsDirty_) {
+    return;
+  }
+  this.faceUniformsDirty_ = false;
+
+  gl.uniform3f(
+      program.u_ambientLightColor,
+      this.ambientLightColor[0],
+      this.ambientLightColor[1],
+      this.ambientLightColor[2]);
+  gl.uniform3f(
+      program.u_sunLightDirection,
+      this.sunLightDirection[0],
+      this.sunLightDirection[1],
+      this.sunLightDirection[2]);
+  gl.uniform3f(
+      program.u_sunLightColor,
+      this.sunLightColor[0],
+      this.sunLightColor[1],
+      this.sunLightColor[2]);
+  gl.uniform2f(
+      program.u_fogInfo,
+      this.fogNear,
+      this.fogFar);
+  gl.uniform3f(
+      program.u_fogColor,
+      this.fogColor[0],
+      this.fogColor[1],
+      this.fogColor[2]);
 };

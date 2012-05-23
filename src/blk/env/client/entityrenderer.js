@@ -18,7 +18,6 @@ goog.provide('blk.env.client.EntityRenderer');
 
 goog.require('blk.env.Face');
 goog.require('blk.env.client.BaseRenderer');
-goog.require('gf.graphics.SpriteBuffer');
 goog.require('goog.vec.Mat4');
 goog.require('goog.vec.Quaternion');
 goog.require('goog.vec.Vec3');

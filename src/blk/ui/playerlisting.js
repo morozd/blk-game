@@ -16,7 +16,6 @@
 
 goog.provide('blk.ui.PlayerListing');
 
-goog.require('gf.graphics.SpriteBuffer');
 goog.require('goog.Disposable');
 goog.require('goog.vec.Mat4');
 goog.require('goog.vec.Vec4');

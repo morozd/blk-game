@@ -40,7 +40,6 @@ goog.require('gf.assets.AssetManager');
 goog.require('gf.audio.AudioManager');
 goog.require('gf.dom.Display');
 goog.require('gf.graphics.GraphicsContext');
-goog.require('gf.graphics.SpriteBuffer');
 goog.require('gf.input.Data');
 goog.require('gf.input.InputManager');
 goog.require('gf.input.MouseButton');

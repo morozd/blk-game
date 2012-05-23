@@ -486,7 +486,7 @@ blk.env.client.ViewManager.prototype.render = function(frame, viewport,
 
   var fogNear = viewport.far * 0.5;
   var fogFar = viewport.far * 0.85;
-  renderState.setLighting(
+  renderState.lightingInfo.update(
       map.environment.ambientLightColor,
       map.environment.sunLightDirection, map.environment.sunLightColor,
       fogNear, fogFar, map.environment.fogColor);

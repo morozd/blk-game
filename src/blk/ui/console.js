@@ -16,7 +16,6 @@
 
 goog.provide('blk.ui.Console');
 
-goog.require('gf.graphics.SpriteBuffer');
 goog.require('gf.net.chat.EventType');
 goog.require('goog.Disposable');
 goog.require('goog.dom.TagName');
