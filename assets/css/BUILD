@@ -11,4 +11,5 @@ file_set(
         'font-monospace.gss',
         'alert-assets.gss',
         'alerts.gss',
+        'playerlisting.gss',
         ])

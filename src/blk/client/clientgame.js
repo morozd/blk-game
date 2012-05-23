@@ -257,19 +257,27 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
   this.registerDisposable(this.spriteBuffer_);
 
   /**
+   * UI widgets.
+   * @private
+   * @type {!Array.<blk.ui.Widget>}
+   */
+  this.widgets_ = [];
+
+  /**
    * Console.
    * @type {!blk.ui.Console}
    */
   this.console = new blk.ui.Console(this);
   this.registerDisposable(this.console);
+  //this.addWidget_(this.console);
 
   /**
    * Player listing.
    * @type {!blk.ui.PlayerListing}
    */
-  this.playerListing = new blk.ui.PlayerListing(graphicsContext,
-      this.renderState, this.state);
+  this.playerListing = new blk.ui.PlayerListing(this);
   this.registerDisposable(this.playerListing);
+  this.addWidget_(this.playerListing);
 
   /**
    * Local player.
@@ -361,6 +369,19 @@ blk.client.ClientGame.prototype.disposeInternal = function() {
 
 
 /**
+ * Adds a widget to the game screen.
+ * @private
+ * @param {!blk.ui.Widget} widget Widget to add.
+ */
+blk.client.ClientGame.prototype.addWidget_ = function(widget) {
+  // TODO(benvanik): add more logic around widget lifetimes/etc
+  this.widgets_.push(widget);
+  this.registerDisposable(widget);
+  widget.enterDocument();
+};
+
+
+/**
  * Gets the entity representing the local player.
  * HACK: this will be removed soon
  * @return {blk.env.Entity} Entity, if any.
@@ -425,7 +446,6 @@ blk.client.ClientGame.prototype.update = function(frame) {
 
   // Update UI bits
   this.console.update(frame);
-  this.playerListing.update(frame);
 
   // Update views
   this.localView.update(frame, this.viewport.position);
@@ -450,6 +470,8 @@ blk.client.ClientGame.prototype.handleUserConnect = function(user) {
   this.console.log(
       user.info.displayName + ' (' + user.sessionId + ') connected on ' +
       user.agent.toString());
+
+  this.playerListing.refresh();
 };
 
 
@@ -477,6 +499,22 @@ blk.client.ClientGame.prototype.handleUserDisconnect = function(user) {
   this.console.log(
       user.info.displayName + ' (' + user.sessionId + ') disconnected:',
       gf.net.DisconnectReason.toString(user.disconnectReason));
+
+  this.playerListing.refresh();
+};
+
+
+/**
+ * Handles a user update event.
+ * @param {!gf.net.User} user User.
+ */
+blk.client.ClientGame.prototype.handleUserUpdate = function(user) {
+  var player = this.state.getPlayerBySessionId(user.sessionId);
+  if (player && player.entity) {
+    player.entity.title = user.info.displayName;
+  }
+
+  this.playerListing.refresh();
 };
 
 
@@ -676,7 +714,6 @@ blk.client.ClientGame.prototype.render = function(frame) {
       this.localPlayer.entity.state.velocity[1].toFixed(8),
       this.localPlayer.entity.state.velocity[2].toFixed(8)].join(',') : '';
     this.console.render(frame, viewport, mapStats, renderStats, movement);
-    this.playerListing.render(frame, viewport);
     this.drawInputUI_(frame);
     this.drawBlockTypes_(frame);
 

@@ -16,9 +16,12 @@
 
 goog.provide('blk.ui.PlayerListing');
 
-goog.require('goog.Disposable');
-goog.require('goog.vec.Mat4');
-goog.require('goog.vec.Vec4');
+goog.require('blk.ui.Widget');
+goog.require('blk.ui.playerlisting');
+goog.require('gf.log');
+goog.require('goog.dom');
+goog.require('goog.soy');
+goog.require('goog.style');
 
 
 
@@ -26,175 +29,51 @@ goog.require('goog.vec.Vec4');
  * Player listing overlay.
  *
  * @constructor
- * @extends {goog.Disposable}
- * @param {!gf.graphics.GraphicsContext} graphicsContext Graphics context.
- * @param {!blk.graphics.RenderState} renderState Render state.
- * @param {!blk.GameState} gameState Game state.
+ * @extends {blk.ui.Widget}
+ * @param {!blk.client.ClientGame} game Client game.
  */
-blk.ui.PlayerListing = function(graphicsContext, renderState, gameState) {
-  goog.base(this);
+blk.ui.PlayerListing = function(game) {
+  goog.base(this, game, blk.ui.playerlisting.listing, {
+  });
+
+  goog.style.setUnselectable(this.root);
 
   /**
-   * Graphics context.
-   * @type {!gf.graphics.GraphicsContext}
-   */
-  this.graphicsContext = graphicsContext;
-
-  /**
-   * Render state.
-   * @type {!blk.graphics.RenderState}
-   */
-  this.renderState = renderState;
-
-  /**
-   * Font.
-   * @type {!gf.graphics.BitmapFont}
-   */
-  this.font = this.renderState.font;
-
-  /**
-   * UI texture atlas.
-   * @type {!gf.graphics.Texture}
-   */
-  this.uiAtlas = this.renderState.uiAtlas;
-
-  /**
-   * Game state.
-   * @type {!blk.GameState}
-   */
-  this.gameState = gameState;
-
-  /**
-   * Sprite buffer used for text drawing.
    * @private
-   * @type {!gf.graphics.SpriteBuffer}
+   * @type {!Element}
    */
-  this.textBuffer_ = this.renderState.createSpriteBuffer();
-  this.registerDisposable(this.textBuffer_);
+  this.bodyEl_ = this.dom.getElementByClass(
+      goog.getCssName('blkPlayerListingBody'), this.root);
 
-  /**
-   * Sprite buffer used for UI drawing.
-   * @private
-   * @type {!gf.graphics.SpriteBuffer}
-   */
-  this.spriteBuffer_ = this.renderState.createSpriteBuffer();
-  this.registerDisposable(this.spriteBuffer_);
+  this.refresh();
 };
-goog.inherits(blk.ui.PlayerListing, goog.Disposable);
+goog.inherits(blk.ui.PlayerListing, blk.ui.Widget);
 
 
 /**
- * Spacing between each line in the console.
- * @private
- * @const
- * @type {number}
+ * Refreshes the player listing.
+ * Should be called whenever something interesting changes.
  */
-blk.ui.PlayerListing.LINE_SPACING_ = 2;
+blk.ui.PlayerListing.prototype.refresh = function() {
+  gf.log.write('would update player listing');
 
+  // TODO(benvanik): could probably make this more efficient, but that'd require
+  // tracking dirty state of the DOM elements
+  // Hopefully this is infrequent enough that it doesn't really matter
 
-/**
- * Updates the console gameState.
- * @param {!gf.UpdateFrame} frame Current update frame.
- */
-blk.ui.PlayerListing.prototype.update = function(frame) {
-  // TODO(benvanik): expire messages, etc
-};
+  goog.dom.removeChildren(this.bodyEl_);
 
+  // TODO(benvanik): sort players by name
 
-/**
- * Renders the console.
- * @param {!gf.RenderFrame} frame Current render frame.
- * @param {!gf.vec.Viewport} viewport Current viewport.
- */
-blk.ui.PlayerListing.prototype.render = function(frame, viewport) {
-  var textBuffer = this.textBuffer_;
-  textBuffer.clear();
-  var spriteBuffer = this.spriteBuffer_;
-  spriteBuffer.clear();
-
-  var x = 0;
-  var y = 0;
-
-  var slotCoords = blk.ui.PlayerListing.tmpVec4_;
-
-  for (var n = 0; n < this.gameState.players.length; n++) {
-    var player = this.gameState.players[n];
-    var userInfo = player.user.info;
-    var name = userInfo.displayName + ' (' + player.user.sessionId + ')';
-    var latency = player.user.statistics.averageLatency;
-
-    // Name
-    var wh = this.font.prepareString(textBuffer, name, player.color, x, y);
-
-    // Lag meter
-    // There are 5 meters, 0-4, with 0 being lowest and 4 being highest
-    var lagSlot = 0;
-    if (latency < 30) {
-      lagSlot = 4;
-    } else if (latency < 60) {
-      lagSlot = 3;
-    } else if (latency < 100) {
-      lagSlot = 2;
-    } else if (latency < 150) {
-      lagSlot = 1;
-    } else {
-      lagSlot = 0;
-    }
-    this.uiAtlas.getSlotCoords(lagSlot, slotCoords);
-    spriteBuffer.add(
-        slotCoords[0], slotCoords[1],
-        slotCoords[2] - slotCoords[0], slotCoords[3] - slotCoords[1],
-        0xFFFFFFFF,
-        x - 16, y, 16, 16);
-
-    y += wh[1] + blk.ui.PlayerListing.LINE_SPACING_;
+  var players = this.game.state.players;
+  for (var n = 0; n < players.length; n++) {
+    var player = players[n];
+    var playerEl = /** @type {Element} */ (goog.soy.renderAsFragment(
+        blk.ui.playerlisting.player, {
+          sessionId: player.user.sessionId,
+          displayName: player.user.info.displayName,
+          latency: player.user.statistics.averageLatency
+        }, undefined, this.dom));
+    goog.dom.appendChild(this.bodyEl_, playerEl);
   }
-
-  var worldMatrix = blk.ui.PlayerListing.tmpMat4_;
-  goog.vec.Mat4.setFromValues(worldMatrix,
-      2, 0, 0, 0,
-      0, 2, 0, 0,
-      0, 0, 1, 0,
-      42, viewport.height - 60 - y, 0, 1);
-
-  this.renderState.beginSprites(this.uiAtlas, false);
-  spriteBuffer.draw(viewport.orthoMatrix, worldMatrix);
-
-  this.renderState.beginSprites(this.font.atlas, false);
-
-  // Draw shadow
-  worldMatrix[12] += 2;
-  worldMatrix[13] += 2;
-  textBuffer.draw(viewport.orthoMatrix, worldMatrix,
-      blk.ui.PlayerListing.shadowColor_);
-  worldMatrix[12] -= 2;
-  worldMatrix[13] -= 2;
-
-  // Draw base text
-  textBuffer.draw(viewport.orthoMatrix, worldMatrix);
 };
-
-
-/**
- * Temp vec4 for math.
- * @private
- * @type {!goog.vec.Vec4.Float32}
- */
-blk.ui.PlayerListing.tmpVec4_ = goog.vec.Vec4.createFloat32();
-
-
-/**
- * Temp mat4 for math.
- * @private
- * @type {!goog.vec.Mat4.Type}
- */
-blk.ui.PlayerListing.tmpMat4_ = goog.vec.Mat4.createFloat32();
-
-
-/**
- * Shadow color modulator.
- * @private
- * @type {!goog.vec.Vec4.Float32}
- */
-blk.ui.PlayerListing.shadowColor_ =
-    goog.vec.Vec4.createFloat32FromValues(0.5, 0.5, 0.5, 1);
