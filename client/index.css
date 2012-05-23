@@ -68,6 +68,7 @@ body {
   border: 1px solid black;
   background-color: #EEE;
   width: 150px;
+  padding: 3px;
 }
 
 #browser-line {

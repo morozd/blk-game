@@ -39,6 +39,7 @@
   font-size: FONT_SIZE;
   color: white;
   text-shadow: #888 1px 1px;
+  padding: 3px;
 }
 
 body {

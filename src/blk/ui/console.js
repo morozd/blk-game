@@ -97,7 +97,8 @@ blk.ui.Console = function(game) {
     'border': '1px solid black',
     'background-color': '#EEE',
     'color': '#000',
-    'width': '100%'
+    'width': '100%',
+    'padding': '3px'
   });
   inputEl.appendChild(textBox);
 

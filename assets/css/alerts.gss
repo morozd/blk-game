@@ -99,6 +99,7 @@
   font-size: 1em;
   background-color: #EEEEEE;
   color: black;
+  padding: 3px;
   border: 1px solid black;
 }
 
