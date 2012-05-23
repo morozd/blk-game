@@ -16,6 +16,7 @@
 
 goog.provide('blk.ui.Settings');
 
+goog.require('blk.env.ChunkView');
 goog.require('blk.ui.Popup');
 goog.require('blk.ui.alerts');
 goog.require('gf.net.UserInfo');

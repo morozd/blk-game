@@ -79,14 +79,13 @@ blk.env.client.EntityRenderer = function(renderState, entity) {
    * @private
    * @type {!gf.graphics.SpriteBuffer}
    */
-  this.spriteBuffer_ = new gf.graphics.SpriteBuffer(
-      renderState.graphicsContext);
+  this.spriteBuffer_ = renderState.createSpriteBuffer();
   this.registerDisposable(this.spriteBuffer_);
 
   /**
    * Current title string, if any.
    * @private
-   * @type {string|null}
+   * @type {?string}
    */
   this.cachedTitle_ = null;
   this.updateTitle_();
@@ -182,7 +181,7 @@ blk.env.client.EntityRenderer.prototype.updateTitle_ = function() {
     font.prepareString(this.spriteBuffer_, title, 0xFFFFFFFF,
         -wh[0] / 2 , 0);
   }
-}
+};
 
 
 /**

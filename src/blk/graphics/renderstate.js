@@ -20,6 +20,7 @@ goog.require('blk.assets.blocksets.simple');
 goog.require('blk.assets.fonts.MonospaceFont');
 goog.require('blk.assets.programs.FaceProgram');
 goog.require('blk.assets.programs.LineProgram');
+goog.require('blk.assets.programs.SpriteProgram');
 goog.require('blk.assets.textures.ui');
 goog.require('blk.graphics.BlockBuilder');
 goog.require('gf.graphics.BlendState');
@@ -27,7 +28,6 @@ goog.require('gf.graphics.DepthState');
 goog.require('gf.graphics.RasterizerState');
 goog.require('gf.graphics.Resource');
 goog.require('gf.graphics.SpriteBuffer');
-goog.require('gf.graphics.SpriteProgram');
 goog.require('goog.asserts');
 goog.require('goog.webgl');
 
@@ -94,12 +94,12 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
 
   /**
    * Sprite program.
-   * @private
-   * @type {gf.graphics.SpriteProgram}
+   * @type {!blk.assets.programs.SpriteProgram}
    */
-  this.spriteProgram_ = /** @type {gf.graphics.SpriteProgram} */ (
-      graphicsContext.getSharedProgram(gf.graphics.SpriteProgram));
-  goog.asserts.assert(this.spriteProgram_);
+  this.spriteProgram = blk.assets.programs.SpriteProgram.create(
+      assetManager, graphicsContext);
+  this.registerDisposable(this.spriteProgram);
+  this.spriteProgram.restore();
 
   /**
    * Shared index buffer used for drawing sprites.
@@ -133,6 +133,18 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
   this.faceProgram.load();
 };
 goog.inherits(blk.graphics.RenderState, gf.graphics.Resource);
+
+
+/**
+ * Creates a sprite buffer.
+ * The returned sprite buffer must be disposed by the caller.
+ * @return {!gf.graphics.SpriteBuffer} A new sprite buffer.
+ */
+blk.graphics.RenderState.prototype.createSpriteBuffer = function() {
+  return new gf.graphics.SpriteBuffer(
+      this.graphicsContext,
+      /** @type {!gf.graphics.SpriteProgram} */ (this.spriteProgram));
+};
 
 
 /**
@@ -354,11 +366,14 @@ blk.graphics.RenderState.prototype.setLighting = function(
     ambientLightColor,
     sunLightDirection, sunLightColor,
     fogNear, fogFar, fogColor) {
-  var gl = this.graphicsContext.gl;
+  var ctx = this.graphicsContext;
+  var gl = ctx.gl;
+
+  // TODO(benvanik): stash and set on first use
 
   // Line program
   var lineProgram = this.lineProgram;
-  gl.useProgram(lineProgram.handle);
+  ctx.setProgram(lineProgram);
   gl.uniform2f(lineProgram.u_fogInfo,
       fogNear, fogFar);
   gl.uniform3f(lineProgram.u_fogColor,
@@ -366,7 +381,7 @@ blk.graphics.RenderState.prototype.setLighting = function(
 
   // Face program
   var faceProgram = this.faceProgram;
-  gl.useProgram(faceProgram.handle);
+  ctx.setProgram(faceProgram);
   gl.uniform3f(faceProgram.u_ambientLightColor,
       ambientLightColor[0],
       ambientLightColor[1],
@@ -401,17 +416,12 @@ blk.graphics.RenderState.prototype.beginChunkPass1 = function() {
   ctx.setBlendState(blk.graphics.RenderState.BLEND_CHUNK_PASS1_);
   ctx.setDepthState(blk.graphics.RenderState.DEPTH_CHUNK_PASS1_);
 
-  // Program
-  gl.useProgram(this.faceProgram.handle);
+  ctx.setProgram(this.faceProgram);
 
   // Texture atlas
-  if (this.blockAtlas.handle) {
-    gl.bindTexture(goog.webgl.TEXTURE_2D, this.blockAtlas.handle);
-    gl.uniform2f(this.faceProgram.u_texSize,
-        this.blockAtlas.width, this.blockAtlas.height);
-  } else {
-    gl.bindTexture(goog.webgl.TEXTURE_2D, null);
-  }
+  ctx.setTexture(0, this.blockAtlas);
+  gl.uniform2f(this.faceProgram.u_texSize,
+      this.blockAtlas.width, this.blockAtlas.height);
 
   // Index buffer used by face buffers
   gl.bindBuffer(goog.webgl.ELEMENT_ARRAY_BUFFER, this.blockIndexBuffer_);
@@ -438,17 +448,12 @@ blk.graphics.RenderState.prototype.beginChunkPass2 = function() {
   ctx.setBlendState(blk.graphics.RenderState.BLEND_CHUNK_PASS2_);
   ctx.setDepthState(blk.graphics.RenderState.DEPTH_CHUNK_PASS2_);
 
-  // Program
-  gl.useProgram(this.faceProgram.handle);
+  ctx.setProgram(this.faceProgram);
 
   // Texture atlas
-  if (this.blockAtlas.handle) {
-    gl.bindTexture(goog.webgl.TEXTURE_2D, this.blockAtlas.handle);
-    gl.uniform2f(this.faceProgram.u_texSize,
-        this.blockAtlas.width, this.blockAtlas.height);
-  } else {
-    gl.bindTexture(goog.webgl.TEXTURE_2D, null);
-  }
+  ctx.setTexture(0, this.blockAtlas);
+  gl.uniform2f(this.faceProgram.u_texSize,
+      this.blockAtlas.width, this.blockAtlas.height);
 
   // Index buffer used by face buffers
   gl.bindBuffer(goog.webgl.ELEMENT_ARRAY_BUFFER, this.blockIndexBuffer_);
@@ -475,8 +480,7 @@ blk.graphics.RenderState.prototype.beginLines = function() {
   ctx.setBlendState(blk.graphics.RenderState.BLEND_LINES_);
   ctx.setDepthState(blk.graphics.RenderState.DEPTH_LINES_);
 
-  // Program
-  gl.useProgram(this.lineProgram.handle);
+  ctx.setProgram(this.lineProgram);
 
   // TODO(benvanik): VAO
   gl.enableVertexAttribArray(0);
@@ -501,15 +505,10 @@ blk.graphics.RenderState.prototype.beginSprites = function(atlas, depthTest) {
       blk.graphics.RenderState.DEPTH_ENABLED_SPRITES_ :
       blk.graphics.RenderState.DEPTH_DISABLED_SPRITES_);
 
-  // Texture atlas
-  if (atlas.handle) {
-    gl.bindTexture(goog.webgl.TEXTURE_2D, atlas.handle);
-  } else {
-    gl.bindTexture(goog.webgl.TEXTURE_2D, null);
-  }
+  ctx.setProgram(this.spriteProgram);
 
-  // Program
-  gl.useProgram(this.spriteProgram_.program);
+  // Texture atlas
+  ctx.setTexture(0, atlas);
 
   // TODO(benvanik): VAO
   gl.bindBuffer(goog.webgl.ELEMENT_ARRAY_BUFFER, this.spriteIndexBuffer_);

@@ -254,7 +254,7 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
    * @private
    * @type {!gf.graphics.SpriteBuffer}
    */
-  this.spriteBuffer_ = new gf.graphics.SpriteBuffer(graphicsContext);
+  this.spriteBuffer_ = this.renderState.createSpriteBuffer();
   this.registerDisposable(this.spriteBuffer_);
 
   /**

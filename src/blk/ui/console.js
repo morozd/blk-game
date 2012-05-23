@@ -63,7 +63,7 @@ blk.ui.Console = function(game) {
    * @private
    * @type {!gf.graphics.SpriteBuffer}
    */
-  this.textBuffer_ = new gf.graphics.SpriteBuffer(this.graphicsContext);
+  this.textBuffer_ = this.renderState.createSpriteBuffer();
   this.registerDisposable(this.textBuffer_);
 
   /**

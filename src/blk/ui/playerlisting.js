@@ -70,7 +70,7 @@ blk.ui.PlayerListing = function(graphicsContext, renderState, gameState) {
    * @private
    * @type {!gf.graphics.SpriteBuffer}
    */
-  this.textBuffer_ = new gf.graphics.SpriteBuffer(graphicsContext);
+  this.textBuffer_ = this.renderState.createSpriteBuffer();
   this.registerDisposable(this.textBuffer_);
 
   /**
@@ -78,7 +78,7 @@ blk.ui.PlayerListing = function(graphicsContext, renderState, gameState) {
    * @private
    * @type {!gf.graphics.SpriteBuffer}
    */
-  this.spriteBuffer_ = new gf.graphics.SpriteBuffer(graphicsContext);
+  this.spriteBuffer_ = this.renderState.createSpriteBuffer();
   this.registerDisposable(this.spriteBuffer_);
 };
 goog.inherits(blk.ui.PlayerListing, goog.Disposable);
