@@ -24,7 +24,7 @@
       <br/>
       <br/>
       <div id="go">
-        &gt; <a href="game.html?host=local://blk-server-0" target="_blank">Run Locally</a>
+        &gt; <a href="game.html?host=local://blk-server-0" target="_blank">Run Locally</a> (<a href="javascript:resetLocalStorage()">reset map</a>)
         <br/>
         <br/>
         &gt; <a href="game.html?host=ws://173.160.235.109:1338" target="_blank" id="joinLink">Join Multiplayer</a>
@@ -271,6 +271,30 @@
       }
       updateLink();
       nameBox.addEventListener('change', updateLink, false);
+
+      function resetLocalStorage() {
+        function resetFS(fs) {
+          var reader = fs.root.createReader();
+          function removeMore(entries) {
+            for (var n = 0; n < entries.length; n++) {
+              var entry = entries[n];
+              if (entry.isDirectory) {
+                entry.removeRecursively(function() {});
+              }
+            }
+            if (entries.length) {
+              reader.readEntries(removeMore);
+            } else {
+              alert('Done!');
+            }
+          };
+          reader.readEntries(removeMore);
+        };
+        var requestFileSystem =
+            window.requestFileSystem || window.webkitRequestFileSystem;
+        requestFileSystem.call(
+            window, window.PERSISTENT, 1, resetFS);
+      }
     </script>
   </body>
 </html>
