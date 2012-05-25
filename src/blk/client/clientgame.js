@@ -222,7 +222,10 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
   this.audio = new gf.audio.AudioManager(this, this.dom);
   this.registerDisposable(this.audio);
   this.addComponent(this.audio);
-  this.audio.setMuted(this.settings.audioMuted);
+
+  // TODO(benvanik): toggle global mutes
+  // this.settings.soundFxMuted
+  // this.settings.musicMuted
 
   /**
    * Sound bank for game sounds.
@@ -407,7 +410,9 @@ blk.client.ClientGame.prototype.update = function(frame) {
     gf.log.write('disconnected');
     this.console.log('disconnected!');
 
-    this.sounds.playAmbient('player_leave');
+    if (!this.settings.soundFxMuted) {
+      this.sounds.playAmbient('player_leave');
+    }
     this.stopTicking();
 
     var d = blk.ui.Popup.show(blk.ui.alerts.disconnected, {
@@ -469,7 +474,9 @@ blk.client.ClientGame.prototype.handleUserDisconnect = function(user) {
   goog.dispose(player);
 
   // TODO(benvanik): join/leave sound
-  this.sounds.playAmbient('player_leave');
+  if (!this.settings.soundFxMuted) {
+    this.sounds.playAmbient('player_leave');
+  }
 
   gf.log.write('client disconnected',
       user.sessionId, user.disconnectReason);
@@ -500,7 +507,7 @@ blk.client.ClientGame.prototype.setBlock = function(x, y, z, blockData) {
   var changed = map.setBlock(x, y, z, blockData);
 
   // Play block sound, if any and only if needed
-  if (changed) {
+  if (!this.settings.soundFxMuted && changed) {
     var soundData = blockData ? blockData : oldData;
     if (soundData >> 8) {
       var block = map.blockSet.get(soundData >> 8);
@@ -794,6 +801,10 @@ blk.client.ClientGame.prototype.hitTestBlockTypes_ = function(mouseData) {
  * @private
  */
 blk.client.ClientGame.prototype.showSettings_ = function() {
+  if (!this.settings.soundFxMuted) {
+    this.sounds.playAmbient('click');
+  }
+
   this.input.setEnabled(false);
 
   // TODO(benvanik): proper dynamic view adjustment
@@ -816,7 +827,10 @@ blk.client.ClientGame.prototype.showSettings_ = function() {
           this.session.updateUserInfo(userInfo);
 
           this.input.mouse.setSensitivity(this.settings.mouseSensitivity);
-          this.audio.setMuted(this.settings.audioMuted);
+
+          // TODO(benvanik): toggle global mutes
+          // this.settings.soundFxMuted
+          // this.settings.musicMuted
         }
 
         this.input.setEnabled(true);
@@ -878,7 +892,9 @@ blk.client.ClientGame.prototype.handleInput_ = function(frame) {
     }
   }
   if (didSwitchBlock) {
-    this.sounds.playAmbient('click');
+    if (!this.settings.soundFxMuted) {
+      this.sounds.playAmbient('click');
+    }
   }
 
   if (keyboardData.didKeyGoDown(goog.events.KeyCodes.M)) {

@@ -23,6 +23,7 @@ goog.require('gf.net.UserInfo');
 goog.require('goog.asserts');
 goog.require('goog.events.EventType');
 goog.require('goog.string');
+goog.require('goog.style');
 
 
 
@@ -85,13 +86,20 @@ blk.ui.Settings.prototype.enterDocument = function() {
       function(sliderValue) {
         return goog.string.padNumber(sliderValue, 1);
       });
+
+  this.setupCheckbox_(
+      goog.getCssName('blkSettingsSoundFx'),
+      !settings.soundFxMuted);
+  this.setupCheckbox_(
+      goog.getCssName('blkSettingsMusic'),
+      !settings.musicMuted);
 };
 
 
 /**
  * Sets up a slider group for control/updating.
  * @private
- * @param {string} className, Slider root CSS class name.
+ * @param {string} className Slider root CSS class name.
  * @param {number} minValue Minimum value.
  * @param {number} maxValue Maximum value.
  * @param {number} defaultValue Default value.
@@ -103,7 +111,7 @@ blk.ui.Settings.prototype.setupSlider_ = function(
     className,
     minValue, maxValue, defaultValue, initialValue,
     toStringCallback) {
-  var root = /** @type {Element} */ (this.dom.getElementByClass(className));
+  var root = this.dom.getElementByClass(className);
   if (!root) {
     return;
   }
@@ -118,8 +126,8 @@ blk.ui.Settings.prototype.setupSlider_ = function(
   slider.max = String(maxValue);
   slider.value = String(initialValue);
 
-  var label = /** @type {Element} */ (this.dom.getElementByClass(
-      goog.getCssName('blkSettingsSliderLabel'), root));
+  var label = this.dom.getElementByClass(
+      goog.getCssName('blkSettingsSliderLabel'), root);
   goog.asserts.assert(label);
 
   function updateLabel() {
@@ -128,8 +136,8 @@ blk.ui.Settings.prototype.setupSlider_ = function(
   updateLabel();
   this.eh.listen(slider, goog.events.EventType.CHANGE, updateLabel);
 
-  var reset = /** @type {Element} */ (this.dom.getElementByClass(
-      goog.getCssName('blkSettingsSliderReset'), root));
+  var reset = this.dom.getElementByClass(
+      goog.getCssName('blkSettingsSliderReset'), root);
   goog.asserts.assert(reset);
   this.eh.listen(reset, goog.events.EventType.CLICK,
       function() {
@@ -146,7 +154,7 @@ blk.ui.Settings.prototype.setupSlider_ = function(
  * @return {number|undefined} Slider value.
  */
 blk.ui.Settings.prototype.getSliderValue_ = function(className) {
-  var root = /** @type {Element} */ (this.dom.getElementByClass(className));
+  var root = this.dom.getElementByClass(className);
   if (!root) {
     return undefined;
   }
@@ -158,6 +166,63 @@ blk.ui.Settings.prototype.getSliderValue_ = function(className) {
   }
 
   return Number(slider.value);
+};
+
+
+/**
+ * Sets up a checkbox group for control/updating.
+ * @private
+ * @param {string} className Checkbox root CSS class name.
+ * @param {boolean} initialValue Initial value.
+ */
+blk.ui.Settings.prototype.setupCheckbox_ = function(
+    className, initialValue) {
+  var root = this.dom.getElementByClass(className);
+  if (!root) {
+    return;
+  }
+
+  var checkbox = /** @type {HTMLInputElement} */ (this.dom.getElementByClass(
+      goog.getCssName('blkSettingsCheckboxInput'), root));
+  if (!checkbox) {
+    return;
+  }
+
+  goog.style.setUnselectable(root, true);
+
+  checkbox.checked = initialValue;
+
+  this.eh.listen(root, goog.events.EventType.CLICK,
+      /**
+       * @param {!goog.events.BrowserEvent} e
+       */
+      function(e) {
+        if (e.target != checkbox) {
+          checkbox.checked = !checkbox.checked;
+        }
+      });
+};
+
+
+/**
+ * Gets the current value of a checkbox.
+ * @private
+ * @param {string} className Checkbox root CSS class name.
+ * @return {boolean|undefined} Checkbox value.
+ */
+blk.ui.Settings.prototype.getCheckboxValue_ = function(className) {
+  var root = this.dom.getElementByClass(className);
+  if (!root) {
+    return undefined;
+  }
+
+  var checkbox = /** @type {HTMLInputElement} */ (this.dom.getElementByClass(
+      goog.getCssName('blkSettingsCheckboxInput'), root));
+  if (!checkbox) {
+    return undefined;
+  }
+
+  return checkbox.checked;
 };
 
 
@@ -190,6 +255,18 @@ blk.ui.Settings.prototype.beforeClose = function(buttonId) {
       this.getSliderValue_(goog.getCssName('blkSettingsDistanceSlider'));
   if (goog.isDef(viewDistance)) {
     settings.viewDistance = viewDistance;
+  }
+
+  var enableSoundFx = this.getCheckboxValue_(
+      goog.getCssName('blkSettingsSoundFx'));
+  if (goog.isDef(enableSoundFx)) {
+    settings.soundFxMuted = !enableSoundFx;
+  }
+
+  var enableMusic = this.getCheckboxValue_(
+      goog.getCssName('blkSettingsMusic'));
+  if (goog.isDef(enableMusic)) {
+    settings.musicMuted = !enableMusic;
   }
 
   settings.save();

@@ -5,7 +5,6 @@ Before Release
 * hide console dv
 
 * music
-    * music toggle in settings
     * randomly play music
 
 M2b: Replace UI with DOM

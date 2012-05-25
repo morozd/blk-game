@@ -334,14 +334,25 @@
           </div>
         </div>
       </div>-->
-      <div class="{css blkSettingsRow}">
+      <div class="{css blkSettingsRow} {css blkSettingsAudio}">
         <div class="{css blkSettingsLabel}">
           {msg desc="Audio/music settings header."}
             Audio:
           {/msg}
         </div>
         <div class="{css blkSettingsValue}">
-          on / off
+          <div class="{css blkSettingsCheckbox} {css blkSettingsSoundFx}">
+            <input type="checkbox" class="{css blkSettingsCheckboxInput}"/>
+            {msg desc="Enable sound effects."}
+              Sound FX
+            {/msg}
+          </div>
+          <div class="{css blkSettingsCheckbox} {css blkSettingsMusic}">
+            <input type="checkbox" class="{css blkSettingsCheckboxInput}"/>
+            {msg desc="Enable music."}
+              Music
+            {/msg}
+          </div>
         </div>
       </div>
     {/param}

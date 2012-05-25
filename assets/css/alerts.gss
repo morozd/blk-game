@@ -120,6 +120,17 @@
   @mixin noSelect();
 }
 
+.blkSettingsCheckbox {
+  cursor: pointer;
+}
+.blkSettingsCheckboxInput {
+  cursor: pointer;
+  margin-right: 7px;
+}
+
 .blkSettingsNameValue {}
 .blkSettingsSensitivitySlider {}
 .blkSettingsDistanceSlider {}
+.blkSettingsAudio {}
+.blkSettingsSoundFx {}
+.blkSettingsMusic {}
