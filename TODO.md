@@ -2,7 +2,6 @@ Before Release
 ================================================================================
 
 * new sounds - credit sean
-* hide console dv
 
 * music
     * randomly play music

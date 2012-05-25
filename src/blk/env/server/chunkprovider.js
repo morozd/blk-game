@@ -18,6 +18,7 @@ goog.provide('blk.env.server.ChunkProvider');
 
 goog.require('blk.env.Chunk');
 goog.require('blk.env.gen.ChunkBuilder');
+goog.require('gf');
 goog.require('gf.math.Random');
 goog.require('goog.Disposable');
 goog.require('goog.asserts');
@@ -89,7 +90,7 @@ goog.inherits(blk.env.server.ChunkProvider, goog.Disposable);
  * @const
  * @type {number}
  */
-blk.env.server.ChunkProvider.GENERATION_INTERVAL_ = 10;
+blk.env.server.ChunkProvider.GENERATION_INTERVAL_ = 5;
 
 
 /**
@@ -184,7 +185,7 @@ blk.env.server.ChunkProvider.prototype.processGenerationQueue_ = function() {
   // TODO(benvanik): out of process/offthread generation
   // Can use node-webworker (https://github.com/pgriess/node-webworker) to
   // support the same code on both web clients and node
-  var startTime = goog.now();
+  var startTime = gf.now();
   while (this.generationQueue_.length) {
     var chunk = this.generationQueue_.shift();
 
@@ -202,7 +203,7 @@ blk.env.server.ChunkProvider.prototype.processGenerationQueue_ = function() {
     // TODO(benvanik): queue for population (needs to happen from view?)
 
     // Stop generating if over time limit
-    if (goog.now() - startTime >
+    if (gf.now() - startTime >
         blk.env.server.ChunkProvider.MAX_GENERATION_TIME_) {
       break;
     }

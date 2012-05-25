@@ -46,7 +46,7 @@ require('../third_party/games-framework/third_party/node-closure/closure').Closu
 goog.loadScript('./blk_js_uncompiled-deps.js');
 
 // Pull in blk
-global.gf = {
+global.gfdefines = {
   SERVER: true,
   NODE: true
 };
