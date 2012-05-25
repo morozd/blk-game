@@ -104,11 +104,16 @@ blk.ui.Settings.prototype.setupSlider_ = function(
     minValue, maxValue, defaultValue, initialValue,
     toStringCallback) {
   var root = /** @type {Element} */ (this.dom.getElementByClass(className));
-  goog.asserts.assert(root);
+  if (!root) {
+    return;
+  }
 
   var slider = /** @type {HTMLInputElement} */ (this.dom.getElementByClass(
       goog.getCssName('blkSettingsSlider'), root));
-  goog.asserts.assert(slider);
+  if (!slider) {
+    return;
+  }
+
   slider.min = String(minValue);
   slider.max = String(maxValue);
   slider.value = String(initialValue);
@@ -138,15 +143,19 @@ blk.ui.Settings.prototype.setupSlider_ = function(
  * Gets the current value of a slider.
  * @private
  * @param {string} className, Slider root CSS class name.
- * @return {number} Slider value.
+ * @return {number|undefined} Slider value.
  */
 blk.ui.Settings.prototype.getSliderValue_ = function(className) {
   var root = /** @type {Element} */ (this.dom.getElementByClass(className));
-  goog.asserts.assert(root);
+  if (!root) {
+    return undefined;
+  }
 
   var slider = /** @type {HTMLInputElement} */ (this.dom.getElementByClass(
       goog.getCssName('blkSettingsSlider'), root));
-  goog.asserts.assert(slider);
+  if (!slider) {
+    return undefined;
+  }
 
   return Number(slider.value);
 };
@@ -172,12 +181,16 @@ blk.ui.Settings.prototype.beforeClose = function(buttonId) {
 
   var sensitivity =
       this.getSliderValue_(goog.getCssName('blkSettingsSensitivitySlider'));
-  sensitivity = sensitivity / 50;
-  settings.mouseSensitivity = sensitivity;
+  if (goog.isDef(sensitivity)) {
+    sensitivity = sensitivity / 50;
+    settings.mouseSensitivity = sensitivity;
+  }
 
   var viewDistance =
       this.getSliderValue_(goog.getCssName('blkSettingsDistanceSlider'));
-  settings.viewDistance = viewDistance;
+  if (goog.isDef(viewDistance)) {
+    settings.viewDistance = viewDistance;
+  }
 
   settings.save();
 };

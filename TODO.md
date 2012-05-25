@@ -1,7 +1,24 @@
 Before Release
 ================================================================================
 
-* new sounds
+* new sounds - credit sean
+* hide console dv
+
+* music
+    * music toggle in settings
+    * randomly play music
+
+M2b: Replace UI with DOM
+================================================================================
+
+* replace custom UI with soy
+    * playerlisting
+    * console
+    * block types
+
+* remove bitmap font?
+    * need rendering of names to canvas, uploading to texture
+    * gf.graphics.Texture#drawText?
 
 M3: Infinite Maps
 ================================================================================
@@ -26,6 +43,12 @@ M4: UI
 
 M5: Performance Tuning
 ================================================================================
+
+* draw distance adjust
+    * client must tell server
+
+* store block counts per segment in chunk so can fast skip build queue work
+    * helps on mba, where cost to scan can be heavy
 
 * performance
     * forEachInViewport / viewport.containsBoundingBox is slowest method!
@@ -84,10 +107,6 @@ M7: Weapons
 
 Experiments
 ================================================================================
-
-* draw distance adjust
-    * client must tell server
-* store block counts per segment in chunk so can fast skip build queue work
 
 * fog rewrite
     * environment density setting
