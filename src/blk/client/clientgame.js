@@ -678,11 +678,11 @@ blk.client.ClientGame.prototype.render = function(frame) {
     // Draw UI
     var mapStats = this.map.getStatisticsString();
     var renderStats = this.viewManager.getStatisticsString();
-    var movement = this.localPlayer ? [
-      this.localPlayer.entity.state.velocity[0].toFixed(8),
-      this.localPlayer.entity.state.velocity[1].toFixed(8),
-      this.localPlayer.entity.state.velocity[2].toFixed(8)].join(',') : '';
-    this.console.render(frame, viewport, mapStats, renderStats, movement);
+    // var movement = this.localPlayer ? [
+    //   this.localPlayer.entity.state.velocity[0].toFixed(8),
+    //   this.localPlayer.entity.state.velocity[1].toFixed(8),
+    //   this.localPlayer.entity.state.velocity[2].toFixed(8)].join(',') : '';
+    this.console.render(frame, viewport, mapStats, renderStats);//, movement);
     this.playerListing.render(frame, viewport);
     this.drawInputUI_(frame);
     this.drawBlockTypes_(frame);
