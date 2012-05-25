@@ -6,7 +6,7 @@ Before Release
 * music
     * randomly play music
 
-M2b: Replace UI with DOM
+M3: Replace UI with DOM
 ================================================================================
 
 * replace custom UI with soy
@@ -18,7 +18,7 @@ M2b: Replace UI with DOM
     * need rendering of names to canvas, uploading to texture
     * gf.graphics.Texture#drawText?
 
-M3: Infinite Maps
+M4: Infinite Maps
 ================================================================================
 
 * io
@@ -26,24 +26,14 @@ M3: Infinite Maps
 
 * programmable views
     * packets for create/delete per player, attach to entity
+        * change view distance is a delete/create/wait
     * waitForLoaded or something (before entering player into the world)
-
-M4: UI
-================================================================================
-
-* settings ui:
-    * escape to toggle + ui button?
-    * mouse sensitivity
-    * view distance -> send packets to adjust view
-
-* better error propagation
-    * error types?
 
 M5: Performance Tuning
 ================================================================================
 
-* draw distance adjust
-    * client must tell server
+* better error propagation
+    * error types?
 
 * store block counts per segment in chunk so can fast skip build queue work
     * helps on mba, where cost to scan can be heavy
