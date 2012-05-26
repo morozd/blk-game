@@ -156,5 +156,23 @@ blk.env.server.ServerMap.prototype.flush = function() {
  * @override
  */
 blk.env.server.ServerMap.prototype.requestChunk = function(chunk) {
-  this.chunkProvider_.requestChunk(chunk);
+  // Compute the priority of the chunk request based on the minimum distance to
+  // all active views
+  // This could be made much faster, but hopefully it is infrequent enough
+  // that it doesn't matter (only when there is a chunk cache miss)
+  var priority = Number.MAX_VALUE;
+  for (var n = 0; n < this.activeViews.length; n++) {
+    var view = this.activeViews[n];
+    var x = chunk.x - view.center[0];
+    var z = chunk.z - view.center[2];
+    var distanceSq = x * x + z * z;
+    if (distanceSq < priority) {
+      priority = distanceSq;
+    }
+  }
+  if (priority == Number.MAX_VALUE) {
+    priority = undefined;
+  }
+
+  this.chunkProvider_.requestChunk(chunk, priority);
 };
