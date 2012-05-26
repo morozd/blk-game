@@ -18,6 +18,7 @@ goog.provide('blk.client.MusicController');
 
 goog.require('blk.assets.audio.Music');
 goog.require('goog.Disposable');
+goog.require('goog.Timer');
 
 
 
@@ -58,6 +59,13 @@ blk.client.MusicController = function(game) {
   this.isPlaying_ = false;
 
   /**
+   * Timer ID for the next track play event.
+   * @private
+   * @type {?number}
+   */
+  this.nextTimerId_ = null;
+
+  /**
    * Background sound track list.
    * @private
    * @type {!gf.audio.TrackList}
@@ -65,8 +73,20 @@ blk.client.MusicController = function(game) {
   this.trackList_ = blk.assets.audio.Music.create(
       this.game.assetManager, this.audio_.context);
   this.audio_.loadTrackList(this.trackList_);
+
+  // Setup a first playback
+  this.scheduleNextPlay_(0);
 };
 goog.inherits(blk.client.MusicController, goog.Disposable);
+
+
+/**
+ * @override
+ */
+blk.client.MusicController.prototype.disposeInternal = function() {
+  this.stop();
+  goog.base(this, 'disposeInternal');
+};
 
 
 /**
@@ -98,19 +118,66 @@ blk.client.MusicController.prototype.togglePlayback = function() {
 
 
 /**
+ * Minimum playback interval, in seconds.
+ * @private
+ * @const
+ * @type {number}
+ */
+blk.client.MusicController.MIN_PLAYBACK_INTERVAL_ = 10;
+
+
+/**
+ * Average playback interval, in seconds.
+ * @private
+ * @const
+ * @type {number}
+ */
+blk.client.MusicController.AVG_PLAYBACK_INTERVAL_ = 60;
+
+
+/**
+ * Schedules the next track start.
+ * @private
+ * @param {number} minTime Minimum amount of time that must elapse before
+ *     playback can begin, in ms.
+ */
+blk.client.MusicController.prototype.scheduleNextPlay_ = function(minTime) {
+  var silence = (blk.client.MusicController.MIN_PLAYBACK_INTERVAL_ +
+      Math.random() * blk.client.MusicController.AVG_PLAYBACK_INTERVAL_);
+  silence *= 1000;
+  var nextStart = minTime + silence;
+  goog.Timer.clear(this.nextTimerId_);
+  this.nextTimerId_ = goog.Timer.callOnce(this.playRandom, nextStart, this);
+};
+
+
+/**
  * Starts playing a random track.
  */
 blk.client.MusicController.prototype.playRandom = function() {
   if (this.isMuted_) {
     return;
   }
+  this.stop();
 
-  // TODO(benvanik): pick a track
+  var track = null;
+  var tracks = this.trackList_.getAllTracks();
+  // TODO(benvanik): randomly pick a track
+  // TODO(benvanik): way to have track themes? naming scheme? metadata?
   // TODO(benvanik): check what's playing and ensure something else
+  if (tracks.length) {
+    track = tracks[0];
+  }
+  if (!track) {
+    return;
+  }
 
-  this.trackList_.stopAll();
-  this.trackList_.play('track1');
+  // Play
+  this.trackList_.play(track);
   this.isPlaying_ = true;
+
+  // Schedule the next track
+  this.scheduleNextPlay_(track.duration);
 };
 
 
@@ -118,6 +185,11 @@ blk.client.MusicController.prototype.playRandom = function() {
  * Stops any playback that may be occuring.
  */
 blk.client.MusicController.prototype.stop = function() {
+  if (this.nextTimerId_ !== null) {
+    goog.Timer.clear(this.nextTimerId_);
+    this.nextTimerId_ = null;
+  }
+
   this.trackList_.stopAll();
   this.isPlaying_ = false;
 };

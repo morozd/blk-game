@@ -3,9 +3,6 @@ Before Release
 
 * new sounds - credit sean
 
-* music
-    * randomly play music
-
 M3: Replace UI with DOM
 ================================================================================
 
