@@ -150,7 +150,7 @@ blk.ui.Settings.prototype.setupSlider_ = function(
 /**
  * Gets the current value of a slider.
  * @private
- * @param {string} className, Slider root CSS class name.
+ * @param {string} className Slider root CSS class name.
  * @return {number|undefined} Slider value.
  */
 blk.ui.Settings.prototype.getSliderValue_ = function(className) {
@@ -194,7 +194,7 @@ blk.ui.Settings.prototype.setupCheckbox_ = function(
 
   this.eh.listen(root, goog.events.EventType.CLICK,
       /**
-       * @param {!goog.events.BrowserEvent} e
+       * @param {!goog.events.BrowserEvent} e Event.
        */
       function(e) {
         if (e.target != checkbox) {
