@@ -19,8 +19,9 @@ M3: Replace UI with DOM
 M4: Infinite Maps
 ================================================================================
 
-* io
-    * prioritize reads (distance from view? min when multiple users?)
+* client deserialize queue
+    * ClientNetService#handleChunkData_ should queue up the data
+    * periodic ticking in ClientMap to deserialize and setup chunks
 
 * programmable views
     * packets for create/delete per player, attach to entity
