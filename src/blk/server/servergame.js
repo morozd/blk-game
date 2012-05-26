@@ -88,11 +88,17 @@ blk.server.ServerGame = function(launchOptions, session, mapStore) {
   this.state = new blk.GameState(this, session, this.map);
   this.registerDisposable(this.state);
 
+  // If running in a web worker, don't use compression (it's a waste)
+  var compressionFormat;
+  if (gf.SERVER && !gf.NODE) {
+    compressionFormat = blk.io.CompressionFormat.UNCOMPRESSED;
+  }
+
   /**
-   * Cached chunk serialization utility.
+   * Cached chunk serialization utility used when sending chunks to clients.
    * @type {!blk.io.ChunkSerializer}
    */
-  this.chunkSerializer = new blk.io.ChunkSerializer();
+  this.chunkSerializer = new blk.io.ChunkSerializer(compressionFormat);
 
   // TODO(benvanik): something better
   this.nextEntityId_ = 0;

@@ -10,6 +10,7 @@ M3: Replace UI with DOM
     * playerlisting
     * console
     * block types
+* add new tools ui (options, info)
 
 * remove bitmap font?
     * need rendering of names to canvas, uploading to texture

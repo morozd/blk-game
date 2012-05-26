@@ -31,8 +31,10 @@ goog.require('goog.asserts');
  * allocation overhead.
  *
  * @constructor
+ * @param {blk.io.CompressionFormat=} opt_compressionFormat Compression format
+ *     used when serializing chunks.
  */
-blk.io.ChunkSerializer = function() {
+blk.io.ChunkSerializer = function(opt_compressionFormat) {
   /**
    * @private
    * @type {!gf.net.PacketReader}
@@ -44,6 +46,14 @@ blk.io.ChunkSerializer = function() {
    * @type {!gf.net.PacketWriter}
    */
   this.writer_ = new gf.net.PacketWriter();
+
+  /**
+   * Compression format when serializing chunks.
+   * @private
+   * @type {blk.io.CompressionFormat}
+   */
+  this.compressionFormat_ = goog.isDef(opt_compressionFormat) ?
+      opt_compressionFormat : blk.io.CompressionFormat.RLE;
 };
 
 
@@ -54,16 +64,6 @@ blk.io.ChunkSerializer = function() {
  * @type {number}
  */
 blk.io.ChunkSerializer.CURRENT_VERSION_ = 1;
-
-
-/**
- * Default compression format when serializing chunks.
- * @private
- * @const
- * @type {blk.io.CompressionFormat}
- */
-blk.io.ChunkSerializer.COMPRESSION_FORMAT_ =
-    blk.io.CompressionFormat.RLE;
 
 
 /**
@@ -113,8 +113,8 @@ blk.io.ChunkSerializer.prototype.serializeV1_ = function(chunk, writer) {
   writer.writeInt32(chunk.z);
 
   // Chunk block data
-  writer.writeUint8(blk.io.ChunkSerializer.COMPRESSION_FORMAT_);
-  switch (blk.io.ChunkSerializer.COMPRESSION_FORMAT_) {
+  writer.writeUint8(this.compressionFormat_);
+  switch (this.compressionFormat_) {
     default:
     case blk.io.CompressionFormat.UNCOMPRESSED:
       writer.writeUint8Array(new Uint8Array(chunk.blockData.buffer));
