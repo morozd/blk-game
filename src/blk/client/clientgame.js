@@ -19,8 +19,8 @@ goog.provide('blk.client.ClientGame');
 goog.require('blk.GameState');
 goog.require('blk.Player');
 goog.require('blk.assets.audio.Bank1');
-goog.require('blk.assets.audio.Music');
 goog.require('blk.client.ClientNetService');
+goog.require('blk.client.MusicController');
 goog.require('blk.env');
 goog.require('blk.env.ChunkView');
 goog.require('blk.env.Entity');
@@ -223,10 +223,6 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
   this.registerDisposable(this.audio);
   this.addComponent(this.audio);
 
-  // TODO(benvanik): toggle global mutes
-  // this.settings.soundFxMuted
-  // this.settings.musicMuted
-
   /**
    * Sound bank for game sounds.
    * @type {!gf.audio.SoundBank}
@@ -236,20 +232,14 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
   this.audio.loadSoundBank(this.sounds);
 
   /**
-   * Background sound track list.
+   * Music controller.
+   * Handles automatic playback of music, track management, etc.
    * @private
-   * @type {!gf.audio.TrackList}
+   * @type {!blk.client.MusicController}
    */
-  this.backgroundTracks_ = blk.assets.audio.Music.create(
-      this.assetManager, this.audio.context);
-  this.audio.loadTrackList(this.backgroundTracks_);
-
-  /**
-   * True if music is playing.
-   * @private
-   * @type {boolean}
-   */
-  this.playingMusic_ = false;
+  this.musicController_ = new blk.client.MusicController(this);
+  this.registerDisposable(this.musicController_);
+  this.musicController_.setMuted(this.settings.musicMuted);
 
   /**
    * Sprite buffer used for UI drawing.
@@ -828,9 +818,8 @@ blk.client.ClientGame.prototype.showSettings_ = function() {
 
           this.input.mouse.setSensitivity(this.settings.mouseSensitivity);
 
-          // TODO(benvanik): toggle global mutes
-          // this.settings.soundFxMuted
-          // this.settings.musicMuted
+          // Toggle global mutes
+          this.musicController_.setMuted(this.settings.musicMuted);
         }
 
         this.input.setEnabled(true);
@@ -898,12 +887,7 @@ blk.client.ClientGame.prototype.handleInput_ = function(frame) {
   }
 
   if (keyboardData.didKeyGoDown(goog.events.KeyCodes.M)) {
-    if (this.playingMusic_) {
-      this.backgroundTracks_.stopAll();
-    } else {
-      this.backgroundTracks_.play('track1');
-    }
-    this.playingMusic_ = !this.playingMusic_;
+    this.musicController_.togglePlayback();
   }
 
   // Chunk rebuild
