@@ -15,7 +15,7 @@
  */
 
 //#name SpriteProgram
-//#description Simple 2D sprites
+//#description Simple 2D sprite program
 
 //! NAMESPACE=blk.assets.programs
 //! CLASS=SpriteProgram

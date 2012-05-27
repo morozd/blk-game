@@ -25,6 +25,7 @@ goog.require('blk.env.blocks.DirtBlock');
 goog.require('blk.env.blocks.GlassBlock');
 goog.require('blk.env.blocks.StoneBlock');
 goog.require('blk.env.blocks.WoodBlock');
+goog.require('gf.log');
 goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.asserts');

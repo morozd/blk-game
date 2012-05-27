@@ -25,6 +25,7 @@ goog.require('blk.assets.textures.ui');
 goog.require('blk.graphics.BlockBuilder');
 goog.require('gf.graphics.BlendState');
 goog.require('gf.graphics.DepthState');
+goog.require('gf.graphics.ProgramCache');
 goog.require('gf.graphics.RasterizerState');
 goog.require('gf.graphics.Resource');
 goog.require('gf.graphics.SpriteBuffer');
@@ -63,6 +64,38 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
   this.lightingInfo = new blk.graphics.RenderState.LightingInfo();
 
   /**
+   * Program cache.
+   * @private
+   * @type {!gf.graphics.ProgramCache}
+   */
+  this.programCache_ = new gf.graphics.ProgramCache(graphicsContext);
+  this.registerDisposable(this.programCache_);
+
+  /**
+   * Line program.
+   * @type {!blk.assets.programs.LineProgram}
+   */
+  this.lineProgram = blk.assets.programs.LineProgram.create(
+      assetManager, graphicsContext);
+  this.programCache_.register(this.lineProgram);
+
+  /**
+   * Sprite program.
+   * @type {!blk.assets.programs.SpriteProgram}
+   */
+  this.spriteProgram = blk.assets.programs.SpriteProgram.create(
+      assetManager, graphicsContext);
+  this.programCache_.register(this.spriteProgram);
+
+  /**
+   * Program used to render faces.
+   * @type {!blk.assets.programs.FaceProgram}
+   */
+  this.faceProgram = blk.assets.programs.FaceProgram.create(
+      assetManager, graphicsContext);
+  this.programCache_.register(this.faceProgram);
+
+  /**
    * Font.
    * @type {!blk.assets.fonts.MonospaceFont}
    */
@@ -89,22 +122,6 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
   this.registerDisposable(this.uiAtlas);
 
   /**
-   * Line program.
-   * @type {!blk.assets.programs.LineProgram}
-   */
-  this.lineProgram = blk.assets.programs.LineProgram.create(
-      assetManager, graphicsContext);
-  this.registerDisposable(this.lineProgram);
-
-  /**
-   * Sprite program.
-   * @type {!blk.assets.programs.SpriteProgram}
-   */
-  this.spriteProgram = blk.assets.programs.SpriteProgram.create(
-      assetManager, graphicsContext);
-  this.registerDisposable(this.spriteProgram);
-
-  /**
    * Shared index buffer used for drawing sprites.
    * @private
    * @type {WebGLBuffer}
@@ -124,14 +141,6 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
    */
   this.blockBuilder = new blk.graphics.BlockBuilder(this);
   this.registerDisposable(this.blockBuilder);
-
-  /**
-   * Program used to render faces.
-   * @type {!blk.assets.programs.FaceProgram}
-   */
-  this.faceProgram = blk.assets.programs.FaceProgram.create(
-      assetManager, graphicsContext);
-  this.registerDisposable(this.faceProgram);
 };
 goog.inherits(blk.graphics.RenderState, gf.graphics.Resource);
 
