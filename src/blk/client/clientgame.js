@@ -388,7 +388,13 @@ blk.client.ClientGame.prototype.makeReady = function() {
  */
 blk.client.ClientGame.prototype.update = function(frame) {
   // Networking
+  var netStart = gf.now();
   this.session.poll();
+  var netDuration = gf.now() - netStart;
+  if (netDuration > 5) {
+    // TODO(benvanik): a real profiling tools
+    gf.log.write('long net frame', netDuration);
+  }
 
   // Only update state if still connected
   if (this.session.state != gf.net.SessionState.DISCONNECTED) {
