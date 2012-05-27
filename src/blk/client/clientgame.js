@@ -384,17 +384,20 @@ blk.client.ClientGame.prototype.makeReady = function() {
 
 
 /**
+ * Maximum amount of time, in ms, the network poll is allowed to take.
+ * @private
+ * @const
+ * @type {number}
+ */
+blk.client.ClientGame.MAX_NETWORK_POLL_TIME_ = 2;
+
+
+/**
  * @override
  */
 blk.client.ClientGame.prototype.update = function(frame) {
   // Networking
-  var netStart = gf.now();
-  this.session.poll(4);
-  var netDuration = gf.now() - netStart;
-  if (netDuration > 5) {
-    // TODO(benvanik): a real profiling tools
-    gf.log.write('long net frame', netDuration);
-  }
+  this.session.poll(blk.client.ClientGame.MAX_NETWORK_POLL_TIME_);
 
   // Only update state if still connected
   if (this.session.state != gf.net.SessionState.DISCONNECTED) {
