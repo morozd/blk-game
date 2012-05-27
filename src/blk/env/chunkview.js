@@ -182,7 +182,7 @@ blk.env.ChunkView.SIZE_Y_ = 1;
  */
 blk.env.ChunkView.prototype.getDrawDistance = function() {
   // TODO(benvanik): I'm sure there's a tighter approximation here
-  return this.chunkRadiusXZ_ * blk.env.Chunk.SIZE_XZ;
+  return this.chunkRadiusXZ_ * blk.env.Chunk.SIZE_XZ + 16;
 };
 
 
