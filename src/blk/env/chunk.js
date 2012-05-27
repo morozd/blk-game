@@ -373,6 +373,8 @@ blk.env.Chunk.prototype.getBlock = function(x, y, z) {
  * @return {boolean} True if the block data changed.
  */
 blk.env.Chunk.prototype.setBlock = function(x, y, z, value) {
+  goog.asserts.assert(this.state == blk.env.Chunk.State.LOADED);
+
   var bx = x & blk.env.Chunk.MASK_XZ;
   var by = y & blk.env.Chunk.MASK_Y;
   var bz = z & blk.env.Chunk.MASK_XZ;

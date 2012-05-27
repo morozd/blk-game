@@ -23,6 +23,8 @@ M4: Infinite Maps
     * ClientNetService#handleChunkData_ should queue up the data
     * periodic ticking in ClientMap to deserialize and setup chunks
 
+* Map#setBlock - queue block sets until chunks load
+
 * programmable views
     * packets for create/delete per player, attach to entity
         * change view distance is a delete/create/wait

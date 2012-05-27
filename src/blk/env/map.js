@@ -267,6 +267,12 @@ blk.env.Map.prototype.setBlock = function(x, y, z, value) {
   if (!chunk) {
     // This is technically a failure, it should be gracefully handled though
     return false;
+  } else if (chunk.state != blk.env.Chunk.State.LOADED) {
+    // TODO(benvanik): queue the set for handling when the chunk has been loaded
+    //     to ensure consistency (if a setBlock occurs while the client is
+    //     waiting for a chunk to download)
+    gf.log.write('setBlock before chunk fully loaded - inconsistent state!');
+    return false;
   }
 
   if (!chunk.setBlock(x, y, z, value)) {

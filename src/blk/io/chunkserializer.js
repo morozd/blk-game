@@ -186,19 +186,27 @@ blk.io.ChunkSerializer.prototype.deserializeV1_ = function(chunk, reader) {
   var z = reader.readInt32();
   chunk.beginLoad(x, y, z);
 
+  // HACK(benvanik): poking directly into the reader - this could break
+  // Unfortunately typedarray subarray is really slow, and doing this improves
+  // perf of large chunk transfers quite a bit
+  // var rawBlockData = reader.subsetUint8Array();
+
   // Chunk block data
   var dataFormat = /** @type {blk.io.CompressionFormat} */ (reader.readUint8());
-  var rawBlockData = reader.subsetUint8Array();
   var blockData = chunk.blockData;
   switch (dataFormat) {
     default:
     case blk.io.CompressionFormat.UNCOMPRESSED:
-      for (var n = 0, m = 0; n < blk.env.Chunk.TOTAL_BLOCKS; n++, m += 2) {
-        blockData[n] = (rawBlockData[m + 1] << 8) | rawBlockData[m];
+      reader.readUint32();
+      for (var n = 0, m = reader.offset;
+          n < blk.env.Chunk.TOTAL_BLOCKS; n++, m += 2) {
+        blockData[n] = (reader.buffer[m + 1] << 8) | reader.buffer[m];
       }
       break;
     case blk.io.CompressionFormat.RLE:
-      blk.io.rle.decodeUint16(rawBlockData, blockData);
+      var dataLength = reader.readUint32();
+      blk.io.rle.decodeUint16(
+          reader.buffer, blockData, reader.offset, dataLength);
       break;
     case blk.io.CompressionFormat.DEFLATE:
       goog.asserts.fail('deflate not yet implemented');
