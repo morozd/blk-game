@@ -19,10 +19,6 @@ M3: Replace UI with DOM
 M4: Infinite Maps
 ================================================================================
 
-* client deserialize queue
-    * ClientNetService#handleChunkData_ should queue up the data
-    * periodic ticking in ClientMap to deserialize and setup chunks
-
 * Map#setBlock - queue block sets until chunks load
 
 * programmable views
@@ -38,6 +34,7 @@ M5: Performance Tuning
 
 * store block counts per segment in chunk so can fast skip build queue work
     * helps on mba, where cost to scan can be heavy
+    * needed for large view radii
 
 * performance
     * forEachInViewport / viewport.containsBoundingBox is slowest method!
@@ -55,9 +52,6 @@ M5: Performance Tuning
             * on HTML use a queue (chained deferreds)
         * optimized reader resets (just update extents)
 
-* prime sound system on start
-    * may not matter anymore?
-    * generated empty buffer/playback node?
 
 M6: Physics
 ================================================================================
