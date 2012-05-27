@@ -389,7 +389,7 @@ blk.client.ClientGame.prototype.makeReady = function() {
 blk.client.ClientGame.prototype.update = function(frame) {
   // Networking
   var netStart = gf.now();
-  this.session.poll();
+  this.session.poll(4);
   var netDuration = gf.now() - netStart;
   if (netDuration > 5) {
     // TODO(benvanik): a real profiling tools

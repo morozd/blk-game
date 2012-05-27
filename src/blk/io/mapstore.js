@@ -324,7 +324,7 @@ blk.io.MapStore.prototype.pump_ = function() {
       var sortEnd = this.queue_.length - 1;
       for (var n = 0; n < this.queue_.length; n++) {
         if (this.queue_[n].priority == Number.MAX_VALUE) {
-          sortEnd = n;
+          sortEnd = n - 1;
           break;
         }
       }
