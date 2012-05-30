@@ -94,6 +94,12 @@
   margin-left: 20px;
 }
 
+.blkSettingsLeft {
+  float: left;
+  margin-left: 5px;
+  margin-right: 15px;
+}
+
 .blkSettingsInput {
   font-family: monospace-8bit;
   font-size: 1em;
@@ -130,6 +136,9 @@
 
 .blkSettingsNameValue {}
 .blkSettingsSensitivitySlider {}
+.blkSettingsMouseLock {
+  margin-bottom: 5px;
+}
 .blkSettingsDistanceSlider {}
 .blkSettingsAudio {}
 .blkSettingsSoundFx {}

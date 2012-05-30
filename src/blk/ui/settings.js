@@ -76,6 +76,9 @@ blk.ui.Settings.prototype.enterDocument = function() {
       function(sliderValue) {
         return goog.string.padNumber(sliderValue / 50, 1, 2);
       });
+  this.setupCheckbox_(
+      goog.getCssName('blkSettingsMouseLock'),
+      settings.mouseLock);
 
   this.setupSlider_(
       goog.getCssName('blkSettingsDistanceSlider'),
@@ -249,6 +252,12 @@ blk.ui.Settings.prototype.beforeClose = function(buttonId) {
   if (goog.isDef(sensitivity)) {
     sensitivity = sensitivity / 50;
     settings.mouseSensitivity = sensitivity;
+  }
+
+  var mouseLock = this.getCheckboxValue_(
+      goog.getCssName('blkSettingsMouseLock'));
+  if (goog.isDef(mouseLock)) {
+    settings.mouseLock = mouseLock;
   }
 
   var viewDistance =

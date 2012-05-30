@@ -302,11 +302,23 @@
       </div>
       <div class="{css blkSettingsRow} {css blkSettingsSensitivitySlider}">
         <div class="{css blkSettingsLabel}">
-          {msg desc="Sensitivity of the mouse adjustment settings header."}
-            Mouse Sensitivity:
+          {msg desc="Settings related to mouse input."}
+            Mouse:
           {/msg}
         </div>
         <div class="{css blkSettingsValue}">
+          <div class="{css blkSettingsCheckbox} {css blkSettingsMouseLock}">
+            <input type="checkbox" class="{css blkSettingsCheckboxInput}"/>
+            {msg desc="Enable mouse lock on focus to the control."}
+              Mouse Lock
+            {/msg}
+          </div>
+          <span class="{css blkSettingsLeft}">
+            {msg desc="Sensitivity of the mouse adjustment settings header."}
+              Sensitivity:
+            {/msg}
+            {sp}
+          </span>
           <input class="{css blkSettingsSlider}" type="range" min="1" max="100" />
           <div class="{css blkSettingsSliderLabel}"></div>
           {sp}

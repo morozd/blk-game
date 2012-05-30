@@ -201,10 +201,13 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
   this.registerDisposable(this.input);
   this.addComponent(this.input);
   this.input.mouse.setSensitivity(this.settings.mouseSensitivity);
+  this.input.mouse.setLockOnFocus(this.settings.mouseLock);
   this.input.keyboard.setFullScreenHandler(goog.bind(function() {
     var goingFullScreen = !this.display.isFullScreen;
     this.display.toggleFullScreen();
-    if (goingFullScreen && this.input.mouse.supportsLocking) {
+    if (goingFullScreen &&
+        this.input.mouse.supportsLocking &&
+        this.settings.mouseLock) {
       this.input.mouse.lock();
     }
   }, this));
@@ -826,6 +829,12 @@ blk.client.ClientGame.prototype.showSettings_ = function() {
           this.session.updateUserInfo(userInfo);
 
           this.input.mouse.setSensitivity(this.settings.mouseSensitivity);
+          this.input.mouse.setLockOnFocus(this.settings.mouseLock);
+          if (this.settings.mouseLock) {
+            this.input.mouse.lock();
+          } else {
+            this.input.mouse.unlock();
+          }
 
           // Toggle global mutes
           this.musicController_.setMuted(this.settings.musicMuted);

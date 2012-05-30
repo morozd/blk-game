@@ -52,3 +52,7 @@ body {
   top: 0;
   bottom: 0;
 }
+
+.blkClear {
+  clear: both;
+}
