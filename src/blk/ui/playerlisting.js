@@ -18,7 +18,7 @@ goog.provide('blk.ui.PlayerListing');
 
 goog.require('blk.ui.Widget');
 goog.require('blk.ui.playerlisting');
-goog.require('gf.log');
+goog.require('goog.array');
 goog.require('goog.dom');
 goog.require('goog.soy');
 goog.require('goog.string');
@@ -96,7 +96,7 @@ blk.ui.PlayerListing.prototype.refresh = function() {
     return goog.string.caseInsensitiveCompare(
         a.user.info.displayName,
         b.user.info.displayName);
-  })
+  });
 
   for (var n = 0; n < players.length; n++) {
     var player = players[n];

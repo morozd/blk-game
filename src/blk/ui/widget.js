@@ -20,6 +20,7 @@ goog.require('goog.Disposable');
 goog.require('goog.dom');
 goog.require('goog.events.EventHandler');
 goog.require('goog.soy');
+goog.require('goog.style');
 
 
 
@@ -88,9 +89,6 @@ blk.ui.Widget.prototype.disposeInternal = function() {
  */
 blk.ui.Widget.prototype.enterDocument = function() {
   this.dom.appendChild(this.parentElement, this.root);
-
-  //var buttonEls = this.dom.getElementsByClass(
-  //    goog.getCssName('blkAlertButton'), this.root);
 };
 
 
@@ -101,4 +99,21 @@ blk.ui.Widget.prototype.enterDocument = function() {
 blk.ui.Widget.prototype.exitDocument = function() {
   this.eh.removeAll();
   this.dom.removeNode(this.root);
+};
+
+
+/**
+ * Sets whether the widget is visible.
+ * @param {boolean} value True to display the widget.
+ */
+blk.ui.Widget.prototype.setVisible = function(value) {
+  goog.style.showElement(this.root, value);
+};
+
+
+/**
+ * Toggles the visibility of the widget.
+ */
+blk.ui.Widget.prototype.toggleVisibility = function() {
+  goog.style.showElement(this.root, !goog.style.isElementShown(this.root));
 };

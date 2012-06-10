@@ -31,6 +31,7 @@ goog.require('blk.graphics.RenderState');
 goog.require('blk.net.packets.SetBlock');
 goog.require('blk.physics.ClientMovement');
 goog.require('blk.ui.Console');
+goog.require('blk.ui.Menubar');
 goog.require('blk.ui.PlayerListing');
 goog.require('blk.ui.Popup');
 goog.require('blk.ui.Settings');
@@ -269,11 +270,21 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
 
   /**
    * Player listing.
+   * @private
    * @type {!blk.ui.PlayerListing}
    */
-  this.playerListing = new blk.ui.PlayerListing(this);
-  this.registerDisposable(this.playerListing);
-  this.addWidget_(this.playerListing);
+  this.playerListing_ = new blk.ui.PlayerListing(this);
+  this.registerDisposable(this.playerListing_);
+  this.addWidget_(this.playerListing_);
+
+  /**
+   * Menubar.
+   * @private
+   * @type {!blk.ui.Menubar}
+   */
+  this.menubar_ = new blk.ui.Menubar(this);
+  this.registerDisposable(this.menubar_);
+  this.addWidget_(this.menubar_);
 
   /**
    * Local player.
@@ -478,7 +489,7 @@ blk.client.ClientGame.prototype.handleUserConnect = function(user) {
       user.info.displayName + ' (' + user.sessionId + ') connected on ' +
       user.agent.toString());
 
-  this.playerListing.refresh();
+  this.playerListing_.refresh();
 };
 
 
@@ -509,7 +520,7 @@ blk.client.ClientGame.prototype.handleUserDisconnect = function(user) {
       user.info.displayName + ' (' + user.sessionId + ') disconnected:',
       gf.net.DisconnectReason.toString(user.disconnectReason));
 
-  this.playerListing.refresh();
+  this.playerListing_.refresh();
 };
 
 
@@ -523,7 +534,7 @@ blk.client.ClientGame.prototype.handleUserUpdate = function(user) {
     player.entity.title = user.info.displayName;
   }
 
-  this.playerListing.refresh();
+  this.playerListing_.refresh();
 };
 
 
@@ -837,9 +848,8 @@ blk.client.ClientGame.prototype.hitTestBlockTypes_ = function(mouseData) {
 
 /**
  * Shows the settings dialog.
- * @private
  */
-blk.client.ClientGame.prototype.showSettings_ = function() {
+blk.client.ClientGame.prototype.showSettings = function() {
   if (!this.settings.soundFxMuted) {
     this.sounds.playAmbient('click');
   }
@@ -884,9 +894,8 @@ blk.client.ClientGame.prototype.showSettings_ = function() {
 
 /**
  * Shows the help dialog.
- * @private
  */
-blk.client.ClientGame.prototype.showHelp_ = function() {
+blk.client.ClientGame.prototype.showHelp = function() {
   if (!this.settings.soundFxMuted) {
     this.sounds.playAmbient('click');
   }
@@ -917,10 +926,13 @@ blk.client.ClientGame.prototype.handleInput_ = function(frame) {
 
   // Show settings
   if (keyboardData.didKeyGoDown(goog.events.KeyCodes.O)) {
-    this.showSettings_();
+    this.showSettings();
     return;
   } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.H)) {
-    this.showHelp_();
+    this.showHelp();
+    return;
+  } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.TAB)) {
+    this.playerListing_.toggleVisibility();
     return;
   }
 
