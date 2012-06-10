@@ -46,11 +46,38 @@ blk.ui.PlayerListing = function(game) {
   this.bodyEl_ = this.dom.getElementByClass(
       goog.getCssName('blkPlayerListingBody'), this.root);
 
-  this.refresh();
+  /**
+   * Refresh interval ID.
+   * @private
+   * @type {number}
+   */
+  this.intervalId_ = goog.global.setInterval(goog.bind(function() {
+    this.refresh();
+  }, this), blk.ui.PlayerListing.REFRESH_INTERVAL_);
 
-  // TODO(benvanik): update timer
+  // Initial update
+  this.refresh();
 };
 goog.inherits(blk.ui.PlayerListing, blk.ui.Widget);
+
+
+/**
+ * Refresh interval, in ms.
+ * @private
+ * @const
+ * @type {number}
+ */
+blk.ui.PlayerListing.REFRESH_INTERVAL_ = 3 * 1000;
+
+
+/**
+ * @override
+ */
+blk.ui.PlayerListing.prototype.disposeInternal = function() {
+  goog.global.clearInterval(this.intervalId_);
+
+  goog.base(this, 'disposeInternal');
+};
 
 
 /**
@@ -81,6 +108,4 @@ blk.ui.PlayerListing.prototype.refresh = function() {
         }, undefined, this.dom));
     goog.dom.appendChild(this.bodyEl_, playerEl);
   }
-
-  goog.style.setUnselectable(this.bodyEl_);
 };

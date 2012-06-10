@@ -28,8 +28,8 @@
   background: rgba(107, 107, 107, 0.2);
   border: 2px solid rgba(36, 36, 36, 0.26);
 
-  @mixin bitDropShadow();
   @mixin bitFont(18px);
+  @mixin noSelect();
 }
 
 .blkPlayerListingHeader {
@@ -42,7 +42,7 @@
 }
 
 .blkPlayerEntry {
-  height: 16px;
+  margin: 2px;
   clear: both;
 }
 
@@ -50,7 +50,7 @@
   float: left;
   width: 20px;
   height: 14px;
-  margin: 2px 5px 0px 2px;
+  margin: 2px 4px 0 1px;
 }
 /* .blkPlayerEntryMeter[0-4] in playerlisting-assets.gss */
 
