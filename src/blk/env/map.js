@@ -25,6 +25,7 @@ goog.require('blk.env.blocks.DirtBlock');
 goog.require('blk.env.blocks.GlassBlock');
 goog.require('blk.env.blocks.StoneBlock');
 goog.require('blk.env.blocks.WoodBlock');
+goog.require('gf.log');
 goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.asserts');
@@ -266,6 +267,12 @@ blk.env.Map.prototype.setBlock = function(x, y, z, value) {
   var chunk = this.chunkCache_.get(x, y, z);
   if (!chunk) {
     // This is technically a failure, it should be gracefully handled though
+    return false;
+  } else if (chunk.state != blk.env.Chunk.State.LOADED) {
+    // TODO(benvanik): queue the set for handling when the chunk has been loaded
+    //     to ensure consistency (if a setBlock occurs while the client is
+    //     waiting for a chunk to download)
+    gf.log.write('setBlock before chunk fully loaded - inconsistent state!');
     return false;
   }
 

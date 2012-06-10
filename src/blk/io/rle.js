@@ -18,15 +18,6 @@ goog.provide('blk.io.rle');
 
 
 /**
- * Control code used to escape run counts or escaped characters with a 1 byte
- * count.
- * @const
- * @type {number}
- */
-blk.io.rle.CONTROL_CODE_1B = 0xFE;
-
-
-/**
  * Control code used to escape run counts or escaped characters with a 2 byte
  * count.
  * @const
@@ -72,21 +63,14 @@ blk.io.rle.encodeUint16 = function(source, target) {
     if (ii >= source.length - 2 ||
         source[ii + 1] != runSeq) {
       if (runCount > 1 ||
-          (runSeq >> 8) == blk.io.rle.CONTROL_CODE_1B ||
           (runSeq >> 8) == blk.io.rle.CONTROL_CODE_2B) {
         // If we have multiple sequences or are using a reserved word
         // we write first a control code and run count, followed by the sequence
         // to repeat
-        if (runCount > 0xFF) {
-          // 2 byte code
-          target[oi++] = blk.io.rle.CONTROL_CODE_2B;
-          target[oi++] = runCount >> 8;
-          target[oi++] = runCount & 0xFF;
-        } else {
-          // 1 byte code
-          target[oi++] = blk.io.rle.CONTROL_CODE_1B;
-          target[oi++] = runCount;
-        }
+        // 2 byte code
+        target[oi++] = blk.io.rle.CONTROL_CODE_2B;
+        target[oi++] = runCount >> 8;
+        target[oi++] = runCount & 0xFF;
         target[oi++] = runSeq >> 8;
         target[oi++] = runSeq & 0xFF;
       } else {
@@ -109,22 +93,19 @@ blk.io.rle.encodeUint16 = function(source, target) {
  *
  * @param {!Uint8Array} source Source encoded data.
  * @param {!Uint16Array} target Target array.
+ * @param {number=} opt_offset Offset into the source array.
+ * @param {number=} opt_length Length in the source array.
  */
-blk.io.rle.decodeUint16 = function(source, target) {
+blk.io.rle.decodeUint16 = function(source, target, opt_offset, opt_length) {
   var oi = 0;
-  for (var ii = 0; ii < source.length;) {
+  var start = opt_offset ? opt_offset : 0;
+  var end = opt_length ? opt_length : source.length;
+  for (var ii = start; ii < start + end;) {
     var s = source[ii++];
-    if (s == blk.io.rle.CONTROL_CODE_1B ||
-        s == blk.io.rle.CONTROL_CODE_2B) {
+    if (s == blk.io.rle.CONTROL_CODE_2B) {
       // Repeated sequence
-      var runCount;
-      if (s == blk.io.rle.CONTROL_CODE_1B) {
-        // 1 byte code
-        runCount = source[ii++];
-      } else {
-        // 2 byte code
-        runCount = (source[ii++] << 8) | source[ii++];
-      }
+      // 2 byte code
+      var runCount = (source[ii++] << 8) | source[ii++];
       var runSeq = (source[ii++] << 8) | source[ii++];
       for (var si = 0; si < runCount; si++) {
         target[oi++] = runSeq;

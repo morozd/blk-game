@@ -3,29 +3,41 @@ Before Release
 
 * new sounds
 
-M3: Infinite Maps
+* skip block building if any neighbors missing
+* lighting
+
+M3: Replace UI with DOM
 ================================================================================
 
-* io
-    * prioritize reads (distance from view? min when multiple users?)
+* replace custom UI with soy
+    * playerlisting
+    * console
+    * block types
+* add new tools ui (options, info)
+
+* remove bitmap font?
+    * need rendering of names to canvas, uploading to texture
+    * gf.graphics.Texture#drawText?
+
+M4: Infinite Maps
+================================================================================
+
+* Map#setBlock - queue block sets until chunks load
 
 * programmable views
     * packets for create/delete per player, attach to entity
+        * change view distance is a delete/create/wait
     * waitForLoaded or something (before entering player into the world)
 
-M4: UI
+M5: Performance Tuning
 ================================================================================
-
-* settings ui:
-    * escape to toggle + ui button?
-    * mouse sensitivity
-    * view distance -> send packets to adjust view
 
 * better error propagation
     * error types?
 
-M5: Performance Tuning
-================================================================================
+* store block counts per segment in chunk so can fast skip build queue work
+    * helps on mba, where cost to scan can be heavy
+    * needed for large view radii
 
 * performance
     * forEachInViewport / viewport.containsBoundingBox is slowest method!
@@ -43,9 +55,6 @@ M5: Performance Tuning
             * on HTML use a queue (chained deferreds)
         * optimized reader resets (just update extents)
 
-* prime sound system on start
-    * may not matter anymore?
-    * generated empty buffer/playback node?
 
 M6: Physics
 ================================================================================
@@ -84,10 +93,6 @@ M7: Weapons
 
 Experiments
 ================================================================================
-
-* draw distance adjust
-    * client must tell server
-* store block counts per segment in chunk so can fast skip build queue work
 
 * fog rewrite
     * environment density setting

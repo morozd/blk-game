@@ -19,8 +19,8 @@ goog.provide('blk.client.ClientGame');
 goog.require('blk.GameState');
 goog.require('blk.Player');
 goog.require('blk.assets.audio.Bank1');
-goog.require('blk.assets.audio.Music');
 goog.require('blk.client.ClientNetService');
+goog.require('blk.client.MusicController');
 goog.require('blk.env');
 goog.require('blk.env.ChunkView');
 goog.require('blk.env.Entity');
@@ -201,10 +201,13 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
   this.registerDisposable(this.input);
   this.addComponent(this.input);
   this.input.mouse.setSensitivity(this.settings.mouseSensitivity);
+  this.input.mouse.setLockOnFocus(this.settings.mouseLock);
   this.input.keyboard.setFullScreenHandler(goog.bind(function() {
     var goingFullScreen = !this.display.isFullScreen;
     this.display.toggleFullScreen();
-    if (goingFullScreen && this.input.mouse.supportsLocking) {
+    if (goingFullScreen &&
+        this.input.mouse.supportsLocking &&
+        this.settings.mouseLock) {
       this.input.mouse.lock();
     }
   }, this));
@@ -222,7 +225,6 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
   this.audio = new gf.audio.AudioManager(this, this.dom);
   this.registerDisposable(this.audio);
   this.addComponent(this.audio);
-  this.audio.setMuted(this.settings.audioMuted);
 
   /**
    * Sound bank for game sounds.
@@ -233,20 +235,14 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
   this.audio.loadSoundBank(this.sounds);
 
   /**
-   * Background sound track list.
+   * Music controller.
+   * Handles automatic playback of music, track management, etc.
    * @private
-   * @type {!gf.audio.TrackList}
+   * @type {!blk.client.MusicController}
    */
-  this.backgroundTracks_ = blk.assets.audio.Music.create(
-      this.assetManager, this.audio.context);
-  this.audio.loadTrackList(this.backgroundTracks_);
-
-  /**
-   * True if music is playing.
-   * @private
-   * @type {boolean}
-   */
-  this.playingMusic_ = false;
+  this.musicController_ = new blk.client.MusicController(this);
+  this.registerDisposable(this.musicController_);
+  this.musicController_.setMuted(this.settings.musicMuted);
 
   /**
    * Sprite buffer used for UI drawing.
@@ -412,11 +408,20 @@ blk.client.ClientGame.prototype.makeReady = function() {
 
 
 /**
+ * Maximum amount of time, in ms, the network poll is allowed to take.
+ * @private
+ * @const
+ * @type {number}
+ */
+blk.client.ClientGame.MAX_NETWORK_POLL_TIME_ = 2;
+
+
+/**
  * @override
  */
 blk.client.ClientGame.prototype.update = function(frame) {
   // Networking
-  this.session.poll();
+  this.session.poll(blk.client.ClientGame.MAX_NETWORK_POLL_TIME_);
 
   // Only update state if still connected
   if (this.session.state != gf.net.SessionState.DISCONNECTED) {
@@ -428,7 +433,9 @@ blk.client.ClientGame.prototype.update = function(frame) {
     gf.log.write('disconnected');
     this.console.log('disconnected!');
 
-    this.sounds.playAmbient('player_leave');
+    if (!this.settings.soundFxMuted) {
+      this.sounds.playAmbient('player_leave');
+    }
     this.stopTicking();
 
     var d = blk.ui.Popup.show(blk.ui.alerts.disconnected, {
@@ -491,7 +498,9 @@ blk.client.ClientGame.prototype.handleUserDisconnect = function(user) {
   goog.dispose(player);
 
   // TODO(benvanik): join/leave sound
-  this.sounds.playAmbient('player_leave');
+  if (!this.settings.soundFxMuted) {
+    this.sounds.playAmbient('player_leave');
+  }
 
   gf.log.write('client disconnected',
       user.sessionId, user.disconnectReason);
@@ -538,7 +547,7 @@ blk.client.ClientGame.prototype.setBlock = function(x, y, z, blockData) {
   var changed = map.setBlock(x, y, z, blockData);
 
   // Play block sound, if any and only if needed
-  if (changed) {
+  if (!this.settings.soundFxMuted && changed) {
     var soundData = blockData ? blockData : oldData;
     if (soundData >> 8) {
       var block = map.blockSet.get(soundData >> 8);
@@ -709,11 +718,11 @@ blk.client.ClientGame.prototype.render = function(frame) {
     // Draw UI
     var mapStats = this.map.getStatisticsString();
     var renderStats = this.viewManager.getStatisticsString();
-    var movement = this.localPlayer ? [
-      this.localPlayer.entity.state.velocity[0].toFixed(8),
-      this.localPlayer.entity.state.velocity[1].toFixed(8),
-      this.localPlayer.entity.state.velocity[2].toFixed(8)].join(',') : '';
-    this.console.render(frame, viewport, mapStats, renderStats, movement);
+    // var movement = this.localPlayer ? [
+    //   this.localPlayer.entity.state.velocity[0].toFixed(8),
+    //   this.localPlayer.entity.state.velocity[1].toFixed(8),
+    //   this.localPlayer.entity.state.velocity[2].toFixed(8)].join(',') : '';
+    this.console.render(frame, viewport, mapStats, renderStats);//, movement);
     this.drawInputUI_(frame);
     this.drawBlockTypes_(frame);
 
@@ -831,6 +840,10 @@ blk.client.ClientGame.prototype.hitTestBlockTypes_ = function(mouseData) {
  * @private
  */
 blk.client.ClientGame.prototype.showSettings_ = function() {
+  if (!this.settings.soundFxMuted) {
+    this.sounds.playAmbient('click');
+  }
+
   this.input.setEnabled(false);
 
   // TODO(benvanik): proper dynamic view adjustment
@@ -853,9 +866,37 @@ blk.client.ClientGame.prototype.showSettings_ = function() {
           this.session.updateUserInfo(userInfo);
 
           this.input.mouse.setSensitivity(this.settings.mouseSensitivity);
-          this.audio.setMuted(this.settings.audioMuted);
+          this.input.mouse.setLockOnFocus(this.settings.mouseLock);
+          if (this.settings.mouseLock) {
+            this.input.mouse.lock();
+          } else {
+            this.input.mouse.unlock();
+          }
+
+          // Toggle global mutes
+          this.musicController_.setMuted(this.settings.musicMuted);
         }
 
+        this.input.setEnabled(true);
+      }, this);
+};
+
+
+/**
+ * Shows the help dialog.
+ * @private
+ */
+blk.client.ClientGame.prototype.showHelp_ = function() {
+  if (!this.settings.soundFxMuted) {
+    this.sounds.playAmbient('click');
+  }
+
+  this.input.setEnabled(false);
+
+  var d = blk.ui.Popup.show(blk.ui.alerts.help, {
+  }, this.dom, this.display.mainFrame);
+  d.addCallback(
+      function(buttonId) {
         this.input.setEnabled(true);
       }, this);
 };
@@ -877,6 +918,9 @@ blk.client.ClientGame.prototype.handleInput_ = function(frame) {
   // Show settings
   if (keyboardData.didKeyGoDown(goog.events.KeyCodes.O)) {
     this.showSettings_();
+    return;
+  } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.H)) {
+    this.showHelp_();
     return;
   }
 
@@ -915,16 +959,13 @@ blk.client.ClientGame.prototype.handleInput_ = function(frame) {
     }
   }
   if (didSwitchBlock) {
-    this.sounds.playAmbient('click');
+    if (!this.settings.soundFxMuted) {
+      this.sounds.playAmbient('click');
+    }
   }
 
   if (keyboardData.didKeyGoDown(goog.events.KeyCodes.M)) {
-    if (this.playingMusic_) {
-      this.backgroundTracks_.stopAll();
-    } else {
-      this.backgroundTracks_.play('track1');
-    }
-    this.playingMusic_ = !this.playingMusic_;
+    this.musicController_.togglePlayback();
   }
 
   // Chunk rebuild

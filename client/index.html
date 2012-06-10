@@ -4,14 +4,17 @@
     <title>BLK, a voxel world tech demo</title>
     <link rel="stylesheet" href="index.css"/>
     <script>
-      var DEFAULT_HOST = 'ws://localhost:1337';
+      var SERVER_QUERY_URL = 'servers.json';
+      var DEV_MODE = window.location.search == '?dev';
+      var GAME_URL = DEV_MODE ? 'game-uncompiled.html' : 'game.html';
     </script>
   </head>
   <body>
+    <a id="forkme_banner" href="https://github.com/benvanik/blk-game">View on GitHub</a>
     <br/>
     <br/>
     <div id="column">
-      <div id="title">BLK, by <a href="http://noxa.org">benvanik</a></div>
+      <div id="title">BLK, by <a href="http://noxa.org">Ben Vanik</a> (<a href="http://twitter.com/benvanik">@benvanik</a>)</div>
       <br/>
       <div class="break"/>
       <br/>
@@ -24,12 +27,13 @@
       <br/>
       <br/>
       <div id="go">
-        &gt; <a href="game.html?host=local://blk-server-0" target="_blank">Run Locally</a>
+        &gt; <a id="local-link" target="_blank">Run Locally</a> (<a href="javascript:resetLocalStorage()">reset map</a>)
         <br/>
         <br/>
-        &gt; <a href="game.html?host=ws://173.160.235.109:1338" target="_blank" id="joinLink">Join Multiplayer</a>
+        &gt; <span>Join Multiplayer</span> as <input id="name" type="text" value="User"/>
         <br/>
-        &nbsp;&nbsp;&nbsp;Name: <input id="name" type="text" value="User"/>
+        <div id="server-list">
+        </div>
       </div>
       <br/>
       <br/>
@@ -51,7 +55,7 @@
         <span class="section">Help/Controls</span>
         <br/>
         <ul>
-          <li>WSAD keys to move around (QZ to change elevation)
+          <li>WSAD keys to move around
           <li>Click and drag the mouse to change the view
           <li>1-5 keys or mouse wheel to change the current block type
           <li>Left click to place a block of the current type
@@ -59,7 +63,6 @@
           <li>Alt-enter to toggle fullscreen mode/mouse lock
           <li>O to change options (like your name)
           <li>T to chat
-          <li>M to play some music
         </ul>
         For the best controls, run in Chrome dev channel or
         <a href="http://tools.google.com/dlpage/chromesxs" target="_blank">Canary</a> and
@@ -74,17 +77,19 @@
         <br/>
         I wanted to do something productive with my 20% time at Google. I've been
         preaching that the web is finally ready for real games, so I figured I'd
-        try to make one. This is the result.
+        try to make one. This is the result. Heavy inspiration comes from Mojang,
+        of course: Minecraft is cool, but more importantly it's technically
+        difficult to get running well, especially in the browser.
         <br/>
         <br/>
         All of the code for this project, including the voxel world client and server,
         the game framework, and the build system used to produce the final output are
-        all open sourced (or will be soon). I'll be continuing to develop the game
+        all open sourced. I'll be continuing to develop the game
         framework and build system, and if I have time throw some more features into
         this demo (like real gameplay, for example). Feel free to fork! Have fun!
-        <!--<br/>
         <br/>
-        <a href="">Interested in the tech?</a>-->
+        <br/>
+        <a href="https://github.com/benvanik/blk-game">Interested in the tech?</a>
       </div>
       <br/>
       <br/>
@@ -92,10 +97,16 @@
         <span class="section">Code</span>
         <br/>
         <br/>
-        Coming soon, patience please! I've already got the build system I'm writing
-        that all of this is produced with available here:
-        <a href="https://github.com/benvanik/anvil-build">anvil-build</a>.
-        The rest will be coming ASAP!
+        Build system (powering the whole thing):
+        <a href="https://github.com/benvanik/anvil-build">anvil-build</a>
+        <br/>
+        <br/>
+        Low-level web games framework:
+        <a href="https://github.com/benvanik/games-framework">games-framework</a>
+        <br/>
+        <br/>
+        The BLK demo code itself:
+        <a href="https://github.com/benvanik/blk-game">blk-game</a>
       </div>
       <br/>
       <br/>
@@ -103,8 +114,14 @@
         <span class="section">Who</span>
         <br/>
         <br/>
-        This demo was conceptualized and coded by <a href="http://noxa.org" target="_blank">benvanik</a>
-        as a 20% project at Google, and is all copyright Google, Inc. 2012.
+        This demo was conceptualized and coded by <a href="http://twitter.com/benvanik">@benvanik</a>
+        as a 20% project at Google, and is all copyright Google 2012.
+        <br/>
+        <br/>
+        Sound effects and punched bricks by <a href="https://twitter.com/somenotes">Sean Dunn</a>.
+        <br/>
+        <br/>
+        UI icons by <a href="https://twitter.com/KM_Alexander">@KM_Alexander</a>.
         <br/>
         <br/>
         The font comes is <a href="http://www.dafont.com/volter-goldfish.font" target="_blank">Volter (Goldfish)</a>.
@@ -115,9 +132,6 @@
         <br/>
         <br/>
         The awesome music is Knuck Beatz's <a href="http://soundcloud.com/casesensative/knuck-beatz-so-many-blocks-so" target="_blank">So Many Blocks, So Little Time (Minecraft Soundtrack)</a>.
-        <br/>
-        <br/>
-        TODO: audio files
       </div>
       <br/>
       <br/>
@@ -252,7 +266,7 @@
         if (value && value.length) {
           nameBox.value = value;
         } else {
-          nameBox.value = 'User';
+          nameBox.value = 'Some Player ' + Math.floor(Math.random() * 100);
         }
       }
       function saveName() {
@@ -264,13 +278,89 @@
         document.cookie = 's_un=' + encodeURIComponent(value);
       }
       loadName();
-      function updateLink() {
-        var joinLink = document.getElementById('joinLink');
-        joinLink.href = 'game.html?host=' + DEFAULT_HOST;
+      saveName();
+      nameBox.addEventListener('change', function() {
         saveName();
+      }, false);
+
+      function resetLocalStorage() {
+        function resetFS(fs) {
+          var reader = fs.root.createReader();
+          function removeMore(entries) {
+            for (var n = 0; n < entries.length; n++) {
+              var entry = entries[n];
+              if (entry.isDirectory) {
+                entry.removeRecursively(function() {});
+              }
+            }
+            if (entries.length) {
+              reader.readEntries(removeMore);
+            } else {
+              alert('Done!');
+            }
+          };
+          reader.readEntries(removeMore);
+        };
+        var requestFileSystem =
+            window.requestFileSystem || window.webkitRequestFileSystem;
+        requestFileSystem.call(
+            window, window.PERSISTENT, 1, resetFS);
       }
-      updateLink();
-      nameBox.addEventListener('change', updateLink, false);
+
+      var localLink = document.getElementById('local-link');
+      localLink.href = GAME_URL + '?host=local://blk-server-0';
+
+      function updateServers() {
+        var serverList = document.getElementById('server-list');
+        var xhr = new XMLHttpRequest();
+        xhr.addEventListener('readystatechange', function() {
+          if (xhr.readyState == 4) {
+            if (xhr.status == 200) {
+              // Succeeded
+              serverList.innerText = '';
+              var targetGameType = DEV_MODE ? 'blk-dev' : 'blk';
+              var table = document.createElement('table');
+              var json = JSON.parse(xhr.responseText);
+              var anyFound = false;
+              for (var n = 0; n < json.length; n++) {
+                var result = json[n];
+                var endpoint = result['endpoint'];
+                var serverInfo = result['serverInfo'];
+                if (serverInfo['gameType'] != targetGameType) {
+                  continue;
+                }
+                anyFound = true;
+                var row = document.createElement('tr');
+                var c1 = document.createElement('td');
+                c1.innerHTML = '<li><a href="' + GAME_URL + '?host=' + endpoint + '" target="_blank">' + serverInfo['name'] + '</a>';
+                row.appendChild(c1);
+                // var c2 = document.createElement('td');
+                // c2.innerText = serverInfo['maximumUsers'];
+                // row.appendChild(c2);
+                // // TODO(benvanik): flag
+                // var c3 = document.createElement('td');
+                // c3.innerText = serverInfo['location'];
+                // row.appendChild(c3);
+                table.appendChild(row);
+              }
+              if (!anyFound) {
+                serverList.innerText = '\nNo servers online! Try again later!';
+              } else {
+                serverList.appendChild(table);
+              }
+            } else {
+              // Failed
+              serverList.innerText = '\nUnable to fetch server list!'
+            }
+          }
+        }, true);
+        xhr.open('GET', SERVER_QUERY_URL);
+        xhr.send();
+      }
+      window.setInterval(function() {
+        updateServers();
+      }, 60 * 1000);
+      updateServers();
     </script>
   </body>
 </html>

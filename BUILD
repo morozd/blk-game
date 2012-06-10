@@ -236,9 +236,9 @@ BLK_SERVER_JS_SRCS=BLK_JS_SRCS + [
     ]
 
 SHARED_JS_FLAGS=[
-    #'--define=gf.BUILD_CLIENT=false',
-    #'--define=goog.DEBUG=false',
-    #'--define=goog.asserts.ENABLE_ASSERTS=false',
+    '--define=gf.BUILD_CLIENT=false',
+    '--define=goog.DEBUG=false',
+    '--define=goog.asserts.ENABLE_ASSERTS=false',
     ]
 
 closure_js_library(

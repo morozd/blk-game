@@ -47,6 +47,12 @@ blk.client.UserSettings = function(dom) {
   this.mouseSensitivity = blk.client.UserSettings.DEFAULT_MOUSE_SENSITIVITY_;
 
   /**
+   * Whether to lock the mouse cursor on focus.
+   * @type {boolean}
+   */
+  this.mouseLock = blk.client.UserSettings.DEFAULT_MOUSE_LOCK_;
+
+  /**
    * View distance setting, in chunk units.
    * Automatically clamped between {@see blk.env.ChunkView.MIN_CHUNK_RADIUS_XZ}
    * and {@see blk.env.ChunkView.MAX_CHUNK_RADIUS_XZ}.
@@ -55,10 +61,16 @@ blk.client.UserSettings = function(dom) {
   this.viewDistance = blk.client.UserSettings.DEFAULT_VIEW_DISTANCE_;
 
   /**
-   * Whether audio playback is muted.
+   * Whether sound FX playback is muted.
    * @type {boolean}
    */
-  this.audioMuted = blk.client.UserSettings.DEFAULT_AUDIO_MUTED_;
+  this.soundFxMuted = blk.client.UserSettings.DEFAULT_SOUND_FX_MUTED_;
+
+  /**
+   * Whether music playback is muted.
+   * @type {boolean}
+   */
+  this.musicMuted = blk.client.UserSettings.DEFAULT_MUSIC_MUTED_;
 };
 
 
@@ -81,6 +93,14 @@ blk.client.UserSettings.DEFAULT_MOUSE_SENSITIVITY_ = 1;
 /**
  * @private
  * @const
+ * @type {boolean}
+ */
+blk.client.UserSettings.DEFAULT_MOUSE_LOCK_ = true;
+
+
+/**
+ * @private
+ * @const
  * @type {number}
  */
 blk.client.UserSettings.DEFAULT_VIEW_DISTANCE_ =
@@ -92,7 +112,15 @@ blk.client.UserSettings.DEFAULT_VIEW_DISTANCE_ =
  * @const
  * @type {boolean}
  */
-blk.client.UserSettings.DEFAULT_AUDIO_MUTED_ = false;
+blk.client.UserSettings.DEFAULT_SOUND_FX_MUTED_ = false;
+
+
+/**
+ * @private
+ * @const
+ * @type {boolean}
+ */
+blk.client.UserSettings.DEFAULT_MUSIC_MUTED_ = false;
 
 
 /**
@@ -103,8 +131,10 @@ blk.client.UserSettings.prototype.clone = function() {
   var settings = new blk.client.UserSettings(this.dom_);
   settings.userName = this.userName;
   settings.mouseSensitivity = this.mouseSensitivity;
+  settings.mouseLock = this.mouseLock;
   settings.viewDistance = this.viewDistance;
-  settings.audioMuted = this.audioMuted;
+  settings.soundFxMuted = this.soundFxMuted;
+  settings.musicMuted = this.musicMuted;
   return settings;
 };
 
@@ -115,8 +145,10 @@ blk.client.UserSettings.prototype.clone = function() {
 blk.client.UserSettings.prototype.reset = function() {
   this.userName = blk.client.UserSettings.DEFAULT_USER_NAME_;
   this.mouseSensitivity = blk.client.UserSettings.DEFAULT_MOUSE_SENSITIVITY_;
+  this.mouseLock = blk.client.UserSettings.DEFAULT_MOUSE_LOCK_;
   this.viewDistance = blk.client.UserSettings.DEFAULT_VIEW_DISTANCE_;
-  this.audioMuted = blk.client.UserSettings.DEFAULT_AUDIO_MUTED_;
+  this.soundFxMuted = blk.client.UserSettings.DEFAULT_SOUND_FX_MUTED_;
+  this.musicMuted = blk.client.UserSettings.DEFAULT_MUSIC_MUTED_;
 };
 
 
@@ -136,14 +168,18 @@ blk.client.UserSettings.prototype.load = function() {
   if (this.mouseSensitivity <= 0.0 || this.mouseSensitivity > 10) {
     this.mouseSensitivity = blk.client.UserSettings.DEFAULT_MOUSE_SENSITIVITY_;
   }
+  this.mouseLock =
+      cookies.get('s_ml', String(this.mouseLock)) == 'true';
   this.viewDistance =
       Number(cookies.get('s_vd', String(this.viewDistance))) | 0;
   if (this.viewDistance <= blk.env.ChunkView.MIN_CHUNK_RADIUS_XZ ||
       this.viewDistance > blk.env.ChunkView.MAX_CHUNK_RADIUS_XZ) {
     this.viewDistance = blk.client.UserSettings.DEFAULT_VIEW_DISTANCE_;
   }
-  this.audioMuted =
-      Boolean(cookies.get('s_am', String(this.audioMuted)));
+  this.soundFxMuted =
+      cookies.get('s_sm', String(this.soundFxMuted)) == 'true';
+  this.musicMuted =
+      cookies.get('s_mm', String(this.musicMuted)) == 'true';
 };
 
 
@@ -155,6 +191,8 @@ blk.client.UserSettings.prototype.save = function() {
   var cookies = new goog.net.Cookies(this.dom_.getDocument());
   cookies.set('s_un', goog.string.urlEncode(this.userName));
   cookies.set('s_ms', String(this.mouseSensitivity));
+  cookies.set('s_ml', String(this.mouseLock));
   cookies.set('s_vd', String(this.viewDistance));
-  cookies.set('s_am', String(this.audioMuted));
+  cookies.set('s_sm', String(this.soundFxMuted));
+  cookies.set('s_mm', String(this.musicMuted));
 };

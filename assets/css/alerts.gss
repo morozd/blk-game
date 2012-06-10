@@ -54,6 +54,7 @@
 .blkAlertFooter {
   height: 28px;
   padding: 3px;
+  margin-bottom: 2px;
 }
 
 .blkAlertButton {
@@ -80,6 +81,11 @@
   @mixin blkAlertButtonDefaultBackground();
 }
 
+a.blkAlertLink,  a.blkAlertLink:visited {
+  color: #D1D1D1;
+  text-shadow: #555555 1px 1px;
+}
+
 .blkSettingsRow {
   margin-top: 15px;
   overflow: auto;
@@ -92,6 +98,12 @@
 
 .blkSettingsValue {
   margin-left: 20px;
+}
+
+.blkSettingsLeft {
+  float: left;
+  margin-left: 5px;
+  margin-right: 15px;
 }
 
 .blkSettingsInput {
@@ -120,6 +132,20 @@
   @mixin noSelect();
 }
 
+.blkSettingsCheckbox {
+  cursor: pointer;
+}
+.blkSettingsCheckboxInput {
+  cursor: pointer;
+  margin-right: 7px;
+}
+
 .blkSettingsNameValue {}
 .blkSettingsSensitivitySlider {}
+.blkSettingsMouseLock {
+  margin-bottom: 5px;
+}
 .blkSettingsDistanceSlider {}
+.blkSettingsAudio {}
+.blkSettingsSoundFx {}
+.blkSettingsMusic {}

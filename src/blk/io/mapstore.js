@@ -47,6 +47,13 @@ blk.io.MapStore = function() {
   this.queue_ = [];
 
   /**
+   * Whether the queue needs to be sorted by priority.
+   * @private
+   * @type {boolean}
+   */
+  this.needsSort_ = false;
+
+  /**
    * Count of in-progress entries.
    * @private
    * @type {number}
@@ -175,15 +182,18 @@ blk.io.MapStore.prototype.finishWriteInfo = function(entry, error) {
 /**
  * Gets chunk data, if present.
  * @param {!blk.env.Chunk} chunk Chunk to read into. Must have its XYZ set.
+ * @param {number} priority Priority, with 0 being the highest priority.
  * @return {!goog.async.Deferred} A deferred fulfilled when the read completes.
  */
-blk.io.MapStore.prototype.readChunk = function(chunk) {
+blk.io.MapStore.prototype.readChunk = function(chunk, priority) {
   var deferred = new goog.async.Deferred();
   var entry = new blk.io.MapStore.QueueEntry(
       deferred,
       blk.io.MapStore.QueueAction.READ_CHUNK, chunk.x, chunk.y, chunk.z);
   entry.chunk = chunk;
+  entry.priority = priority;
   this.queueEntry_(entry);
+  this.needsSort_ = true;
   return deferred;
 };
 
@@ -306,6 +316,36 @@ blk.io.MapStore.prototype.pump_ = function() {
   // Don't remove items so that we keep blocking against them
   // They will be removed on completion
   if (!this.inProgress_ && this.queue_.length) {
+    if (this.needsSort_) {
+      this.needsSort_ = false;
+
+      // TODO(benvanik): make this a million times more efficient
+      // Sort the head of the queue up until the first unprioritized entry
+      var sortEnd = this.queue_.length - 1;
+      for (var n = 0; n < this.queue_.length; n++) {
+        if (this.queue_[n].priority == Number.MAX_VALUE) {
+          sortEnd = n - 1;
+          break;
+        }
+      }
+      if (sortEnd) {
+        // Sort by priority
+        if (sortEnd == this.queue_.length - 1) {
+          // Sorting entire array
+          goog.array.sort(this.queue_,
+              blk.io.MapStore.QueueEntry.comparePriority);
+        } else {
+          // Sorting subregion
+          // TODO(benvanik): find a nice way to do a sub-region sort
+          var region = this.queue_.slice(0, sortEnd);
+          goog.array.sort(region, blk.io.MapStore.QueueEntry.comparePriority);
+          for (var n = 0; n < region.length; n++) {
+            this.queue_[n] = region[n];
+          }
+        }
+      }
+    }
+
     var nextEntry = this.queue_[0];
     this.inProgress_++;
     this.processEntry(nextEntry);
@@ -399,6 +439,12 @@ blk.io.MapStore.QueueEntry = function(
   this.chunk = null;
 
   /**
+   * Priority, with lower values being higher priority.
+   * @type {number}
+   */
+  this.priority = Number.MAX_VALUE;
+
+  /**
    * Version, if a write.
    * @type {number}
    */
@@ -409,4 +455,16 @@ blk.io.MapStore.QueueEntry = function(
    * @type {ArrayBuffer}
    */
   this.data = null;
+};
+
+
+/**
+ * Comparision function for sorts.
+ * Should only be used on entries that have a valid priority (not MAX_VALUE).
+ * @param {!blk.io.MapStore.QueueEntry} a First entry.
+ * @param {!blk.io.MapStore.QueueEntry} b Second entry.
+ * @return {number} Comparision result.
+ */
+blk.io.MapStore.QueueEntry.comparePriority = function(a, b) {
+  return a.priority - b.priority;
 };

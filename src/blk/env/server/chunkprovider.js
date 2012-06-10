@@ -18,9 +18,11 @@ goog.provide('blk.env.server.ChunkProvider');
 
 goog.require('blk.env.Chunk');
 goog.require('blk.env.gen.ChunkBuilder');
+goog.require('gf');
 goog.require('gf.math.Random');
 goog.require('goog.Disposable');
 goog.require('goog.asserts');
+goog.require('goog.structs.PriorityQueue');
 
 
 
@@ -52,12 +54,12 @@ blk.env.server.ChunkProvider = function(map, generator, mapStore) {
   this.mapStore_ = mapStore;
 
   /**
-   * A list of chunks pending generation.
+   * A priority queue of chunks pending generation.
    * TODO(benvanik): handle dispose?
    * @private
-   * @type {!Array.<blk.env.Chunk>}
+   * @type {!goog.structs.PriorityQueue}
    */
-  this.generationQueue_ = [];
+  this.generationQueue_ = new goog.structs.PriorityQueue();
 
   /**
    * Whether the generator processing queue is running.
@@ -89,7 +91,7 @@ goog.inherits(blk.env.server.ChunkProvider, goog.Disposable);
  * @const
  * @type {number}
  */
-blk.env.server.ChunkProvider.GENERATION_INTERVAL_ = 10;
+blk.env.server.ChunkProvider.GENERATION_INTERVAL_ = 5;
 
 
 /**
@@ -129,15 +131,19 @@ blk.env.server.ChunkProvider.prototype.update = function(frame) {
 /**
  * Request a chunk be loaded/generated.
  * @param {!blk.env.Chunk} chunk Requested unloaded chunk.
+ * @param {number=} opt_priority Priority for the request. Lower is better.
  */
-blk.env.server.ChunkProvider.prototype.requestChunk = function(chunk) {
-  //gf.log.write('requesting chunk', chunk.x, chunk.y, chunk.z);
+blk.env.server.ChunkProvider.prototype.requestChunk = function(chunk,
+    opt_priority) {
+  //gf.log.write('requesting chunk', chunk.x, chunk.y, chunk.z, opt_priority);
+
+  var priority = goog.isDef(opt_priority) ? opt_priority : Number.MAX_VALUE;
 
   goog.asserts.assert(chunk.state == blk.env.Chunk.State.UNLOADED);
   chunk.state = blk.env.Chunk.State.LOADING;
 
   // First attempt to load from disk - if it fails, generate
-  var deferred = this.mapStore_.readChunk(chunk);
+  var deferred = this.mapStore_.readChunk(chunk, priority);
   deferred.addCallbacks(
       /**
        * @this {!blk.env.server.ChunkProvider}
@@ -152,7 +158,7 @@ blk.env.server.ChunkProvider.prototype.requestChunk = function(chunk) {
       function(arg) {
         // Chunk not found - generate
         // TODO(benvanik): differentiate load failure from presence check
-        this.queueChunkGeneration_(chunk);
+        this.queueChunkGeneration_(chunk, priority);
       }, this);
 };
 
@@ -161,10 +167,11 @@ blk.env.server.ChunkProvider.prototype.requestChunk = function(chunk) {
  * Queues a chunk for generation.
  * @private
  * @param {!blk.env.Chunk} chunk Chunk to be generated.
+ * @param {number} priority Priority, with 0 being the highest priority.
  */
 blk.env.server.ChunkProvider.prototype.queueChunkGeneration_ =
-    function(chunk) {
-  this.generationQueue_.push(chunk);
+    function(chunk, priority) {
+  this.generationQueue_.enqueue(priority, chunk);
 
   // Start up queue if needed
   if (!this.processingRunning_) {
@@ -184,9 +191,10 @@ blk.env.server.ChunkProvider.prototype.processGenerationQueue_ = function() {
   // TODO(benvanik): out of process/offthread generation
   // Can use node-webworker (https://github.com/pgriess/node-webworker) to
   // support the same code on both web clients and node
-  var startTime = goog.now();
-  while (this.generationQueue_.length) {
-    var chunk = this.generationQueue_.shift();
+  var startTime = gf.now();
+  while (this.generationQueue_.getCount()) {
+    var chunk = /** @type {blk.env.Chunk} */ (this.generationQueue_.dequeue());
+    goog.asserts.assert(chunk);
 
     // TODO(benvanik): create a PRNG based on map seed and chunk ID
     var random = new gf.math.Random(this.generator_.mapParams.seed);
@@ -202,13 +210,13 @@ blk.env.server.ChunkProvider.prototype.processGenerationQueue_ = function() {
     // TODO(benvanik): queue for population (needs to happen from view?)
 
     // Stop generating if over time limit
-    if (goog.now() - startTime >
+    if (gf.now() - startTime >
         blk.env.server.ChunkProvider.MAX_GENERATION_TIME_) {
       break;
     }
   }
 
-  if (this.generationQueue_.length) {
+  if (this.generationQueue_.getCount()) {
     this.processingRunning_ = true;
     this.processingQueueId_ = goog.global.setTimeout(
         goog.bind(this.processGenerationQueue_, this),

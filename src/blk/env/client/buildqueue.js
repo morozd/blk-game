@@ -17,6 +17,7 @@
 goog.provide('blk.env.client.BuildQueue');
 
 goog.require('blk.env.UpdatePriority');
+goog.require('gf');
 goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.vec.Vec3');
@@ -253,7 +254,7 @@ blk.env.client.BuildQueue.prototype.update = function(frame, viewport) {
   // Throttle the number of chunks that are rebuilt each frame
   // TODO(benvanik): throttle better (dynamically?)
   var segmentsRemaining = blk.env.client.BuildQueue.MAX_BUILDS_PER_FRAME_;
-  var startTime = goog.now();
+  var startTime = gf.now();
   var frameNumber = frame.frameNumber;
   var totalSizeDelta = 0;
 
@@ -286,7 +287,7 @@ blk.env.client.BuildQueue.prototype.update = function(frame, viewport) {
   }
 
   while (segmentsRemaining && this.visibleList_.length) {
-    if (goog.now() - startTime >
+    if (gf.now() - startTime >
         blk.env.client.BuildQueue.MAX_BUILD_TIME_PER_FRAME_) {
       return totalSizeDelta;
     }
@@ -299,7 +300,7 @@ blk.env.client.BuildQueue.prototype.update = function(frame, viewport) {
   }
 
   while (segmentsRemaining && this.updateList_.length) {
-    if (goog.now() - startTime >
+    if (gf.now() - startTime >
         blk.env.client.BuildQueue.MAX_BUILD_TIME_PER_FRAME_) {
       return totalSizeDelta;
     }
@@ -312,7 +313,7 @@ blk.env.client.BuildQueue.prototype.update = function(frame, viewport) {
   }
 
   while (segmentsRemaining && this.loadList_.length) {
-    if (goog.now() - startTime >
+    if (gf.now() - startTime >
         blk.env.client.BuildQueue.MAX_BUILD_TIME_PER_FRAME_) {
       return totalSizeDelta;
     }

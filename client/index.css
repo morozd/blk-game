@@ -30,6 +30,20 @@ body {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAklJREFUWMPNl71uE1EQhY83i2PJa8cSkU0SSyi2KKgoqKioUJ6Ad+AR8oYpU1BQORFSSGQLFMc/knGMl+L6g8xoF8q906zuz17dOXPOzNza2Xk/l6TZ9FGSdD1aSpJOh009NT/P+Kj/TJLU2K9Lkr5eLyRJm1X4L22E78vTTJK0+rmWJH27Ct9EFVut+76ZS9LJIHgwvg03225rxmNuznqznZqDDp83CveBxEE37J9PfxnkKkfgjxuLxdbECsOju5vHHSJhvd0JHny+vN8hYM/xnj9MNmYcDQfSpB5iPRi2zMLVaG7GSZKbMaopUwmIfP+xMmrAQKJ6BFqdPePR6EvQ8fB1ZsYgBScwzxmQwP7mk5VRC/mi+jzw7lMvfxorbujHXg0gt5xtzIHkB/8f6ogvD3BDdDqfLg3rl7Pi3M5+xqyrbbkAUt66vWYkHHj18SAvyull+gYxqp/3lBizHy4xv13nRlXVcwAWU/3QK+ZjSA5PG2tTGzxS6Bw76teNGrIsiQSB3nHdTPyvH4D1rDP/5m1HkjQZByQ4l/Ng/fiW6plFggAxQdd0RsSauj+6sDXBs/zuZmo44/MEfYNHrvo8cHwWekJiRqyojr76gRjqKauGnjvUEGoA4+oRePEhy/+lezqly4v7wu6WzEasqYZwAM7gOaoAuQh6wl3VK+vz4QLqgAN4DiIYGe5hokLPUUE0HVHKjXwVxLgpKiH2vpsmA1IlTwZyGXBd+LaMAIFdLMu6WTodYu9fw7wfyt6G7INjINrqRPIu+A0Vklk1N+7sqQAAAABJRU5ErkJggg==);
 }
 
+#forkme_banner {
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 10px;
+  z-index: 10;
+  padding: 10px 50px 10px 10px;
+  color: white;
+  text-shadow: gray 1px 1px;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAcVJREFUeNrMlyFIQ0EYx/dk4YWFBYUFw4LgBMWVBYNBWDAsaLBNFIxqEI2CmA1aRIs4MBgsigbB4BMNBoPiosFgWDA82MCFwTzh98HxMX1jhntf2O947+7b97/77rt7XiLC2u12huY0zKouIQx+fjzPe050YX0JR+Z1UJiiuQcX4Cd8gU04DHO2cmNrf82AM8XJDmt5C304R+TnEbmQp7kD73ku46/jodhEJKrPYAuuwlEi71fv07Bm9zN2Aau2XzN+DOXvbrPaRLJI+wCOwBm4q5QmI3zewaK91jIzRvGs86xeon1kr4GZicHfdkCEjUPJiW14id+08zX+Uvv1isjqPE/16Ft2xSGs2//jdI2lQr2pd/4/ffvMYIsZrNlr775WGysTWaBmINej7yH8bagsbzhXXFWV6QHOw1NbQRdWgSuqhsup9eR8H2/SXoYT8FgpL6rnYh9w0q581jl9YueKeV9wrljO1Vf4CPfVOe2ru1ZT7dcBpbRMUxRP0S9wm9UmgtC+Gxm7UQoLsATXlY8G46W/7NstddsMYnuvzqv9m1V3q4yt1KpIoXIlSivx/pKwlCfV3avUzbeTVC7Jndh9O30LMAC8u5U4zewt5AAAAABJRU5ErkJggg==) #4296D6 no-repeat 95% 50%;
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(0,0,0,.5);
+}
+
 .chrome-icon {
   width: 32px;
   height: 32px;
@@ -47,7 +61,7 @@ body {
 }
 
 #column {
-  width: 600px;
+  width: 620px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -57,7 +71,7 @@ body {
 }
 
 #go {
-  width: 300px;
+  width: 450px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -67,8 +81,19 @@ body {
   font-size: 1em;
   border: 1px solid black;
   background-color: #EEE;
-  width: 150px;
+  width: 160px;
   padding: 3px;
+}
+
+#server-list {
+  margin-left: 20px;
+}
+#server-list table {
+  width: 100%;
+}
+#server-list tr {
+}
+#server-list td {
 }
 
 #browser-line {

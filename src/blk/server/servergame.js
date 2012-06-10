@@ -22,6 +22,7 @@ goog.require('blk.env.Entity');
 goog.require('blk.env.MapParameters');
 goog.require('blk.env.server.ServerMap');
 goog.require('blk.io.ChunkSerializer');
+goog.require('blk.io.CompressionFormat');
 goog.require('blk.net.packets.EntityCreate');
 goog.require('blk.net.packets.EntityDelete');
 goog.require('blk.net.packets.EntityPosition');
@@ -31,6 +32,7 @@ goog.require('blk.physics.ServerMovement');
 goog.require('blk.server.ServerMapObserver');
 goog.require('blk.server.ServerNetService');
 goog.require('blk.server.ServerPlayer');
+goog.require('gf');
 goog.require('gf.Game');
 goog.require('gf.log');
 goog.require('gf.net.chat.ServerChatService');
@@ -88,11 +90,17 @@ blk.server.ServerGame = function(launchOptions, session, mapStore) {
   this.state = new blk.GameState(this, session, this.map);
   this.registerDisposable(this.state);
 
+  // If running in a web worker, don't use compression (it's a waste)
+  var compressionFormat;
+  if (gf.SERVER && !gf.NODE) {
+    compressionFormat = blk.io.CompressionFormat.UNCOMPRESSED;
+  }
+
   /**
-   * Cached chunk serialization utility.
+   * Cached chunk serialization utility used when sending chunks to clients.
    * @type {!blk.io.ChunkSerializer}
    */
-  this.chunkSerializer = new blk.io.ChunkSerializer();
+  this.chunkSerializer = new blk.io.ChunkSerializer(compressionFormat);
 
   // TODO(benvanik): something better
   this.nextEntityId_ = 0;

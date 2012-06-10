@@ -23,6 +23,7 @@ goog.require('gf.net.UserInfo');
 goog.require('goog.asserts');
 goog.require('goog.events.EventType');
 goog.require('goog.string');
+goog.require('goog.style');
 
 
 
@@ -75,6 +76,9 @@ blk.ui.Settings.prototype.enterDocument = function() {
       function(sliderValue) {
         return goog.string.padNumber(sliderValue / 50, 1, 2);
       });
+  this.setupCheckbox_(
+      goog.getCssName('blkSettingsMouseLock'),
+      settings.mouseLock);
 
   this.setupSlider_(
       goog.getCssName('blkSettingsDistanceSlider'),
@@ -85,13 +89,20 @@ blk.ui.Settings.prototype.enterDocument = function() {
       function(sliderValue) {
         return goog.string.padNumber(sliderValue, 1);
       });
+
+  this.setupCheckbox_(
+      goog.getCssName('blkSettingsSoundFx'),
+      !settings.soundFxMuted);
+  this.setupCheckbox_(
+      goog.getCssName('blkSettingsMusic'),
+      !settings.musicMuted);
 };
 
 
 /**
  * Sets up a slider group for control/updating.
  * @private
- * @param {string} className, Slider root CSS class name.
+ * @param {string} className Slider root CSS class name.
  * @param {number} minValue Minimum value.
  * @param {number} maxValue Maximum value.
  * @param {number} defaultValue Default value.
@@ -103,18 +114,23 @@ blk.ui.Settings.prototype.setupSlider_ = function(
     className,
     minValue, maxValue, defaultValue, initialValue,
     toStringCallback) {
-  var root = /** @type {Element} */ (this.dom.getElementByClass(className));
-  goog.asserts.assert(root);
+  var root = this.dom.getElementByClass(className);
+  if (!root) {
+    return;
+  }
 
   var slider = /** @type {HTMLInputElement} */ (this.dom.getElementByClass(
       goog.getCssName('blkSettingsSlider'), root));
-  goog.asserts.assert(slider);
+  if (!slider) {
+    return;
+  }
+
   slider.min = String(minValue);
   slider.max = String(maxValue);
   slider.value = String(initialValue);
 
-  var label = /** @type {Element} */ (this.dom.getElementByClass(
-      goog.getCssName('blkSettingsSliderLabel'), root));
+  var label = this.dom.getElementByClass(
+      goog.getCssName('blkSettingsSliderLabel'), root);
   goog.asserts.assert(label);
 
   function updateLabel() {
@@ -123,8 +139,8 @@ blk.ui.Settings.prototype.setupSlider_ = function(
   updateLabel();
   this.eh.listen(slider, goog.events.EventType.CHANGE, updateLabel);
 
-  var reset = /** @type {Element} */ (this.dom.getElementByClass(
-      goog.getCssName('blkSettingsSliderReset'), root));
+  var reset = this.dom.getElementByClass(
+      goog.getCssName('blkSettingsSliderReset'), root);
   goog.asserts.assert(reset);
   this.eh.listen(reset, goog.events.EventType.CLICK,
       function() {
@@ -137,18 +153,79 @@ blk.ui.Settings.prototype.setupSlider_ = function(
 /**
  * Gets the current value of a slider.
  * @private
- * @param {string} className, Slider root CSS class name.
- * @return {number} Slider value.
+ * @param {string} className Slider root CSS class name.
+ * @return {number|undefined} Slider value.
  */
 blk.ui.Settings.prototype.getSliderValue_ = function(className) {
-  var root = /** @type {Element} */ (this.dom.getElementByClass(className));
-  goog.asserts.assert(root);
+  var root = this.dom.getElementByClass(className);
+  if (!root) {
+    return undefined;
+  }
 
   var slider = /** @type {HTMLInputElement} */ (this.dom.getElementByClass(
       goog.getCssName('blkSettingsSlider'), root));
-  goog.asserts.assert(slider);
+  if (!slider) {
+    return undefined;
+  }
 
   return Number(slider.value);
+};
+
+
+/**
+ * Sets up a checkbox group for control/updating.
+ * @private
+ * @param {string} className Checkbox root CSS class name.
+ * @param {boolean} initialValue Initial value.
+ */
+blk.ui.Settings.prototype.setupCheckbox_ = function(
+    className, initialValue) {
+  var root = this.dom.getElementByClass(className);
+  if (!root) {
+    return;
+  }
+
+  var checkbox = /** @type {HTMLInputElement} */ (this.dom.getElementByClass(
+      goog.getCssName('blkSettingsCheckboxInput'), root));
+  if (!checkbox) {
+    return;
+  }
+
+  goog.style.setUnselectable(root, true);
+
+  checkbox.checked = initialValue;
+
+  this.eh.listen(root, goog.events.EventType.CLICK,
+      /**
+       * @param {!goog.events.BrowserEvent} e Event.
+       */
+      function(e) {
+        if (e.target != checkbox) {
+          checkbox.checked = !checkbox.checked;
+        }
+      });
+};
+
+
+/**
+ * Gets the current value of a checkbox.
+ * @private
+ * @param {string} className Checkbox root CSS class name.
+ * @return {boolean|undefined} Checkbox value.
+ */
+blk.ui.Settings.prototype.getCheckboxValue_ = function(className) {
+  var root = this.dom.getElementByClass(className);
+  if (!root) {
+    return undefined;
+  }
+
+  var checkbox = /** @type {HTMLInputElement} */ (this.dom.getElementByClass(
+      goog.getCssName('blkSettingsCheckboxInput'), root));
+  if (!checkbox) {
+    return undefined;
+  }
+
+  return checkbox.checked;
 };
 
 
@@ -172,12 +249,34 @@ blk.ui.Settings.prototype.beforeClose = function(buttonId) {
 
   var sensitivity =
       this.getSliderValue_(goog.getCssName('blkSettingsSensitivitySlider'));
-  sensitivity = sensitivity / 50;
-  settings.mouseSensitivity = sensitivity;
+  if (goog.isDef(sensitivity)) {
+    sensitivity = sensitivity / 50;
+    settings.mouseSensitivity = sensitivity;
+  }
+
+  var mouseLock = this.getCheckboxValue_(
+      goog.getCssName('blkSettingsMouseLock'));
+  if (goog.isDef(mouseLock)) {
+    settings.mouseLock = mouseLock;
+  }
 
   var viewDistance =
       this.getSliderValue_(goog.getCssName('blkSettingsDistanceSlider'));
-  settings.viewDistance = viewDistance;
+  if (goog.isDef(viewDistance)) {
+    settings.viewDistance = viewDistance;
+  }
+
+  var enableSoundFx = this.getCheckboxValue_(
+      goog.getCssName('blkSettingsSoundFx'));
+  if (goog.isDef(enableSoundFx)) {
+    settings.soundFxMuted = !enableSoundFx;
+  }
+
+  var enableMusic = this.getCheckboxValue_(
+      goog.getCssName('blkSettingsMusic'));
+  if (goog.isDef(enableMusic)) {
+    settings.musicMuted = !enableMusic;
+  }
 
   settings.save();
 };

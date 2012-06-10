@@ -23,7 +23,7 @@ global.importScripts(global.CLOSURE_BASE_PATH + 'base.js');
 
 global.importScripts('../blk_js_uncompiled-deps.js');
 
-global.gf = {
+global.gfdefines = {
   SERVER: true,
   NODE: false
 };

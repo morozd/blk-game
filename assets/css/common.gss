@@ -39,7 +39,6 @@
   font-size: FONT_SIZE;
   color: white;
   text-shadow: #888 1px 1px;
-  padding: 3px;
 }
 
 body {
@@ -52,4 +51,8 @@ body {
   right: 0;
   top: 0;
   bottom: 0;
+}
+
+.blkClear {
+  clear: both;
 }

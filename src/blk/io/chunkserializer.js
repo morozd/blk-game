@@ -31,8 +31,10 @@ goog.require('goog.asserts');
  * allocation overhead.
  *
  * @constructor
+ * @param {blk.io.CompressionFormat=} opt_compressionFormat Compression format
+ *     used when serializing chunks.
  */
-blk.io.ChunkSerializer = function() {
+blk.io.ChunkSerializer = function(opt_compressionFormat) {
   /**
    * @private
    * @type {!gf.net.PacketReader}
@@ -44,6 +46,14 @@ blk.io.ChunkSerializer = function() {
    * @type {!gf.net.PacketWriter}
    */
   this.writer_ = new gf.net.PacketWriter();
+
+  /**
+   * Compression format when serializing chunks.
+   * @private
+   * @type {blk.io.CompressionFormat}
+   */
+  this.compressionFormat_ = goog.isDef(opt_compressionFormat) ?
+      opt_compressionFormat : blk.io.CompressionFormat.RLE;
 };
 
 
@@ -54,16 +64,6 @@ blk.io.ChunkSerializer = function() {
  * @type {number}
  */
 blk.io.ChunkSerializer.CURRENT_VERSION_ = 1;
-
-
-/**
- * Default compression format when serializing chunks.
- * @private
- * @const
- * @type {blk.io.CompressionFormat}
- */
-blk.io.ChunkSerializer.COMPRESSION_FORMAT_ =
-    blk.io.CompressionFormat.RLE;
 
 
 /**
@@ -113,8 +113,8 @@ blk.io.ChunkSerializer.prototype.serializeV1_ = function(chunk, writer) {
   writer.writeInt32(chunk.z);
 
   // Chunk block data
-  writer.writeUint8(blk.io.ChunkSerializer.COMPRESSION_FORMAT_);
-  switch (blk.io.ChunkSerializer.COMPRESSION_FORMAT_) {
+  writer.writeUint8(this.compressionFormat_);
+  switch (this.compressionFormat_) {
     default:
     case blk.io.CompressionFormat.UNCOMPRESSED:
       writer.writeUint8Array(new Uint8Array(chunk.blockData.buffer));
@@ -186,19 +186,27 @@ blk.io.ChunkSerializer.prototype.deserializeV1_ = function(chunk, reader) {
   var z = reader.readInt32();
   chunk.beginLoad(x, y, z);
 
+  // HACK(benvanik): poking directly into the reader - this could break
+  // Unfortunately typedarray subarray is really slow, and doing this improves
+  // perf of large chunk transfers quite a bit
+  // var rawBlockData = reader.subsetUint8Array();
+
   // Chunk block data
   var dataFormat = /** @type {blk.io.CompressionFormat} */ (reader.readUint8());
-  var rawBlockData = reader.subsetUint8Array();
   var blockData = chunk.blockData;
   switch (dataFormat) {
     default:
     case blk.io.CompressionFormat.UNCOMPRESSED:
-      for (var n = 0, m = 0; n < blk.env.Chunk.TOTAL_BLOCKS; n++, m += 2) {
-        blockData[n] = (rawBlockData[m + 1] << 8) | rawBlockData[m];
+      reader.readUint32();
+      for (var n = 0, m = reader.offset;
+          n < blk.env.Chunk.TOTAL_BLOCKS; n++, m += 2) {
+        blockData[n] = (reader.buffer[m + 1] << 8) | reader.buffer[m];
       }
       break;
     case blk.io.CompressionFormat.RLE:
-      blk.io.rle.decodeUint16(rawBlockData, blockData);
+      var dataLength = reader.readUint32();
+      blk.io.rle.decodeUint16(
+          reader.buffer, blockData, reader.offset, dataLength);
       break;
     case blk.io.CompressionFormat.DEFLATE:
       goog.asserts.fail('deflate not yet implemented');

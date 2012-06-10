@@ -169,7 +169,7 @@ blk.client.ClientNetService.prototype.handleChunkData_ = function(packet,
 
   // Grab chunk from the cache, load
   var chunk = map.getChunk(chunkData.x, chunkData.y, chunkData.z);
-  if (this.chunkSerializer_.deserializeFromReader(chunk, reader)) {
+  if (!this.chunkSerializer_.deserializeFromReader(chunk, reader)) {
     // TODO(benvanik): signal load failure? set state?
     return false;
   }
