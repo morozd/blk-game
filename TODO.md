@@ -1,7 +1,10 @@
 Before Release
 ================================================================================
 
-* new sounds - credit sean
+* new sounds
+
+* skip block building if any neighbors missing
+* lighting
 
 M3: Replace UI with DOM
 ================================================================================

@@ -1,80 +1,49 @@
 blk-game
 ========
 
-This is NOT Minecraft! It's a 20% project I've been hacking on to push the bounds of native JavaScript gaming. It is in no way related to the awesome work of [Mojang](www.mojang.com). It's also not a real game (despite the name), but more of a tech demo for many technologies.
+THIS IS NOT MINECRAFT. This is my 20% project attempt at creating a fully
+modifiable multiplayer voxel world in JS that can run efficiently in the
+browser and learning what the pain points are in doing a project of this scale.
+It's just a tech demo of a high-fidelity 100% JavaScript game. Enjoy it for what it is!
 
+I wanted to do something productive with my 20% time at Google. I've been
+preaching that the web is finally ready for real games, so I figured I'd
+try to make one. This is the result. Heavy inspiration comes from Mojang,
+of course: Minecraft is cool, but more importantly it's technically
+difficult to get running well, especially in the browser.
+
+All of the code for this project, including the voxel world client and server,
+the game framework, and the build system used to produce the final output are
+all open sourced. I'll be continuing to develop the game framework and build
+system, and if I have time throw some more features into this demo (like real
+gameplay, for example). Feel free to fork! Have fun!
 
 ## Tech
 
-### Game Library
+This project uses [anvil-build](https://github.com/benvanik/anvil-build) as a build system and builds atop the low-level
+web game framework [games-framework](https://github.com/benvanik/games-framework).
 
-Underlying this demo is a highly modularized library that sits atop
-<a href="http://code.google.com/closure/">Google Closure</a>, using the
-Closure Library as a base and the Closure Compiler to build the tiny
-output Javascript files. Designed to be a set of tools to enable rapid
-high-quality games, it's not an engine (like Unity) or scene graph (like
-three.js), but more like XNA or SDL. Pick what you need, get started
-quickly, and spend timing writing game code vs. platform abstractions.
+Underlying this demo is a highly modularized library I wrote for this project,
+[games-framework](https://github.com/benvanik/games-framework), that sits atop
+[Google Closure](http://code.google.com/closure/), using the Closure Library as a base and the Closure Compiler to build
+the tiny output Javascript files. Designed to be a set of tools to enable rapid high-quality games, it's not an engine
+(like Unity) or scene graph (like three.js), but more like XNA or SDL. Pick what you need, get started quickly, and
+spend timing writing game code vs. platform abstractions.
 
-### Game Library Features
+The server portions of the demo are written such that they share code with the client and can run both on node.js and
+in the browser. This enables a great deal of code reuse and the ability to do things like a local game server when
+running offline or multiplayer over the network using node. The Closure Compiler ensures that code that's used
+exclusively on the server isn't included in the code sent for the client and works great in all environments.
 
-* Runtime
-  * Robust game loop management
-  * Idle state/hidden tab tracking
-* Audio
-  * 3D positional sound via <a href="https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html">Web Audio API</a>
-  * Efficient sound bank representation (single file transfer) + tools for creation
-  * Efficient music playback
-* Graphics
-  * Display supporting orientation changes, fullscreen mode, etc
-  * WebGL context loss/restore handling
-  * Texture atlases and sprite batch rendering
-  * WebGL shader program abstraction
-  * Bitmap fonts with kerning and layout
-* Input abstraction layer
-  * <a href="http://dvcs.w3.org/hg/webevents/raw-file/default/mouse-lock.html">Mouse Lock</a> support
-  * (coming soon) on-screen dpad and accelerometer
-  * (coming soon) <a href="http://dvcs.w3.org/hg/webevents/raw-file/default/gamepad.html">gamepad</a> support
-  * (coming soon) input action map/normalization
-* Multiplayer networking
-  * Client/server session management
-  * Full client-side input prediction and entity interpolation
-  * Synchronized clocks
-  * Localhost server via Web Workers
-  * SharedWorker for multi-tab local networking
-  * node.js server via WebSockets (100% shared code)
-  * Efficient network binary representation
-  * (coming soon) authentication via ID providers
-* Math and Utilities
-  * Axis-aligned bounding box
-  * Octree
-  * Quaternion, ray, vec enhancements
-  * Seedable PRNG
-
-
-### Why Closure?
-
-* Closure Compiler generates some of the smallest Javascript out there
-* Off-the-shelf dependency tracking and build system
-* Compiler inlining can drastically help performance (and can only get better)
-* Native Javascript - no plugins or extensions required to get the functionality
-* Closure Library contains a lot of useful functionality
-  * Localization/i18n
-  * Array, object, and string extensions
-  * Data structures
-  * DOM/CSS/etc templating and abstractions
-  * Rich and efficient vector math library (one of the fastest!)
-  * Well tested and maintained
-
-
-Credits
--------
+## Credits
 
 Everything not listed below was authored by [Ben Vanik](http://noxa.org).
 
 #### Audio
 
-Clicking sound: [S_Dij](http://www.freesound.org/people/S_Dij/)
+Sound effects: [Sean Dunn](https://twitter.com/somenotes)
+
+Music: [Knuck Beatz](http://soundcloud.com/casesensative/knuck-beatz-so-many-blocks-so) So Many Blocks, So Little Time (Minecraft Soundtrack)
 
 #### Fonts
 
@@ -82,9 +51,21 @@ Bitmap font used in game: [Lord Nightmare/IBM's EGA Font](http://dwarffortresswi
 
 TTF font used in UI/etc: [Volter (Goldfish)](http://www.dafont.com/volter-goldfish.font)
 
-#### Music
-[Knuck Beatz](http://soundcloud.com/casesensative/knuck-beatz-so-many-blocks-so) So Many Blocks, So Little Time (Minecraft Soundtrack)
-
 #### Textures
+
 [The Painterly Pack](http://painterlypack.net)
 
+# License
+
+All code except dependencies under third_party/ is licensed under the permissive Apache 2.0 license.
+Feel free to fork/rip/etc and use as you wish!
+
+# Contributing
+
+Have a fix or feature? Submit a pull request - I love them!
+Note that I do keep to the [style_guide](https://github.com/benvanik/games-framework/blob/master/docs/style_guide.md),
+so please check it out first!
+
+As this is a Google project, you *must* first e-sign the
+[Google Contributor License Agreement](http://code.google.com/legal/individual-cla-v1.0.html) before I can accept any
+code. It takes only a second and basically just says you won't sue us or claim copyright of your submitted code.
