@@ -10,6 +10,5 @@ file_set(
         'common.gss',
         'font-monospace.gss',
         'alert-assets.gss',
-        'alerts.gss',
-        'playerlisting.gss',
-        ])
+        'playerlisting-assets.gss',
+        ] + glob('../../src/blk/ui/*.gss'))

@@ -21,6 +21,7 @@ goog.require('blk.ui.playerlisting');
 goog.require('gf.log');
 goog.require('goog.dom');
 goog.require('goog.soy');
+goog.require('goog.string');
 goog.require('goog.style');
 
 
@@ -46,6 +47,8 @@ blk.ui.PlayerListing = function(game) {
       goog.getCssName('blkPlayerListingBody'), this.root);
 
   this.refresh();
+
+  // TODO(benvanik): update timer
 };
 goog.inherits(blk.ui.PlayerListing, blk.ui.Widget);
 
@@ -55,17 +58,19 @@ goog.inherits(blk.ui.PlayerListing, blk.ui.Widget);
  * Should be called whenever something interesting changes.
  */
 blk.ui.PlayerListing.prototype.refresh = function() {
-  gf.log.write('would update player listing');
-
   // TODO(benvanik): could probably make this more efficient, but that'd require
   // tracking dirty state of the DOM elements
   // Hopefully this is infrequent enough that it doesn't really matter
-
   goog.dom.removeChildren(this.bodyEl_);
 
-  // TODO(benvanik): sort players by name
-
+  // Sort players by name
   var players = this.game.state.players;
+  goog.array.stableSort(players, function(a, b) {
+    return goog.string.caseInsensitiveCompare(
+        a.user.info.displayName,
+        b.user.info.displayName);
+  })
+
   for (var n = 0; n < players.length; n++) {
     var player = players[n];
     var playerEl = /** @type {Element} */ (goog.soy.renderAsFragment(
@@ -76,4 +81,6 @@ blk.ui.PlayerListing.prototype.refresh = function() {
         }, undefined, this.dom));
     goog.dom.appendChild(this.bodyEl_, playerEl);
   }
+
+  goog.style.setUnselectable(this.bodyEl_);
 };

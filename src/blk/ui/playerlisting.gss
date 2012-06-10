@@ -24,6 +24,12 @@
   position: absolute;
   left: 10px;
   bottom: 60px;
+
+  background: rgba(107, 107, 107, 0.2);
+  border: 2px solid rgba(36, 36, 36, 0.26);
+
+  @mixin bitDropShadow();
+  @mixin bitFont(18px);
 }
 
 .blkPlayerListingHeader {
@@ -37,27 +43,21 @@
 
 .blkPlayerEntry {
   height: 16px;
+  clear: both;
 }
 
 .blkPlayerEntryMeter {
   float: left;
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 14px;
+  margin: 2px 5px 0px 2px;
 }
-.blkPlayerEntryMeter0 {
-}
-.blkPlayerEntryMeter1 {
-}
-.blkPlayerEntryMeter2 {
-}
-.blkPlayerEntryMeter3 {
-}
-.blkPlayerEntryMeter4 {
-}
+/* .blkPlayerEntryMeter[0-4] in playerlisting-assets.gss */
 
 .blkPlayerEntryName {
   float: left;
 }
 
 .blkPlayerEntryId {
+  color: rgba(255, 255, 255, 0.5);
 }
