@@ -54,6 +54,7 @@
 .blkAlertFooter {
   height: 28px;
   padding: 3px;
+  margin-bottom: 2px;
 }
 
 .blkAlertButton {
@@ -78,6 +79,11 @@
   text-shadow: #888 1px 1px;
 
   @mixin blkAlertButtonDefaultBackground();
+}
+
+a.blkAlertLink,  a.blkAlertLink:visited {
+  color: #D1D1D1;
+  text-shadow: #555555 1px 1px;
 }
 
 .blkSettingsRow {

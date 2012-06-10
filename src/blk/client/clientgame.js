@@ -846,6 +846,26 @@ blk.client.ClientGame.prototype.showSettings_ = function() {
 
 
 /**
+ * Shows the help dialog.
+ * @private
+ */
+blk.client.ClientGame.prototype.showHelp_ = function() {
+  if (!this.settings.soundFxMuted) {
+    this.sounds.playAmbient('click');
+  }
+
+  this.input.setEnabled(false);
+
+  var d = blk.ui.Popup.show(blk.ui.alerts.help, {
+  }, this.dom, this.display.mainFrame);
+  d.addCallback(
+      function(buttonId) {
+        this.input.setEnabled(true);
+      }, this);
+};
+
+
+/**
  * Handles local user input.
  * @private
  * @param {!gf.RenderFrame} frame Current frame.
@@ -861,6 +881,9 @@ blk.client.ClientGame.prototype.handleInput_ = function(frame) {
   // Show settings
   if (keyboardData.didKeyGoDown(goog.events.KeyCodes.O)) {
     this.showSettings_();
+    return;
+  } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.H)) {
+    this.showHelp_();
     return;
   }
 

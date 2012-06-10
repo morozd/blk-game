@@ -376,3 +376,43 @@
     {/param}
   {/call}
 {/template}
+
+
+/**
+ * A help dialog.
+ */
+{template .help}
+  {call .simpleAlert_ data="all"}
+    {param header}
+      {msg desc="Help header."}
+        Help
+      {/msg}
+    {/param}
+    {param body}
+      Conceptualized and coded by <a class="{css blkAlertLink}" href="http://twitter.com/benvanik" target="_blank">@benvanik</a> as a 20% project at Google.
+      <br/>
+      Copyright Google, Inc 2012.
+      <br/>
+      <br/>
+      <a class="{css blkAlertLink}" href="index.html" target="_blank">More Information</a>, <a class="{css blkAlertLink}" href="https://www.github.com/benvanik/blk-game" target="_blank">source code</a>.
+      <br/>
+      <br/>
+      Controls:
+      <ul>
+        <li>WSAD keys to move around
+        <li>Click/drag the mouse to change the view
+        <li>1-5 keys/mouse wheel to change the block type
+        <li>Left click to place a block
+        <li>Right click/ctrl-click to remove a block
+        <li>Alt-enter to toggle fullscreen mode
+        <li>O to change options (like your name)
+        <li>T to chat
+      </ul>
+      Use <a class="{css blkAlertLink}" href="http://tools.google.com/dlpage/chromesxs" target="_blank">Chrome Canary</a> and
+      turn on 'Enable Pointer Lock' in about:flags. Restart, run the game, and use alt-enter to get FPS gaming goodness!
+    {/param}
+    {param buttons}
+      {call .alertButtonClose_ /}
+    {/param}
+  {/call}
+{/template}
