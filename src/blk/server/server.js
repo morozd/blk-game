@@ -60,6 +60,8 @@ blk.server.start = function(uri, options) {
   // TODO(benvanik): authtoken/serverinfo
   var authToken = new gf.net.AuthToken();
   var serverInfo = new gf.net.ServerInfo();
+  serverInfo.gameType = goog.DEBUG ? 'blk-dev' : 'blk';
+  serverInfo.gameVersion = '0.0.1';
   serverInfo.maximumUsers = launchOptions.userCount;
 
   var listenDeferred = gf.net.listen(
