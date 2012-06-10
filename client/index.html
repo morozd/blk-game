@@ -4,7 +4,9 @@
     <title>BLK, a voxel world tech demo</title>
     <link rel="stylesheet" href="index.css"/>
     <script>
-      var DEFAULT_HOST = 'ws://localhost:1337';
+      var SERVER_QUERY_URL = 'servers.json';
+      var DEV_MODE = window.location.search == '?dev';
+      var GAME_URL = DEV_MODE ? 'game-uncompiled.html' : 'game.html';
     </script>
   </head>
   <body>
@@ -25,12 +27,13 @@
       <br/>
       <br/>
       <div id="go">
-        &gt; <a href="game.html?host=local://blk-server-0" target="_blank">Run Locally</a> (<a href="javascript:resetLocalStorage()">reset map</a>)
+        &gt; <a id="local-link" target="_blank">Run Locally</a> (<a href="javascript:resetLocalStorage()">reset map</a>)
         <br/>
         <br/>
-        &gt; <a href="game.html?host=ws://173.160.235.109:1338" target="_blank" id="joinLink">Join Multiplayer</a>
+        &gt; <span>Join Multiplayer</span> as <input id="name" type="text" value="User"/>
         <br/>
-        &nbsp;&nbsp;&nbsp;Name: <input id="name" type="text" value="User"/>
+        <div id="server-list">
+        </div>
       </div>
       <br/>
       <br/>
@@ -264,7 +267,7 @@
         if (value && value.length) {
           nameBox.value = value;
         } else {
-          nameBox.value = 'User';
+          nameBox.value = 'Some Player ' + Math.floor(Math.random() * 100);
         }
       }
       function saveName() {
@@ -276,13 +279,10 @@
         document.cookie = 's_un=' + encodeURIComponent(value);
       }
       loadName();
-      function updateLink() {
-        var joinLink = document.getElementById('joinLink');
-        joinLink.href = 'game.html?host=' + DEFAULT_HOST;
+      saveName();
+      nameBox.addEventListener('change', function() {
         saveName();
-      }
-      updateLink();
-      nameBox.addEventListener('change', updateLink, false);
+      }, false);
 
       function resetLocalStorage() {
         function resetFS(fs) {
@@ -307,6 +307,61 @@
         requestFileSystem.call(
             window, window.PERSISTENT, 1, resetFS);
       }
+
+      var localLink = document.getElementById('local-link');
+      localLink.href = GAME_URL + '?host=local://blk-server-0';
+
+      function updateServers() {
+        var serverList = document.getElementById('server-list');
+        var xhr = new XMLHttpRequest();
+        xhr.addEventListener('readystatechange', function() {
+          if (xhr.readyState == 4) {
+            if (xhr.status == 200) {
+              // Succeeded
+              serverList.innerText = '';
+              var targetGameType = DEV_MODE ? 'blk-dev' : 'blk';
+              var table = document.createElement('table');
+              var json = JSON.parse(xhr.responseText);
+              var anyFound = false;
+              for (var n = 0; n < json.length; n++) {
+                var result = json[n];
+                var endpoint = result['endpoint'];
+                var serverInfo = result['serverInfo'];
+                if (serverInfo['gameType'] != targetGameType) {
+                  continue;
+                }
+                anyFound = true;
+                var row = document.createElement('tr');
+                var c1 = document.createElement('td');
+                c1.innerHTML = '<li><a href="' + GAME_URL + '?host=' + endpoint + '" target="_blank">' + serverInfo['name'] + '</a>';
+                row.appendChild(c1);
+                // var c2 = document.createElement('td');
+                // c2.innerText = serverInfo['maximumUsers'];
+                // row.appendChild(c2);
+                // // TODO(benvanik): flag
+                // var c3 = document.createElement('td');
+                // c3.innerText = serverInfo['location'];
+                // row.appendChild(c3);
+                table.appendChild(row);
+              }
+              if (!anyFound) {
+                serverList.innerText = '\nNo servers online! Try again later!';
+              } else {
+                serverList.appendChild(table);
+              }
+            } else {
+              // Failed
+              serverList.innerText = '\nUnable to fetch server list!'
+            }
+          }
+        }, true);
+        xhr.open('GET', SERVER_QUERY_URL);
+        xhr.send();
+      }
+      window.setInterval(function() {
+        updateServers();
+      }, 60 * 1000);
+      updateServers();
     </script>
   </body>
 </html>
