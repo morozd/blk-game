@@ -89,6 +89,7 @@ M7: Weapons
 * mesh/meshbuilder/etc to replace facebuffer for entities
 * use vao
 * entity rewrite
+* inventory/etc
 
 * actions in movement
 * latency compensation on server (rewind players/previous states/etc)
