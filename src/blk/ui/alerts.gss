@@ -149,3 +149,15 @@ a.blkAlertLink,  a.blkAlertLink:visited {
 .blkSettingsAudio {}
 .blkSettingsSoundFx {}
 .blkSettingsMusic {}
+
+.blkHelpTableHeader {
+  font-weight: 700;
+}
+.blkHelpTable {
+  margin-left: auto;
+  margin-right: auto;
+}
+.blkHelpTable td {
+  vertical-align: top;
+  padding-right: 15px;
+}
