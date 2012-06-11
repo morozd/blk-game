@@ -28,8 +28,9 @@
   background: rgba(107, 107, 107, 0.2);
   border: 2px solid rgba(36, 36, 36, 0.26);
 
+  cursor: default;
+
   @mixin bitFont(18px);
-  @mixin noSelect();
 }
 
 .blkPlayerListingHeader {

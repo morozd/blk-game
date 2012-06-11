@@ -203,15 +203,8 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
   this.addComponent(this.input);
   this.input.mouse.setSensitivity(this.settings.mouseSensitivity);
   this.input.mouse.setLockOnFocus(this.settings.mouseLock);
-  this.input.keyboard.setFullScreenHandler(goog.bind(function() {
-    var goingFullScreen = !this.display.isFullScreen;
-    this.display.toggleFullScreen();
-    if (goingFullScreen &&
-        this.input.mouse.supportsLocking &&
-        this.settings.mouseLock) {
-      this.input.mouse.lock();
-    }
-  }, this));
+  this.input.keyboard.setFullScreenHandler(
+      goog.bind(this.toggleFullscreen, this));
 
   /**
    * Input data storage.
@@ -276,6 +269,9 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
   this.playerListing_ = new blk.ui.PlayerListing(this);
   this.registerDisposable(this.playerListing_);
   this.addWidget_(this.playerListing_);
+  if (this.session.isLocal()) {
+    this.playerListing_.toggleVisibility();
+  }
 
   /**
    * Menubar.
@@ -338,13 +334,11 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
   ];
 
   // Say hi
-  this.console.log('wsad / click drag to move');
-  this.console.log('left click to place blocks');
-  this.console.log('ctrl-left / right click to remove blocks');
-  this.console.log('alt-enter for fullscreen/mouse lock');
-  this.console.log('t to chat');
-  this.console.log('o for options');
-  this.console.log('don\'t be an ass!');
+  this.console.log('wsad to move');
+  this.console.log('left click to place blocks, right click to remove');
+  if (!this.session.isLocal()) {
+    this.console.log('t to chat');
+  }
 
   // Simulated latency
   this.session.socket.simulatedLatency = launchOptions.simulatedLatency;
@@ -843,6 +837,21 @@ blk.client.ClientGame.prototype.hitTestBlockTypes_ = function(mouseData) {
     }
   }
   return undefined;
+};
+
+
+/**
+ * Toggles fullscreen mode.
+ * This only works when called from a key or mouse handler.
+ */
+blk.client.ClientGame.prototype.toggleFullscreen = function() {
+  var goingFullScreen = !this.display.isFullScreen;
+  this.display.toggleFullScreen();
+  if (goingFullScreen &&
+      this.input.mouse.supportsLocking &&
+      this.settings.mouseLock) {
+    this.input.mouse.lock();
+  }
 };
 
 

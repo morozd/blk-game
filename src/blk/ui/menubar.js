@@ -35,7 +35,7 @@ blk.ui.Menubar = function(game) {
   goog.base(this, game, blk.ui.menubar.bar, {
   });
 
-  goog.style.setUnselectable(this.root);
+  goog.style.setUnselectable(this.root, true);
 };
 goog.inherits(blk.ui.Menubar, blk.ui.Widget);
 
@@ -54,6 +54,9 @@ blk.ui.Menubar.prototype.enterDocument = function() {
         this.eh.listen(buttonEl, goog.events.EventType.CLICK,
             function() {
               switch (buttonId) {
+                case 'fullscreen':
+                  this.game.toggleFullscreen();
+                  break;
                 case 'settings':
                   this.game.showSettings();
                   break;

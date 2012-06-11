@@ -37,14 +37,14 @@ blk.ui.PlayerListing = function(game) {
   goog.base(this, game, blk.ui.playerlisting.listing, {
   });
 
-  goog.style.setUnselectable(this.root);
+  goog.style.setUnselectable(this.root, true);
 
   /**
    * @private
    * @type {!Element}
    */
-  this.bodyEl_ = this.dom.getElementByClass(
-      goog.getCssName('blkPlayerListingBody'), this.root);
+  this.bodyEl_ = /** @type {!Element} */ (this.dom.getElementByClass(
+      goog.getCssName('blkPlayerListingBody'), this.root));
 
   /**
    * Refresh interval ID.

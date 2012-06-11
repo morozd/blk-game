@@ -15,6 +15,8 @@ M3: Replace UI with DOM
     * block types
 * add new tools ui (options, info)
 
+* hide menubar when in fullscreen mode
+
 * remove bitmap font?
     * need rendering of names to canvas, uploading to texture
     * gf.graphics.Texture#drawText?

@@ -26,7 +26,6 @@
   top: 3px;
 
   @mixin bitFont(18px);
-  @mixin noSelect();
 }
 
 .blkMenubarButton {
@@ -38,9 +37,6 @@
   cursor: pointer;
 
   background: rgba(107, 107, 107, 0.5);
-
-  @mixin noSelect();
-  @mixin bitDropShadow();
 }
 
 .blkMenubarButtonLabel {
