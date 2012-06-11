@@ -10,10 +10,14 @@ M3: Replace UI with DOM
 ================================================================================
 
 * replace custom UI with soy
-    * playerlisting
     * console
     * block types
-* add new tools ui (options, info)
+        * need a way to read block textures
+
+* icons for menubar
+    * fullscreen
+    * settings
+    * help
 
 * hide menubar when in fullscreen mode
 

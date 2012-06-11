@@ -282,6 +282,15 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
   this.registerDisposable(this.menubar_);
   this.addWidget_(this.menubar_);
 
+  // /**
+  //  * Toolbar.
+  //  * @private
+  //  * @type {!blk.ui.Toolbar}
+  //  */
+  // this.toolbar_ = new blk.ui.Toolbar(this);
+  // this.registerDisposable(this.toolbar_);
+  // this.addWidget_(this.toolbar_);
+
   /**
    * Local player.
    * @type {blk.Player}
