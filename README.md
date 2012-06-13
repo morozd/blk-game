@@ -35,9 +35,45 @@ in the browser. This enables a great deal of code reuse and the ability to do th
 running offline or multiplayer over the network using node. The Closure Compiler ensures that code that's used
 exclusively on the server isn't included in the code sent for the client and works great in all environments.
 
+## Setup
+
+Wanna play around?
+
+```
+# ensure you have python and easy_install!
+# clone the repo
+git clone https://github.com/benvanik/blk-game.git blk-game
+cd blk-game/
+# run the setup script to initialize the repo and dependencies
+sudo ./tools/setup.sh
+# build debug
+anvil build :debug
+# start a web server
+anvil serve
+# start a debug node game server
+NODE_PATH=$NODE_PATH:third_party/games-framework/third_party node server/server-uncompiled.js
+# deploy a release build
+anvil deploy -o /tmp/blk-release/ :release
+```
+
+## Contributing
+
+Have a fix or feature? Submit a pull request - I love them!
+Note that I do keep to the [style_guide](https://github.com/benvanik/games-framework/blob/master/docs/style_guide.md),
+so please check it out first!
+
+As this is a Google project, you *must* first e-sign the
+[Google Contributor License Agreement](http://code.google.com/legal/individual-cla-v1.0.html) before I can accept any
+code. It takes only a second and basically just says you won't sue us or claim copyright of your submitted code.
+
+## License
+
+All code except dependencies under third_party/ is licensed under the permissive Apache 2.0 license.
+Feel free to fork/rip/etc and use as you wish!
+
 ## Credits
 
-Everything not listed below was authored by [Ben Vanik](http://noxa.org).
+Code by [Ben Vanik](http://noxa.org). See [AUTHORS](https://github.com/benvanik/games-framework/blob/master/AUTHORS) for additional contributors.
 
 #### Audio
 
@@ -54,18 +90,3 @@ TTF font used in UI/etc: [Volter (Goldfish)](http://www.dafont.com/volter-goldfi
 #### Textures
 
 [The Painterly Pack](http://painterlypack.net)
-
-# License
-
-All code except dependencies under third_party/ is licensed under the permissive Apache 2.0 license.
-Feel free to fork/rip/etc and use as you wish!
-
-# Contributing
-
-Have a fix or feature? Submit a pull request - I love them!
-Note that I do keep to the [style_guide](https://github.com/benvanik/games-framework/blob/master/docs/style_guide.md),
-so please check it out first!
-
-As this is a Google project, you *must* first e-sign the
-[Google Contributor License Agreement](http://code.google.com/legal/individual-cla-v1.0.html) before I can accept any
-code. It takes only a second and basically just says you won't sue us or claim copyright of your submitted code.
