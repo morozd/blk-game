@@ -2,6 +2,8 @@
 
 # Copyright 2012 Google Inc. All Rights Reserved.
 
+# blk-game unix setup script
+
 # This script sets up the repository and dependencies.
 
 # Ensure running as root (or on Cygwin, where it doesn't matter)
@@ -18,8 +20,8 @@ fi
 # ==============================================================================
 echo "Grabbing third_party/..."
 
-git submodule init
-git submodule update
+sudo -u "$SUDO_USER" git submodule init
+sudo -u "$SUDO_USER" git submodule update
 
 echo ""
 # ==============================================================================
@@ -28,8 +30,8 @@ echo ""
 echo "Grabbing games-framework third_party/..."
 
 cd third_party/games-framework/
-git submodule init
-git submodule update
+sudo -u "$SUDO_USER" git submodule init
+sudo -u "$SUDO_USER" git submodule update
 cd ../..
 
 echo ""
@@ -39,13 +41,5 @@ echo ""
 echo "Running games-framework setup.sh..."
 
 ./third_party/games-framework/tools/setup.sh
-
-echo ""
-# ==============================================================================
-# Grab anvil-build
-# ==============================================================================
-echo "Installing anvil-build..."
-
-easy_install anvil-build
 
 echo ""
