@@ -48,7 +48,7 @@ cd blk-game/
 sudo ./tools/setup.sh
 # build debug
 anvil build :debug
-# start a web server
+# start a web server, open http://localhost:8080/client/index.html?dev
 anvil serve
 # start a debug node game server
 NODE_PATH=$NODE_PATH:third_party/games-framework/third_party node server/server-uncompiled.js
