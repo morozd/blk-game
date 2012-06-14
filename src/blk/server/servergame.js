@@ -173,8 +173,8 @@ blk.server.ServerGame.prototype.handleUserConnect = function(user) {
 
   // Create view - must be cleaned up on player disconnect
   var view = new blk.env.ChunkView(map,
-      //blk.env.ChunkView.HIGH_CHUNK_RADIUS_XZ);
-      blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ);
+      blk.env.ChunkView.HIGH_CHUNK_RADIUS_XZ);
+      //blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ);
   map.addChunkView(view);
   player.view = view;
 
