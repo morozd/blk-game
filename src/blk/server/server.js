@@ -48,18 +48,26 @@ blk.server.start = function(uri, options) {
 
   // TODO(benvanik): proper endpoint selection
   var endpoint;
+  var endpointString = 'blk://local-0';
   if (gf.NODE) {
     endpoint = /** @type {gf.net.Endpoint} */ (String(options['port']));
+    endpointString = 'ws://[ip]:' + endpoint;
   } else {
     endpoint = /** @type {gf.net.Endpoint} */ (goog.global);
+    endpointString = 'blk://local-0';
   }
 
   var launchOptions = new blk.server.LaunchOptions(uri,
-      options['mapPath'], Number(options['userCount']));
+      options['mapPath'],
+      options['browserUrl'],
+      options['serverId'],
+      options['serverKey'],
+      Number(options['userCount']));
 
   // TODO(benvanik): authtoken/serverinfo
   var authToken = new gf.net.AuthToken();
   var serverInfo = new gf.net.ServerInfo();
+  serverInfo.endpoint = endpointString;
   // TODO(benvanik): give the server a name
   serverInfo.name = 'Server';
   serverInfo.gameType = goog.DEBUG ? 'blk-dev' : 'blk';

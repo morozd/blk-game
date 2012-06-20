@@ -35,6 +35,8 @@ goog.require('blk.server.ServerPlayer');
 goog.require('gf');
 goog.require('gf.Game');
 goog.require('gf.log');
+goog.require('gf.net.SessionType');
+goog.require('gf.net.browser.BrowserClient');
 goog.require('gf.net.chat.ServerChatService');
 goog.require('goog.vec.Vec3');
 
@@ -52,6 +54,25 @@ goog.require('goog.vec.Vec3');
  */
 blk.server.ServerGame = function(launchOptions, session, mapStore) {
   goog.base(this, launchOptions, session.clock);
+
+  /**
+   * Server browser client.
+   * Registers the game with the browser (if non-local) and keeps it updated.
+   * @private
+   * @type {gf.net.browser.BrowserClient}
+   */
+  this.browserClient_ = null;
+  if (session.type == gf.net.SessionType.REMOTE &&
+      launchOptions.browserUrl &&
+      launchOptions.serverId && launchOptions.serverKey) {
+    this.browserClient_ = new gf.net.browser.BrowserClient(
+        launchOptions.browserUrl,
+        launchOptions.serverId, launchOptions.serverKey);
+    this.registerDisposable(this.browserClient_);
+    this.browserClient_.registerServer(session.serverInfo);
+  }
+
+  // TODO(benvanik): setup a timer for updating the registration
 
   /**
    * Server session.
@@ -109,6 +130,18 @@ blk.server.ServerGame = function(launchOptions, session, mapStore) {
   this.session.ready();
 };
 goog.inherits(blk.server.ServerGame, gf.Game);
+
+
+/**
+ * @override
+ */
+blk.server.ServerGame.prototype.disposeInternal = function() {
+  if (this.browserClient_) {
+    this.browserClient_.unregisterServer();
+  }
+
+  goog.base(this, 'disposeInternal');
+};
 
 
 /**
@@ -174,7 +207,7 @@ blk.server.ServerGame.prototype.handleUserConnect = function(user) {
   // Create view - must be cleaned up on player disconnect
   var view = new blk.env.ChunkView(map,
       blk.env.ChunkView.HIGH_CHUNK_RADIUS_XZ);
-      //blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ);
+  //blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ);
   map.addChunkView(view);
   player.view = view;
 

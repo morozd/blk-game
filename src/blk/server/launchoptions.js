@@ -27,9 +27,13 @@ goog.require('gf.LaunchOptions');
  * @extends {gf.LaunchOptions}
  * @param {string} uri Source app URI string.
  * @param {string} mapPath Map path.
+ * @param {?string} browserUrl Server browser URL.
+ * @param {?string} serverId Server UUID.
+ * @param {?string} serverKey Server private key.
  * @param {number} userCount Maximum number of simultaneous users.
  */
-blk.server.LaunchOptions = function(uri, mapPath, userCount) {
+blk.server.LaunchOptions = function(uri,
+    mapPath, browserUrl, serverId, serverKey, userCount) {
   goog.base(this, uri);
 
   /**
@@ -39,12 +43,40 @@ blk.server.LaunchOptions = function(uri, mapPath, userCount) {
   this.mapPath = mapPath || '/maps/map01/';
 
   /**
+   * Server browser URL.
+   * @type {string}
+   */
+  this.browserUrl = browserUrl || blk.server.LaunchOptions.DEFAULT_BROWSER_URL_;
+
+  /**
+   * Server UUID.
+   * @type {?string}
+   */
+  this.serverId = serverId || null;
+
+  /**
+   * Server private key.
+   * @type {?string}
+   */
+  this.serverKey = serverKey || null;
+
+  /**
    * Maximum simultaneous user count.
    * @type {number}
    */
   this.userCount = userCount || blk.server.LaunchOptions.DEFAULT_USER_COUNT_;
 };
 goog.inherits(blk.server.LaunchOptions, gf.LaunchOptions);
+
+
+/**
+ * Default server browser URL.
+ * @private
+ * @const
+ * @type {string}
+ */
+blk.server.LaunchOptions.DEFAULT_BROWSER_URL_ =
+    'http://something/';
 
 
 /**

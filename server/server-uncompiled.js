@@ -31,6 +31,12 @@ var opts = nopt({
   'filesystem': [String, '/tmp/blk/'],
   // Map path in the file system
   'map': [String, 'maps/map_dev/'],
+  // Server browser URL
+  'browserUrl': [String, 'http://localhost:8081/'],
+  // Server UUID
+  'serverId': [String, null],
+  // Server private key
+  'serverKey': [String, null],
   // Maximum users that can connect
   'users': [Number, 8]
 }, {
@@ -57,6 +63,9 @@ var port = opts['port'] || 1337;
 var infoPort = opts['info_port'] || null;
 var fileSystemPath = opts['filesystem'] || '/tmp/blk/';
 var mapPath = opts['map'] || 'maps/map_dev/';
+var browserUrl = opts['browserUrl'] || null;
+var serverId = opts['serverId'] || null;
+var serverKey = opts['serverKey'] || null;
 var userCount = opts['users'] || 8;
 
 // TODO(benvanik): some sensible URI from command line args
@@ -66,6 +75,9 @@ var uri = 'http://127.0.0.1:' + port + '/node/';
 blk.server.start(uri, {
   port: port,
   mapPath: mapPath,
+  browserUrl: browserUrl,
+  serverId: serverId,
+  serverKey: serverKey,
   userCount: userCount,
   persistentRoot: path.join(fileSystemPath, 'persistent/'),
   temporaryRoot: path.join(fileSystemPath, 'temporary/')

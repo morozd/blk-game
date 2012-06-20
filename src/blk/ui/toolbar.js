@@ -18,8 +18,6 @@ goog.provide('blk.ui.Toolbar');
 
 goog.require('blk.ui.Widget');
 goog.require('blk.ui.toolbar');
-goog.require('goog.array');
-goog.require('goog.events.EventType');
 goog.require('goog.style');
 
 
