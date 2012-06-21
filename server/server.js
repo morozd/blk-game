@@ -29,7 +29,7 @@ var opts = nopt({
   // Map path in the file system
   'map': [String, 'maps/map_dev/'],
   // Server browser URL
-  'browserUrl': [String, 'http://localhost:8081/'],
+  'browserUrl': [String, 'http://gf-browser.appspot.com/'],
   // Server UUID
   'serverId': [String, null],
   // Server private key
@@ -54,7 +54,7 @@ var port = opts['port'] || 1337;
 var infoPort = opts['info_port'] || null;
 var fileSystemPath = opts['filesystem'] || '/tmp/blk/';
 var mapPath = opts['map'] || 'maps/map_dev/';
-var browserUrl = opts['browserUrl'] || null;
+var browserUrl = opts['browserUrl'] || 'http://gf-browser.appspot.com/';
 var serverId = opts['serverId'] || null;
 var serverKey = opts['serverKey'] || null;
 var userCount = opts['users'] || 8;

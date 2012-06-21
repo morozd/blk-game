@@ -50,8 +50,9 @@ blk.server.start = function(uri, options) {
   var endpoint;
   var endpointString = 'blk://local-0';
   if (gf.NODE) {
-    endpoint = /** @type {gf.net.Endpoint} */ (String(options['port']));
-    endpointString = 'ws://[ip]:' + endpoint;
+    var port = String(options['port']);
+    endpoint = /** @type {gf.net.Endpoint} */ (port);
+    endpointString = port;
   } else {
     endpoint = /** @type {gf.net.Endpoint} */ (goog.global);
     endpointString = 'blk://local-0';

@@ -69,10 +69,23 @@ blk.server.ServerGame = function(launchOptions, session, mapStore) {
         launchOptions.browserUrl,
         launchOptions.serverId, launchOptions.serverKey);
     this.registerDisposable(this.browserClient_);
-    this.browserClient_.registerServer(session.serverInfo);
+    this.browserClient_.registerServer(session.serverInfo).addCallbacks(
+        function() {
+          gf.log.write('Registered with server browser at ' +
+              launchOptions.browserUrl);
+          this.updateBrowser_();
+        },
+        function(arg) {
+          gf.log.write('Unable to register with server browser: ', arg);
+        }, this);
   }
 
-  // TODO(benvanik): setup a timer for updating the registration
+  /**
+   * Timer ID of the server browser update, if it is running.
+   * @private
+   * @type {number?}
+   */
+  this.browserUpdateId_ = null;
 
   /**
    * Server session.
@@ -136,11 +149,41 @@ goog.inherits(blk.server.ServerGame, gf.Game);
  * @override
  */
 blk.server.ServerGame.prototype.disposeInternal = function() {
+  if (this.browserUpdateId_) {
+    goog.global.clearTimeout(this.browserUpdateId_);
+    this.browserUpdateId_ = null;
+  }
   if (this.browserClient_) {
     this.browserClient_.unregisterServer();
   }
 
   goog.base(this, 'disposeInternal');
+};
+
+
+/**
+ * Updates the server browser with the current user info.
+ * @private
+ */
+blk.server.ServerGame.prototype.updateBrowser_ = function() {
+  if (!this.browserClient_) {
+    return;
+  }
+
+  // Build user infos
+  var userInfos = [];
+  for (var n = 0; n < this.session.users.length; n++) {
+    var user = this.session.users[n];
+    userInfos.push(user.info);
+  }
+
+  this.browserClient_.updateServer(userInfos).addBoth(
+      function() {
+        // Call again
+        this.browserUpdateId_ = goog.global.setTimeout(
+            goog.bind(this.updateBrowser_, this),
+            gf.net.browser.BrowserClient.UPDATE_FREQUENCY * 1000);
+      }, this);
 };
 
 

@@ -4,9 +4,11 @@
     <title>BLK, a voxel world tech demo</title>
     <link rel="stylesheet" href="index.css"/>
     <script>
-      var SERVER_QUERY_URL = 'servers.json';
       var DEV_MODE = window.location.search == '?dev';
       var GAME_URL = DEV_MODE ? 'game-uncompiled.html' : 'game.html';
+      var GAME_TYPE = DEV_MODE ? 'blk-dev' : 'blk';
+      var BROWSER_URL = DEV_MODE ? 'http://localhost:8081/' : 'http://gf-browser.appspot.com/';
+      var SERVER_QUERY_URL = BROWSER_URL + 'api/query/' + GAME_TYPE;
     </script>
   </head>
   <body>
@@ -33,6 +35,7 @@
         &gt; <span>Join Multiplayer</span> as <input id="name" type="text" value="User"/>
         <br/>
         <div id="server-list">
+          loading...
         </div>
       </div>
       <br/>
@@ -318,32 +321,22 @@
             if (xhr.status == 200) {
               // Succeeded
               serverList.innerText = '';
-              var targetGameType = DEV_MODE ? 'blk-dev' : 'blk';
               var table = document.createElement('table');
               var json = JSON.parse(xhr.responseText);
-              var anyFound = false;
+              if (DEV_MODE) {
+                addServerRow(table, {
+                  'endpoint': 'ws://localhost:1337',
+                  'server_name': '&lt;localhost&gt;',
+                  'user_count': '?',
+                  'user_max': '?'
+                });
+              }
               for (var n = 0; n < json.length; n++) {
                 var result = json[n];
-                var endpoint = result['endpoint'];
-                var serverInfo = result['serverInfo'];
-                if (serverInfo['gameType'] != targetGameType) {
-                  continue;
-                }
-                anyFound = true;
-                var row = document.createElement('tr');
-                var c1 = document.createElement('td');
-                c1.innerHTML = '<li><a href="' + GAME_URL + '?host=' + endpoint + '" target="_blank">' + serverInfo['name'] + '</a>';
-                row.appendChild(c1);
-                // var c2 = document.createElement('td');
-                // c2.innerText = serverInfo['maximumUsers'];
-                // row.appendChild(c2);
-                // // TODO(benvanik): flag
-                // var c3 = document.createElement('td');
-                // c3.innerText = serverInfo['location'];
-                // row.appendChild(c3);
-                table.appendChild(row);
+                var serverInfo = result['server_info'];
+                addServerRow(table, serverInfo);
               }
-              if (!anyFound) {
+              if (!json.length) {
                 serverList.innerText = '\nNo servers online! Try again later!';
               } else {
                 serverList.appendChild(table);
@@ -357,9 +350,24 @@
         xhr.open('GET', SERVER_QUERY_URL);
         xhr.send();
       }
+      function addServerRow(table, serverInfo) {
+        var endpoint = serverInfo['endpoint'];
+        var row = document.createElement('tr');
+        var c1 = document.createElement('td');
+        c1.innerHTML = '<li><a href="' + GAME_URL + '?host=' + endpoint + '" target="_blank">' + serverInfo['server_name'] + '</a>';
+        row.appendChild(c1);
+        var c2 = document.createElement('td');
+        c2.innerText = serverInfo['user_count'] + '/' + serverInfo['user_max'];
+        row.appendChild(c2);
+        // // TODO(benvanik): flag
+        // var c3 = document.createElement('td');
+        // c3.innerText = serverInfo['server_location'];
+        // row.appendChild(c3);
+        table.appendChild(row);
+      }
       window.setInterval(function() {
         updateServers();
-      }, 60 * 1000);
+      }, 30 * 1000);
       updateServers();
     </script>
   </body>
