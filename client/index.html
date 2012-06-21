@@ -7,8 +7,9 @@
       var DEV_MODE = window.location.search == '?dev';
       var GAME_URL = DEV_MODE ? 'game-uncompiled.html' : 'game.html';
       var GAME_TYPE = DEV_MODE ? 'blk-dev' : 'blk';
+      var GAME_VERSION = '0.0.1';
       var BROWSER_URL = DEV_MODE ? 'http://localhost:8081/' : 'http://gf-browser.appspot.com/';
-      var SERVER_QUERY_URL = BROWSER_URL + 'api/query/' + GAME_TYPE;
+      var SERVER_QUERY_URL = BROWSER_URL + 'api/query/' + GAME_TYPE + '/' + GAME_VERSION;
     </script>
   </head>
   <body>
