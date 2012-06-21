@@ -30,10 +30,11 @@ goog.require('gf.LaunchOptions');
  * @param {?string} browserUrl Server browser URL.
  * @param {?string} serverId Server UUID.
  * @param {?string} serverKey Server private key.
+ * @param {?string} serverName Server name.
  * @param {number} userCount Maximum number of simultaneous users.
  */
 blk.server.LaunchOptions = function(uri,
-    mapPath, browserUrl, serverId, serverKey, userCount) {
+    mapPath, browserUrl, serverId, serverKey, serverName, userCount) {
   goog.base(this, uri);
 
   /**
@@ -52,13 +53,19 @@ blk.server.LaunchOptions = function(uri,
    * Server UUID.
    * @type {?string}
    */
-  this.serverId = serverId || null;
+  this.serverId = !goog.string.isEmptySafe(serverId) ? serverId : null;
 
   /**
    * Server private key.
    * @type {?string}
    */
-  this.serverKey = serverKey || null;
+  this.serverKey = !goog.string.isEmptySafe(serverKey) ? serverKey : null;
+
+  /**
+   * Server name.
+   * @type {?string}
+   */
+  this.serverName = !goog.string.isEmptySafe(serverName) ? serverName : null;
 
   /**
    * Maximum simultaneous user count.

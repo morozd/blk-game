@@ -73,12 +73,14 @@ copy_files(
     name='blk_node_static_uncompiled',
     srcs=COMMON_NODE_STATIC_FILES + [
         'server/server-uncompiled.js',
+        'run-server-uncompiled.sh',
         ])
 
 copy_files(
     name='blk_node_static_compiled',
     srcs=COMMON_NODE_STATIC_FILES + [
         'server/server.js',
+        'run-server.sh',
         ])
 
 
@@ -321,6 +323,14 @@ file_set(
         ':node_modules',
         ])
 
+archive_files(
+    name='release-server',
+    srcs=[
+        ':blk_node_static_compiled',
+        ':blk_node_js_compiled',
+        ':node_modules'
+        ])
+
 file_set(
     name='release',
     srcs=[
@@ -333,6 +343,7 @@ file_set(
         ':blk_server_js_compiled',
         ':blk_node_js_compiled',
         ':node_modules',
+        ':release-server',
         ],
     deps=[
         #':blk_js_lint',

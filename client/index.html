@@ -338,7 +338,11 @@
                 addServerRow(table, serverInfo);
               }
               if (!json.length) {
-                serverList.innerText = '\nNo servers online! Try again later!';
+                serverList.innerText = '\nNo servers online! Try again later!'//' or ';
+                // var startLink = document.createElement('a');
+                // startLink.href = 'a';
+                // startLink.innerText = 'start your own!';
+                // serverList.appendChild(startLink);
               } else {
                 serverList.appendChild(table);
               }

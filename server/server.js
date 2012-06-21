@@ -22,8 +22,10 @@ var path = require('path');
 var opts = nopt({
   // Port to listen on for game connections
   'port': [Number, null],
-  // Port to listen on for info connections
-  'info_port': [Number, null],
+  // Name for the server in the browser
+  'serverName': [String, 'Server'],
+  // Maximum users that can connect
+  'users': [Number, 8],
   // Filesystem root path
   'filesystem': [String, '/tmp/blk/'],
   // Map path in the file system
@@ -33,9 +35,7 @@ var opts = nopt({
   // Server UUID
   'serverId': [String, null],
   // Server private key
-  'serverKey': [String, null],
-  // Maximum users that can connect
-  'users': [Number, 8]
+  'serverKey': [String, null]
 }, {
   'p': '--port',
   'f': '--filesystem',
@@ -44,19 +44,19 @@ var opts = nopt({
 
 // Load compiled code
 global.require = require;
-var compiledLibrary = require('../blk_node_js_compiled');
+var compiledLibrary = require('blk_node_js_compiled');
 for (var key in compiledLibrary) {
   global[key] = compiledLibrary[key]
 }
 
 // Options
 var port = opts['port'] || 1337;
-var infoPort = opts['info_port'] || null;
 var fileSystemPath = opts['filesystem'] || '/tmp/blk/';
 var mapPath = opts['map'] || 'maps/map_dev/';
 var browserUrl = opts['browserUrl'] || 'http://gf-browser.appspot.com/';
 var serverId = opts['serverId'] || null;
 var serverKey = opts['serverKey'] || null;
+var serverName = opts['serverName'] || null;
 var userCount = opts['users'] || 8;
 
 // TODO(benvanik): some sensible URI from command line args
@@ -69,6 +69,7 @@ blk.server.start(uri, {
   browserUrl: browserUrl,
   serverId: serverId,
   serverKey: serverKey,
+  serverName: serverName,
   userCount: userCount,
   persistentRoot: path.join(fileSystemPath, 'persistent/'),
   temporaryRoot: path.join(fileSystemPath, 'temporary/')

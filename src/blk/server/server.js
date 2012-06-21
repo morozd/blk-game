@@ -63,6 +63,7 @@ blk.server.start = function(uri, options) {
       options['browserUrl'],
       options['serverId'],
       options['serverKey'],
+      options['serverName'],
       Number(options['userCount']));
 
   // TODO(benvanik): authtoken/serverinfo
