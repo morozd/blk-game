@@ -51,13 +51,13 @@ blk.client.ENABLE_SHARED_WORKERS_ = false;
  * @param {string} uri Invoking URI.
  * @param {boolean} sourceMode True if running from source.
  * @param {!Document} doc Document.
- * @param {Object} options Game options.
+ * @param {Object.<*>=} opt_args Key-value argument map.
  */
-blk.client.start = function(uri, sourceMode, doc, options) {
+blk.client.start = function(uri, sourceMode, doc, opt_args) {
   goog.asserts.assert(!gf.SERVER);
   var dom = new goog.dom.DomHelper(doc);
 
-  var launchOptions = new blk.client.LaunchOptions(uri);
+  var launchOptions = new blk.client.LaunchOptions(uri, opt_args);
   var settings = new blk.client.UserSettings(dom);
   settings.load();
 

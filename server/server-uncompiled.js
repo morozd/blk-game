@@ -15,36 +15,6 @@
  * limitations under the License.
  */
 
-var http = require('http');
-var nopt = require('nopt');
-var path = require('path');
-var url = require('url');
-var util = require('util');
-
-// Parse options
-var opts = nopt({
-  // Port to listen on for game connections
-  'port': [Number, null],
-  // Port to listen on for info connections
-  'info_port': [Number, null],
-  // Filesystem root path
-  'filesystem': [String, '/tmp/blk/'],
-  // Map path in the file system
-  'map': [String, 'maps/map_dev/'],
-  // Server browser URL
-  'browserUrl': [String, 'http://localhost:8081/'],
-  // Server UUID
-  'serverId': [String, null],
-  // Server private key
-  'serverKey': [String, null],
-  // Maximum users that can connect
-  'users': [Number, 8]
-}, {
-  'p': '--port',
-  'f': '--filesystem',
-  'm': '--map'
-}, process.argv, 2);
-
 // Load Closure base
 global.require = require;
 global.CLOSURE_BASE_PATH = './third_party/games-framework/third_party/closure-library/closure/goog/';
@@ -58,43 +28,25 @@ global.gfdefines = {
 };
 goog.require('blk.server.start');
 
-// Options
-var port = opts['port'] || 1337;
-var infoPort = opts['info_port'] || null;
-var fileSystemPath = opts['filesystem'] || '/tmp/blk/';
-var mapPath = opts['map'] || 'maps/map_dev/';
-var browserUrl = opts['browserUrl'] || 'http://localhost:8081/';
-var serverId = opts['serverId'] || null;
-var serverKey = opts['serverKey'] || null;
-var userCount = opts['users'] || 8;
-
-// TODO(benvanik): some sensible URI from command line args
-var uri = 'http://127.0.0.1:' + port + '/node/';
-
 // Start the server
-blk.server.start(uri, {
-  port: port,
-  mapPath: mapPath,
-  browserUrl: browserUrl,
-  serverId: serverId,
-  serverKey: serverKey,
-  userCount: userCount,
-  persistentRoot: path.join(fileSystemPath, 'persistent/'),
-  temporaryRoot: path.join(fileSystemPath, 'temporary/')
-}).addCallbacks(function(game) {
-  if (infoPort) {
-    setupInfoPage(game);
-  }
+var uri = ('file://' + process.argv[1]).replace(/\\/g, '/');
+var args = process.argv.slice(2);
+blk.server.start(uri, args).addCallbacks(function(game) {
+  console.log('server started');
 }, function(arg) {
   console.log('unable to start server', arg);
 });
+
+
+/*
+var http = require('http');
+var url = require('url');
 
 function setupInfoPage(game) {
   var session = game.session;
 
   function showInfo() {
     var sb = '';
-
     for (var n = 0; n < session.users.length; n++) {
       var user = session.users[n];
       sb += user.info.displayName + ' (' + user.sessionId + ')<br>';
@@ -103,15 +55,12 @@ function setupInfoPage(game) {
       sb += '<a href="/' + user.sessionId + '/kick">kick</a><br>';
       sb += '<br>';
     }
-
     return sb;
   };
 
   function userKick(user) {
     var sb = 'kicking...';
-
     session.disconnectUser(user, gf.net.DisconnectReason.KICKED);
-
     return sb;
   };
 
@@ -119,9 +68,7 @@ function setupInfoPage(game) {
     res.writeHead(200, {
       'Content-Type': 'text/html'
     });
-
     var sb = '';
-
     var reqUrl = url.parse(req.url);
     var path = reqUrl.pathname.split('/');
     if (path.length > 1) {
@@ -144,3 +91,4 @@ function setupInfoPage(game) {
     res.end(sb);
   }).listen(infoPort);
 };
+*/

@@ -17,39 +17,62 @@
 goog.provide('blk.client.LaunchOptions');
 
 goog.require('gf.LaunchOptions');
-goog.require('goog.asserts');
 
 
 
 /**
- * Client aunch options utility.
+ * Client launch options utility.
  *
  * @constructor
  * @extends {gf.LaunchOptions}
  * @param {string} uri Source app URI string.
+ * @param {Object.<*>=} opt_args Key-value argument map.
  */
-blk.client.LaunchOptions = function(uri) {
-  goog.base(this, uri);
+blk.client.LaunchOptions = function(uri, opt_args) {
+  goog.base(this, blk.client.LaunchOptions.getArgumentInfo(), uri, opt_args);
 
   /**
    * Extra latency, in ms, to add to send/recv.
    * @type {number}
    */
-  this.simulatedLatency = this.getNumber('simulatedLatency', 0) || 0;
+  this.simulatedLatency = this.getNumberAlways('simulatedLatency');
 
   /**
    * User name for multiplayer.
    * @type {string?}
    */
-  this.userName = this.getString('userName', null) || null;
+  this.userName = this.getString('userName');
 
   /**
    * Host endpoint for connections.
    * @type {string}
    */
-  this.host;
-  var host = this.getString('host', 'local://blk-0');
-  goog.asserts.assert(host);
-  this.host = host;
+  this.host = this.getStringAlways('host');
 };
 goog.inherits(blk.client.LaunchOptions, gf.LaunchOptions);
+
+
+/**
+ * Gets argument information for the BLK client launch option arguments.
+ * @return {!Object.<!gf.LaunchOptions.ArgumentInfo>} Argument information.
+ */
+blk.client.LaunchOptions.getArgumentInfo = function() {
+  // TODO(benvanik): info
+  return {
+    'simulatedLatency': {
+      help: 'Extra latency, in ms, to add to send/recv.',
+      type: Number,
+      defaultValue: 0
+    },
+    'userName': {
+      help: 'User name for multiplayer.',
+      type: String,
+      defaultValue: null
+    },
+    'host': {
+      help: 'Host endpoint for connections.',
+      type: String,
+      defaultValue: 'local://blk-0'
+    }
+  };
+};

@@ -17,80 +17,116 @@
 goog.provide('blk.server.LaunchOptions');
 
 goog.require('gf.LaunchOptions');
-goog.require('goog.string');
 
 
 
 /**
- * Client aunch options utility.
+ * Server launch options utility.
  *
  * @constructor
  * @extends {gf.LaunchOptions}
  * @param {string} uri Source app URI string.
- * @param {string} mapPath Map path.
- * @param {?string} browserUrl Server browser URL.
- * @param {?string} serverId Server UUID.
- * @param {?string} serverKey Server private key.
- * @param {?string} serverName Server name.
- * @param {number} userCount Maximum number of simultaneous users.
+ * @param {Object.<*>=} opt_args Key-value argument map.
  */
-blk.server.LaunchOptions = function(uri,
-    mapPath, browserUrl, serverId, serverKey, serverName, userCount) {
-  goog.base(this, uri);
+blk.server.LaunchOptions = function(uri, opt_args) {
+  goog.base(this, blk.server.LaunchOptions.getArgumentInfo(), uri, opt_args);
+
+  /**
+   * Port to use for game connections.
+   * @type {number}
+   */
+  this.listenPort = this.getNumberAlways('listenPort');
+
+  /**
+   * File system root path.
+   * @type {string}
+   */
+  this.fileSystem = this.getStringAlways('fileSystem');
 
   /**
    * Map path.
    * @type {string}
    */
-  this.mapPath = mapPath || '/maps/map01/';
+  this.mapPath = this.getStringAlways('mapPath');
 
   /**
    * Server browser URL.
    * @type {string}
    */
-  this.browserUrl = browserUrl || blk.server.LaunchOptions.DEFAULT_BROWSER_URL_;
+  this.browserUrl = this.getStringAlways('browserUrl');
 
   /**
    * Server UUID.
    * @type {?string}
    */
-  this.serverId = !goog.string.isEmptySafe(serverId) ? serverId : null;
+  this.serverId = this.getString('serverId');
 
   /**
    * Server private key.
    * @type {?string}
    */
-  this.serverKey = !goog.string.isEmptySafe(serverKey) ? serverKey : null;
+  this.serverKey = this.getString('serverKey');
 
   /**
    * Server name.
    * @type {?string}
    */
-  this.serverName = !goog.string.isEmptySafe(serverName) ? serverName : null;
+  this.serverName = this.getString('serverName');
 
   /**
    * Maximum simultaneous user count.
    * @type {number}
    */
-  this.userCount = userCount || blk.server.LaunchOptions.DEFAULT_USER_COUNT_;
+  this.userCount = this.getNumberAlways('userCount');
 };
 goog.inherits(blk.server.LaunchOptions, gf.LaunchOptions);
 
 
 /**
- * Default server browser URL.
- * @private
- * @const
- * @type {string}
+ * Gets argument information for the BLK server launch option arguments.
+ * @return {!Object.<!gf.LaunchOptions.ArgumentInfo>} Argument information.
  */
-blk.server.LaunchOptions.DEFAULT_BROWSER_URL_ =
-    'http://something/';
-
-
-/**
- * Default number of users allowed to connect.
- * @private
- * @const
- * @type {number}
- */
-blk.server.LaunchOptions.DEFAULT_USER_COUNT_ = 8;
+blk.server.LaunchOptions.getArgumentInfo = function() {
+  return {
+    'listenPort': {
+      help: 'Port to use for game connections.',
+      type: Number,
+      defaultValue: 1337
+    },
+    'fileSystem': {
+      help: 'File system root path.',
+      type: String,
+      defaultValue: '/tmp/blk/'
+    },
+    'mapPath': {
+      help: 'Map path.',
+      type: String,
+      defaultValue: '/maps/map01/'
+    },
+    'browserUrl': {
+      help: 'Server browser base API URL.',
+      type: String,
+      defaultValue: 'http://localhost:8081/'
+    },
+    'serverId': {
+      help: 'Server registration UUID.',
+      type: String,
+      defaultValue: null
+    },
+    'serverKey': {
+      help: 'Server private key.',
+      type: String,
+      defaultValue: null
+    },
+    'serverName': {
+      help: 'Human-readable server name.',
+      type: String,
+      defaultValue: null
+    },
+    'userCount': {
+      help: 'Maximum simultaneous user count.',
+      type: Number,
+      defaultValue: 8
+    }
+  };
+};

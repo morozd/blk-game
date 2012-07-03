@@ -22,7 +22,9 @@ goog.require('blk.net.packets');
 goog.require('blk.server.LaunchOptions');
 goog.require('blk.server.ServerGame');
 goog.require('gf');
+goog.require('gf.LaunchOptions');
 goog.require('gf.io.node');
+goog.require('gf.log');
 goog.require('gf.net');
 goog.require('gf.net.AuthToken');
 goog.require('gf.net.ServerInfo');
@@ -33,38 +35,44 @@ goog.require('goog.async.Deferred');
 /**
  * Starts the game server.
  * @param {string} uri Invoking URI.
- * @param {!Object.<string>} options Options.
+ * @param {!Array.<string>} args A list of command line arguments.
  * @return {!goog.async.Deferred} A deferred fulfilled when the server is ready.
  */
-blk.server.start = function(uri, options) {
+blk.server.start = function(uri, args) {
   goog.asserts.assert(gf.SERVER);
   var deferred = new goog.async.Deferred();
 
+  var argMap = gf.LaunchOptions.parseCommandLine(args);
+  if (argMap['help']) {
+    gf.log.write('BLK game server', goog.DEBUG ? '(debug)' : '(release)');
+    gf.log.write('gf:');
+    gf.log.write(gf.LaunchOptions.getArgumentInfo());
+    gf.log.write('blk:');
+    gf.log.write(blk.server.LaunchOptions.getArgumentInfo());
+    //gf.log.write('Parsed:', argMap);
+    deferred.errback('help query');
+    return deferred;
+  }
+  var launchOptions = new blk.server.LaunchOptions(uri, argMap);
+
   // Setup node filesystem roots
   if (gf.NODE) {
-    gf.io.node.persistentRoot = options['persistentRoot'];
-    gf.io.node.temporaryRoot = options['temporaryRoot'];
+    // TODO(benvanik): path join - thunk to platform require('path') if NODE
+    gf.io.node.persistentRoot = launchOptions.fileSystem + '/persistent/';
+    gf.io.node.temporaryRoot = launchOptions.fileSystem + '/temporary/';
   }
 
   // TODO(benvanik): proper endpoint selection
   var endpoint;
   var endpointString = 'blk://local-0';
   if (gf.NODE) {
-    var port = String(options['port']);
+    var port = String(launchOptions.listenPort);
     endpoint = /** @type {gf.net.Endpoint} */ (port);
     endpointString = port;
   } else {
     endpoint = /** @type {gf.net.Endpoint} */ (goog.global);
     endpointString = 'blk://local-0';
   }
-
-  var launchOptions = new blk.server.LaunchOptions(uri,
-      options['mapPath'],
-      options['browserUrl'],
-      options['serverId'],
-      options['serverKey'],
-      options['serverName'],
-      Number(options['userCount']));
 
   // TODO(benvanik): authtoken/serverinfo
   var authToken = new gf.net.AuthToken();

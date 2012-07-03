@@ -38,6 +38,12 @@ M4: Infinite Maps
 M5: Performance Tuning
 ================================================================================
 
+* SegmentRenderer has a lot of Float32Array:
+    * 2 for each bounding box (min/max)
+    * boundingSphere
+    * centerCoordinates
+    * worldMatrix
+
 * better error propagation
     * error types?
 
@@ -133,3 +139,6 @@ Experiments
     * client cache via mapstore
     * if setBlock on uncached chunk, load chunk, set
         * chunk should queue setBlocks when unloaded, apply when LOADED?
+
+* investigate dtrace probes for server:
+    http://mcavage.github.com/node-restify/#DTrace
