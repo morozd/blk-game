@@ -1,0 +1,87 @@
+/**
+ * Copyright 2012 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Styles for popup dialog soy files and other related UI bits.
+ *
+ * @author benvanik@google.com (Ben Vanik)
+ */
+
+@def BLK_POPUP_DIALOG_WIDTH     500px;
+@def BLK_POPUP_HEADER_HEIGHT    45px;
+
+.blkPopup {
+  position: relative;
+  margin-top: 100px;
+  margin-left: auto;
+  margin-right: auto;
+
+  width: BLK_POPUP_DIALOG_WIDTH;
+  border: 2px solid #353535;
+  background-position: 0 BLK_POPUP_HEADER_HEIGHT;
+
+  @mixin bitDropShadow();
+  @mixin bitFont(18px);
+  @mixin blkPopupBackground();
+}
+
+.blkPopupHeader {
+  padding: 5px 10px 5px 10px;
+  font-size: 22px;
+  height: sub(BLK_POPUP_HEADER_HEIGHT, 10px);
+
+  @mixin blkPopupHeaderBackground();
+}
+
+.blkPopupBody {
+  padding: 10px;
+  min-height: 80px;
+}
+
+.blkPopupFooter {
+  height: 28px;
+  padding: 3px;
+  margin-bottom: 2px;
+}
+
+.blkPopupButton {
+  float: right;
+  margin-left: 3px;
+  padding: 3px;
+  border: 2px solid #CCC;
+
+  cursor: pointer;
+
+  @mixin noSelect();
+  @mixin blkPopupButtonBackground();
+}
+
+.blkPopupButtonLabel {
+  font-size: 18px;
+}
+
+.blkPopupButtonDefault {
+  border-color: #D50;
+  color: #D50;
+  text-shadow: #888 1px 1px;
+
+  @mixin blkPopupButtonDefaultBackground();
+}
+
+a.blkPopupLink,  a.blkPopupLink:visited {
+  color: #D1D1D1;
+  text-shadow: #555555 1px 1px;
+}

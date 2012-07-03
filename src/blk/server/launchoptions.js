@@ -17,6 +17,7 @@
 goog.provide('blk.server.LaunchOptions');
 
 goog.require('gf.LaunchOptions');
+goog.require('goog.string');
 
 
 

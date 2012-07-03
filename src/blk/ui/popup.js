@@ -116,12 +116,12 @@ blk.ui.Popup.prototype.enterDocument = function() {
   this.dom.appendChild(this.parentElement, this.root);
 
   var buttonEls = this.dom.getElementsByClass(
-      goog.getCssName('blkAlertButton'), this.root);
+      goog.getCssName('blkPopupButton'), this.root);
   goog.array.forEach(buttonEls,
       function(buttonEl) {
         var buttonId = buttonEl.getAttribute('data-id');
         var isDefault = goog.dom.classes.has(
-            buttonEl, goog.getCssName('blkAlertButtonDefault'));
+            buttonEl, goog.getCssName('blkPopupButtonDefault'));
 
         // TODO(benvanik): save off buttons for key input/etc
 

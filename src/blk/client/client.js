@@ -21,7 +21,7 @@ goog.require('blk.client.LaunchOptions');
 goog.require('blk.client.UserSettings');
 goog.require('blk.net.packets');
 goog.require('blk.ui.Popup');
-goog.require('blk.ui.alerts');
+goog.require('blk.ui.popups.status');
 goog.require('gf');
 goog.require('gf.io');
 goog.require('gf.io.FileSystemType');
@@ -78,7 +78,7 @@ blk.client.start = function(uri, sourceMode, doc, options) {
   userInfo.displayName = gf.net.UserInfo.sanitizeDisplayName(settings.userName);
 
   // Show connecting dialog
-  var connectDialog = blk.ui.Popup.show(blk.ui.alerts.connecting, {
+  var connectDialog = blk.ui.Popup.show(blk.ui.popups.status.connecting, {
     server_name: launchOptions.host
   }, dom);
 
@@ -145,7 +145,7 @@ blk.client.start = function(uri, sourceMode, doc, options) {
 
     gf.log.write('error:', arg);
 
-    var d = blk.ui.Popup.show(blk.ui.alerts.connectionFailed, {
+    var d = blk.ui.Popup.show(blk.ui.popups.status.connectionFailed, {
       reason: arg
     }, dom);
     d.addCallback(

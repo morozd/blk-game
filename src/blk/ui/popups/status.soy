@@ -1,0 +1,160 @@
+/**
+ * Copyright 2012 Google, Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Templates used for status dialogs.
+ *
+ * @author benvanik@google.com (Ben Vanik)
+ */
+
+{namespace blk.ui.popups.status}
+
+
+/**
+ * A 'connecting...' dialog to use when initially connecting.
+ * @param server_name Server host name the user is connecting to.
+ */
+{template .connecting}
+  {call blk.ui.popups.simplePopup data="all"}
+    {param header}
+      {msg desc="User is connecting to the server."}
+        Connecting...
+      {/msg}
+    {/param}
+    {param body}
+      {msg desc="Attempting to connect to the given remote server."}
+        Trying to connect to {$server_name}
+      {/msg}
+    {/param}
+  {/call}
+{/template}
+
+
+/**
+ * A 'connection failed' dialog to use when initially connecting.
+ * @param reason Reason code from gf.net.DisconnectReason.
+ */
+{template .connectionFailed}
+  {call blk.ui.popups.simplePopup data="all"}
+    {param header}
+      {msg desc="The user could not connect to the server."}
+        Connection Failed
+      {/msg}
+    {/param}
+    {param body}
+      {switch $reason}
+        {case 2}
+          {msg desc="The client or server is too old."}
+            Version mismatch - reload and try again.
+          {/msg}
+        {case 3}
+          {msg desc="Invalid data was detected on the network."}
+            Invalid/broken packet.
+          {/msg}
+        {case 4}
+          {msg desc="User does not have access to the server."}
+            Access denied.
+          {/msg}
+        {case 6}
+          {msg desc="User has been banned by an administrator."}
+            Banned by an administrator! Go away!
+          {/msg}
+        {case 7}
+          {msg desc="Server is over capacity and the user cannot join yet."}
+            Server is full. Try again later.
+          {/msg}
+        {default}
+          {msg desc="User's network has gone down or is too slow."}
+            Unable to contact the server or a timeout occurred while connecting.
+            Check your network settings and try again, or contact the server
+            admin.
+          {/msg}
+      {/switch}
+    {/param}
+    {param buttons}
+      {call blk.ui.popups.buttonReload}
+        {param focusDefault: true /}
+      {/call}
+      {call blk.ui.popups.buttonClose /}
+    {/param}
+  {/call}
+{/template}
+
+
+/**
+ * A user disconnection dialog to display when the user loses connection to the
+ * server.
+ * @param reason Reason code from gf.net.DisconnectReason.
+ */
+{template .disconnected}
+  {call blk.ui.popups.simplePopup data="all"}
+    {param header}
+      {msg desc="The user's connection to the server was lost."}
+        Connection Lost
+      {/msg}
+    {/param}
+    {param body}
+      {switch $reason}
+        {case 1}
+          {msg desc="User's network has gone down or is too slow."}
+            Timeout while communicating with the server. Check your connection
+            and try again.
+          {/msg}
+        {case 2}
+          {msg desc="The client or server is too old."}
+            Version mismatch - reload and try again.
+          {/msg}
+        {case 3}
+          {msg desc="Invalid data was detected on the network."}
+            Invalid/broken packet.
+          {/msg}
+        {case 4}
+          {msg desc="User does not have access to the server."}
+            Access denied.
+          {/msg}
+        {case 5}
+          {msg desc="User has been kicked by an administrator."}
+            Kicked by an administrator!
+          {/msg}
+        {case 6}
+          {msg desc="User has been banned by an administrator."}
+            Banned by an administrator!
+          {/msg}
+        {case 7}
+          {msg desc="Server is over capacity and the user cannot join yet."}
+            Server is full. Try again later.
+          {/msg}
+        {default}
+          {msg desc="Something bad happened, but not sure what."}
+            Whoops.
+          {/msg}
+      {/switch}
+    {/param}
+    {param buttons}
+      {switch $reason}
+        {case 4, 5, 6}
+          {call blk.ui.popups.buttonClose}
+            {param focusDefault: true /}
+          {/call}
+        {default}
+          {call blk.ui.popups.buttonReload}
+            {param focusDefault: true /}
+          {/call}
+          {call blk.ui.popups.buttonClose /}
+      {/switch}
+    {/param}
+  {/call}
+{/template}

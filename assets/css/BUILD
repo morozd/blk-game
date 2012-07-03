@@ -9,6 +9,6 @@ file_set(
     srcs=[
         'common.gss',
         'font-monospace.gss',
-        'alert-assets.gss',
+        'popup-assets.gss',
         'playerlisting-assets.gss',
-        ] + glob('../../src/blk/ui/*.gss'))
+        ] + glob('../../src/blk/ui/**/*.gss'))

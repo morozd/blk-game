@@ -34,8 +34,9 @@ goog.require('blk.ui.Console');
 goog.require('blk.ui.Menubar');
 goog.require('blk.ui.PlayerListing');
 goog.require('blk.ui.Popup');
-goog.require('blk.ui.Settings');
-goog.require('blk.ui.alerts');
+goog.require('blk.ui.popups.Settings');
+goog.require('blk.ui.popups.help');
+goog.require('blk.ui.popups.status');
 goog.require('gf.Game');
 goog.require('gf.assets.AssetManager');
 goog.require('gf.audio.AudioManager');
@@ -455,7 +456,7 @@ blk.client.ClientGame.prototype.update = function(frame) {
     }
     this.stopTicking();
 
-    var d = blk.ui.Popup.show(blk.ui.alerts.disconnected, {
+    var d = blk.ui.Popup.show(blk.ui.popups.status.disconnected, {
       reason: this.session.disconnectReason
     }, this.dom, this.display.mainFrame);
     d.addCallback(
@@ -880,7 +881,7 @@ blk.client.ClientGame.prototype.showSettings = function() {
   // TODO(benvanik): proper dynamic view adjustment
   var oldViewDistance = this.settings.viewDistance;
 
-  var d = blk.ui.Settings.show(this, this.dom, this.display.mainFrame);
+  var d = blk.ui.popups.Settings.show(this, this.dom, this.display.mainFrame);
   d.addCallback(
       function(buttonId) {
         if (buttonId == 'save') {
@@ -923,7 +924,7 @@ blk.client.ClientGame.prototype.showHelp = function() {
 
   this.input.setEnabled(false);
 
-  var d = blk.ui.Popup.show(blk.ui.alerts.help, {
+  var d = blk.ui.Popup.show(blk.ui.popups.help.popup, {
   }, this.dom, this.display.mainFrame);
   d.addCallback(
       function(buttonId) {
