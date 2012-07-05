@@ -21,6 +21,8 @@ goog.require('blk.env.ChunkView');
 goog.require('blk.env.Entity');
 goog.require('blk.env.MapParameters');
 goog.require('blk.env.server.ServerMap');
+goog.require('blk.game.server.ServerMapObserver');
+goog.require('blk.game.server.ServerNetService');
 goog.require('blk.game.server.ServerPlayer');
 goog.require('blk.io.ChunkSerializer');
 goog.require('blk.io.CompressionFormat');
@@ -30,8 +32,6 @@ goog.require('blk.net.packets.EntityPosition');
 goog.require('blk.net.packets.ReadyPlayer');
 goog.require('blk.net.packets.SetBlock');
 goog.require('blk.physics.ServerMovement');
-goog.require('blk.server.ServerMapObserver');
-goog.require('blk.server.ServerNetService');
 goog.require('gf');
 goog.require('gf.Game');
 goog.require('gf.log');
@@ -95,9 +95,9 @@ blk.game.server.ServerGame = function(launchOptions, session, mapStore) {
 
   /**
    * Server net service.
-   * @type {!blk.server.ServerNetService}
+   * @type {!blk.game.server.ServerNetService}
    */
-  this.netService = new blk.server.ServerNetService(this);
+  this.netService = new blk.game.server.ServerNetService(this);
   this.session.registerService(this.netService);
 
   /**
@@ -258,7 +258,7 @@ blk.game.server.ServerGame.prototype.handleUserConnect = function(user) {
   player.view = view;
 
   // Setup observer
-  var observer = new blk.server.ServerMapObserver(this, player, view);
+  var observer = new blk.game.server.ServerMapObserver(this, player, view);
   view.addObserver(observer);
 
   // Initialize view - must be done after observers are added

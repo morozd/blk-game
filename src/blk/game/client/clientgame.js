@@ -18,14 +18,13 @@ goog.provide('blk.game.client.ClientGame');
 
 goog.require('blk.GameState');
 goog.require('blk.assets.audio.Bank1');
-goog.require('blk.client.ClientNetService');
 goog.require('blk.env');
 goog.require('blk.env.ChunkView');
 goog.require('blk.env.Entity');
 goog.require('blk.env.blocks.BlockID');
 goog.require('blk.env.client.ClientMap');
 goog.require('blk.env.client.ViewManager');
-goog.require('blk.game.Player');
+goog.require('blk.game.client.ClientNetService');
 goog.require('blk.game.client.ClientPlayer');
 goog.require('blk.game.client.MusicController');
 goog.require('blk.graphics.RenderState');
@@ -93,9 +92,9 @@ blk.game.client.ClientGame = function(launchOptions, settings, dom, session) {
 
   /**
    * Client net service.
-   * @type {!blk.client.ClientNetService}
+   * @type {!blk.game.client.ClientNetService}
    */
-  this.netService = new blk.client.ClientNetService(this);
+  this.netService = new blk.game.client.ClientNetService(this);
   this.session.registerService(this.netService);
 
   /**

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-goog.provide('blk.server.ServerMapObserver');
+goog.provide('blk.game.server.ServerMapObserver');
 
 goog.require('blk.env.Chunk');
 goog.require('blk.env.MapObserver');
@@ -31,7 +31,7 @@ goog.require('blk.env.MapObserver');
  * @param {!blk.game.Player} player Player.
  * @param {!blk.env.ChunkView} view Active view.
  */
-blk.server.ServerMapObserver = function(game, player, view) {
+blk.game.server.ServerMapObserver = function(game, player, view) {
   /**
    * Server game.
    * @type {!blk.game.server.ServerGame}
@@ -55,7 +55,7 @@ blk.server.ServerMapObserver = function(game, player, view) {
 /**
  * @override
  */
-blk.server.ServerMapObserver.prototype.chunkLoaded = function(chunk) {
+blk.game.server.ServerMapObserver.prototype.chunkLoaded = function(chunk) {
   this.player.queueChunkSend(chunk);
 };
 
@@ -63,7 +63,7 @@ blk.server.ServerMapObserver.prototype.chunkLoaded = function(chunk) {
 /**
  * @override
  */
-blk.server.ServerMapObserver.prototype.chunkEnteredView = function(chunk) {
+blk.game.server.ServerMapObserver.prototype.chunkEnteredView = function(chunk) {
   // Only send if already present, otherwise chunkLoaded will send it later
   if (chunk.state == blk.env.Chunk.State.LOADED) {
     this.player.queueChunkSend(chunk);
@@ -74,7 +74,7 @@ blk.server.ServerMapObserver.prototype.chunkEnteredView = function(chunk) {
 /**
  * @override
  */
-blk.server.ServerMapObserver.prototype.chunkLeftView = function(chunk) {
+blk.game.server.ServerMapObserver.prototype.chunkLeftView = function(chunk) {
   //
 };
 
@@ -82,7 +82,7 @@ blk.server.ServerMapObserver.prototype.chunkLeftView = function(chunk) {
 /**
  * @override
  */
-blk.server.ServerMapObserver.prototype.invalidateBlock =
+blk.game.server.ServerMapObserver.prototype.invalidateBlock =
     function(x, y, z, priority) {
 };
 
@@ -90,6 +90,6 @@ blk.server.ServerMapObserver.prototype.invalidateBlock =
 /**
  * @override
  */
-blk.server.ServerMapObserver.prototype.invalidateBlockRegion =
+blk.game.server.ServerMapObserver.prototype.invalidateBlockRegion =
     function(minX, minY, minZ, maxX, maxY, maxZ, priority) {
 };

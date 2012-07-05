@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-goog.provide('blk.client.ClientNetService');
+goog.provide('blk.game.client.ClientNetService');
 
 goog.require('blk.io.ChunkSerializer');
 goog.require('blk.net.packets.ChunkData');
@@ -38,7 +38,7 @@ goog.require('goog.vec.Vec4');
  * @extends {gf.net.NetworkService}
  * @param {!blk.game.client.ClientGame} game Game.
  */
-blk.client.ClientNetService = function(game) {
+blk.game.client.ClientNetService = function(game) {
   goog.base(this, game.session);
 
   /**
@@ -54,13 +54,14 @@ blk.client.ClientNetService = function(game) {
    */
   this.chunkSerializer_ = new blk.io.ChunkSerializer();
 };
-goog.inherits(blk.client.ClientNetService, gf.net.NetworkService);
+goog.inherits(blk.game.client.ClientNetService, gf.net.NetworkService);
 
 
 /**
  * @override
  */
-blk.client.ClientNetService.prototype.setupSwitch = function(packetSwitch) {
+blk.game.client.ClientNetService.prototype.setupSwitch =
+    function(packetSwitch) {
   packetSwitch.register(
       blk.net.packets.MapInfo.ID,
       this.handleMapInfo_, this);
@@ -90,7 +91,7 @@ blk.client.ClientNetService.prototype.setupSwitch = function(packetSwitch) {
 /**
  * @override
  */
-blk.client.ClientNetService.prototype.connected = function() {
+blk.game.client.ClientNetService.prototype.connected = function() {
 
 };
 
@@ -98,7 +99,7 @@ blk.client.ClientNetService.prototype.connected = function() {
 /**
  * @override
  */
-blk.client.ClientNetService.prototype.disconnected = function() {
+blk.game.client.ClientNetService.prototype.disconnected = function() {
 
 };
 
@@ -106,7 +107,7 @@ blk.client.ClientNetService.prototype.disconnected = function() {
 /**
  * @override
  */
-blk.client.ClientNetService.prototype.userConnected = function(user) {
+blk.game.client.ClientNetService.prototype.userConnected = function(user) {
   this.game.handleUserConnect(user);
 };
 
@@ -114,7 +115,7 @@ blk.client.ClientNetService.prototype.userConnected = function(user) {
 /**
  * @override
  */
-blk.client.ClientNetService.prototype.userDisconnected = function(user) {
+blk.game.client.ClientNetService.prototype.userDisconnected = function(user) {
   this.game.handleUserDisconnect(user);
 };
 
@@ -122,7 +123,7 @@ blk.client.ClientNetService.prototype.userDisconnected = function(user) {
 /**
  * @override
  */
-blk.client.ClientNetService.prototype.userUpdated = function(user) {
+blk.game.client.ClientNetService.prototype.userUpdated = function(user) {
   this.game.handleUserUpdate(user);
 };
 
@@ -135,8 +136,8 @@ blk.client.ClientNetService.prototype.userUpdated = function(user) {
  * @param {!gf.net.PacketReader} reader Packet reader.
  * @return {boolean} True if the packet was handled successfully.
  */
-blk.client.ClientNetService.prototype.handleMapInfo_ = function(packet,
-    packetType, reader) {
+blk.game.client.ClientNetService.prototype.handleMapInfo_ =
+    function(packet, packetType, reader) {
   var mapInfo = blk.net.packets.MapInfo.read(reader);
   if (!mapInfo) {
     return false;
@@ -158,8 +159,8 @@ blk.client.ClientNetService.prototype.handleMapInfo_ = function(packet,
  * @param {!gf.net.PacketReader} reader Packet reader.
  * @return {boolean} True if the packet was handled successfully.
  */
-blk.client.ClientNetService.prototype.handleChunkData_ = function(packet,
-    packetType, reader) {
+blk.game.client.ClientNetService.prototype.handleChunkData_ =
+    function(packet, packetType, reader) {
   var chunkData = blk.net.packets.ChunkData.read(reader);
   if (!chunkData) {
     return false;
@@ -188,8 +189,8 @@ blk.client.ClientNetService.prototype.handleChunkData_ = function(packet,
  * @param {!gf.net.PacketReader} reader Packet reader.
  * @return {boolean} True if the packet was handled successfully.
  */
-blk.client.ClientNetService.prototype.handleReadyPlayer_ = function(packet,
-    packetType, reader) {
+blk.game.client.ClientNetService.prototype.handleReadyPlayer_ =
+    function(packet, packetType, reader) {
   var readyPlayer = blk.net.packets.ReadyPlayer.read(reader);
   if (!readyPlayer) {
     return false;
@@ -210,8 +211,8 @@ blk.client.ClientNetService.prototype.handleReadyPlayer_ = function(packet,
  * @param {!gf.net.PacketReader} reader Packet reader.
  * @return {boolean} True if the packet was handled successfully.
  */
-blk.client.ClientNetService.prototype.handleSetBlock_ = function(packet,
-    packetType, reader) {
+blk.game.client.ClientNetService.prototype.handleSetBlock_ =
+    function(packet, packetType, reader) {
   var setBlock = blk.net.packets.SetBlock.read(reader);
   if (!setBlock) {
     return false;
@@ -232,8 +233,8 @@ blk.client.ClientNetService.prototype.handleSetBlock_ = function(packet,
  * @param {!gf.net.PacketReader} reader Packet reader.
  * @return {boolean} True if the packet was handled successfully.
  */
-blk.client.ClientNetService.prototype.handleEntityCreate_ = function(packet,
-    packetType, reader) {
+blk.game.client.ClientNetService.prototype.handleEntityCreate_ =
+    function(packet, packetType, reader) {
   var entityCreate = blk.net.packets.EntityCreate.read(reader);
   if (!entityCreate) {
     return false;
@@ -261,8 +262,8 @@ blk.client.ClientNetService.prototype.handleEntityCreate_ = function(packet,
  * @param {!gf.net.PacketReader} reader Packet reader.
  * @return {boolean} True if the packet was handled successfully.
  */
-blk.client.ClientNetService.prototype.handleEntityDelete_ = function(packet,
-    packetType, reader) {
+blk.game.client.ClientNetService.prototype.handleEntityDelete_ =
+    function(packet, packetType, reader) {
   var entityDelete = blk.net.packets.EntityDelete.read(reader);
   if (!entityDelete) {
     return false;
@@ -284,8 +285,8 @@ blk.client.ClientNetService.prototype.handleEntityDelete_ = function(packet,
  * @param {!gf.net.PacketReader} reader Packet reader.
  * @return {boolean} True if the packet was handled successfully.
  */
-blk.client.ClientNetService.prototype.handleEntityPosition_ = function(packet,
-    packetType, reader) {
+blk.game.client.ClientNetService.prototype.handleEntityPosition_ =
+    function(packet, packetType, reader) {
   var entityPosition = blk.net.packets.EntityPosition.read(reader);
   if (!entityPosition) {
     return false;

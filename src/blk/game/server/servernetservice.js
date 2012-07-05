@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-goog.provide('blk.server.ServerNetService');
+goog.provide('blk.game.server.ServerNetService');
 
 goog.require('blk.net.packets.MapCreate');
 goog.require('blk.net.packets.Move');
@@ -34,7 +34,7 @@ goog.require('gf.net.PacketWriter');
  * @extends {gf.net.NetworkService}
  * @param {!blk.game.server.ServerGame} game Game.
  */
-blk.server.ServerNetService = function(game) {
+blk.game.server.ServerNetService = function(game) {
   goog.base(this, game.session);
 
   /**
@@ -43,13 +43,14 @@ blk.server.ServerNetService = function(game) {
    */
   this.game = game;
 };
-goog.inherits(blk.server.ServerNetService, gf.net.NetworkService);
+goog.inherits(blk.game.server.ServerNetService, gf.net.NetworkService);
 
 
 /**
  * @override
  */
-blk.server.ServerNetService.prototype.setupSwitch = function(packetSwitch) {
+blk.game.server.ServerNetService.prototype.setupSwitch =
+    function(packetSwitch) {
   packetSwitch.register(
       blk.net.packets.MapCreate.ID,
       this.handleMapCreate_, this);
@@ -68,21 +69,21 @@ blk.server.ServerNetService.prototype.setupSwitch = function(packetSwitch) {
 /**
  * @override
  */
-blk.server.ServerNetService.prototype.connected = function() {
+blk.game.server.ServerNetService.prototype.connected = function() {
 };
 
 
 /**
  * @override
  */
-blk.server.ServerNetService.prototype.disconnected = function() {
+blk.game.server.ServerNetService.prototype.disconnected = function() {
 };
 
 
 /**
  * @override
  */
-blk.server.ServerNetService.prototype.userConnected = function(user) {
+blk.game.server.ServerNetService.prototype.userConnected = function(user) {
   this.game.handleUserConnect(user);
 };
 
@@ -90,7 +91,7 @@ blk.server.ServerNetService.prototype.userConnected = function(user) {
 /**
  * @override
  */
-blk.server.ServerNetService.prototype.userDisconnected = function(user) {
+blk.game.server.ServerNetService.prototype.userDisconnected = function(user) {
   this.game.handleUserDisconnect(user);
 };
 
@@ -98,7 +99,7 @@ blk.server.ServerNetService.prototype.userDisconnected = function(user) {
 /**
  * @override
  */
-blk.server.ServerNetService.prototype.userUpdated = function(user) {
+blk.game.server.ServerNetService.prototype.userUpdated = function(user) {
   gf.log.write('user ' + user + ' changed name');
 };
 
@@ -111,8 +112,8 @@ blk.server.ServerNetService.prototype.userUpdated = function(user) {
  * @param {!gf.net.PacketReader} reader Packet reader.
  * @return {boolean} True if the packet was handled successfully.
  */
-blk.server.ServerNetService.prototype.handleMapCreate_ = function(packet,
-    packetType, reader) {
+blk.game.server.ServerNetService.prototype.handleMapCreate_ =
+    function(packet, packetType, reader) {
   var mapCreate = blk.net.packets.MapCreate.read(reader);
   if (!mapCreate) {
     return false;
@@ -140,8 +141,8 @@ blk.server.ServerNetService.prototype.handleMapCreate_ = function(packet,
  * @param {!gf.net.PacketReader} reader Packet reader.
  * @return {boolean} True if the packet was handled successfully.
  */
-blk.server.ServerNetService.prototype.handleRequestChunkData_ = function(packet,
-    packetType, reader) {
+blk.game.server.ServerNetService.prototype.handleRequestChunkData_ =
+    function(packet, packetType, reader) {
   var requestChunkData = blk.net.packets.RequestChunkData.read(reader);
   if (!requestChunkData) {
     return false;
@@ -181,8 +182,8 @@ blk.server.ServerNetService.prototype.handleRequestChunkData_ = function(packet,
  * @param {!gf.net.PacketReader} reader Packet reader.
  * @return {boolean} True if the packet was handled successfully.
  */
-blk.server.ServerNetService.prototype.handleSetBlock_ = function(packet,
-    packetType, reader) {
+blk.game.server.ServerNetService.prototype.handleSetBlock_ =
+    function(packet, packetType, reader) {
   var setBlock = blk.net.packets.SetBlock.read(reader);
   if (!setBlock) {
     return false;
@@ -207,8 +208,8 @@ blk.server.ServerNetService.prototype.handleSetBlock_ = function(packet,
  * @param {!gf.net.PacketReader} reader Packet reader.
  * @return {boolean} True if the packet was handled successfully.
  */
-blk.server.ServerNetService.prototype.handleMove_ = function(packet,
-    packetType, reader) {
+blk.game.server.ServerNetService.prototype.handleMove_ =
+    function(packet, packetType, reader) {
   var move = blk.net.packets.Move.read(reader);
   if (!move) {
     return false;
@@ -228,4 +229,4 @@ blk.server.ServerNetService.prototype.handleMove_ = function(packet,
  * @private
  * @type {!gf.net.PacketWriter}
  */
-blk.server.ServerNetService.packetWriter_ = new gf.net.PacketWriter();
+blk.game.server.ServerNetService.packetWriter_ = new gf.net.PacketWriter();
