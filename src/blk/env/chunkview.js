@@ -177,6 +177,15 @@ blk.env.ChunkView.SIZE_Y_ = 1;
 
 
 /**
+ * @override
+ */
+blk.env.ChunkView.prototype.disposeInternal = function() {
+  goog.disposeAll(this.observers_);
+  goog.base(this, 'disposeInternal');
+};
+
+
+/**
  * Calculates an estimated draw distance, in world units.
  * @return {number} Draw distance.
  */

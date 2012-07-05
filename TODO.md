@@ -142,3 +142,90 @@ Experiments
 
 * investigate dtrace probes for server:
     http://mcavage.github.com/node-restify/#DTrace
+
+
+
+Runtime config
+==============
+
+gf.config.Configuration()
+    addListener(callback, opt_scope)
+    removeListener(callback, opt_scope)
+    registerVariable(variable)
+    getVariables(opt_prefix) -> [variables]
+    getVariableValue(name) -> res
+    setVariableValue(name, str)
+    registerCommand(command)
+    getCommands(opt_prefix) -> [commands]
+    callCommand(name, opt_args) -> res
+    exec(str) -> res
+
+gf.config.Variable()
+    name, description
+    type (string|bool|number)
+    access (admin|debug|host|user|guest)
+    getter, setter=
+
+gf.config.Command()
+    name, description
+    args (CommandArg: name, type, optional)
+    access
+    callback
+
+gf.config.net.ConfigService(session, config)
+gf.config.net.ClientConfigService(session, config)
+    send(str) -> deferred
+    poll() -> [update config, dispatch query results]
+gf.config.net.ServerConfigService(session, config)
+    [config.addListener(this)] -> post
+
+
+Game
+====
+
+blk.game.ServerGame
+    game, netService, players
+    createMap/loadMap/setBlock(s?)
+    createEntity/deleteEntity/updateEntity/moveEntity
+blk.game.ClientGame
+    game, netService, players
+
+
+blk.game.Player:
+    user
+    color/skin/etc
+    ?entity
+    abstract createView/deleteView/updateView/moveView/bindView(entity)
+    abstract update
+
+blk.game.ServerPlayer:
+    impls of view stuff
+    send queue
+
+blk.game.ClientPlayer:
+    impls of view stuff
+
+
+Move existing ClientGame/ServerGame logic to:
+blk.game.building.ServerGameController|ClientGameController
+
+
+GameView
+=========
+    position, rotation
+    boundEntity
+    ChunkView
+    update(): pull from boundEntity, if needed
+
+ServerGameView|ClientGameView
+
+ServerGameViewObserver(MapObserver):
+
+
+
+Entity
+======
+
+* refactor:
+    *
+
