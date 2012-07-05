@@ -29,7 +29,7 @@ goog.require('goog.style');
  *
  * @constructor
  * @extends {goog.Disposable}
- * @param {!blk.client.ClientGame} game Client game.
+ * @param {!blk.game.client.ClientGame} game Client game.
  * @param {Function} template The Soy template defining the element's content.
  * @param {Object=} opt_templateData The data for the template.
  */
@@ -38,7 +38,7 @@ blk.ui.Widget = function(game, template, opt_templateData) {
 
   /**
    * @protected
-   * @type {!blk.client.ClientGame}
+   * @type {!blk.game.client.ClientGame}
    */
   this.game = game;
 

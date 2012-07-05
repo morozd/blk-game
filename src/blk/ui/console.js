@@ -34,14 +34,14 @@ goog.require('goog.vec.Vec4');
  *
  * @constructor
  * @extends {goog.Disposable}
- * @param {!blk.client.ClientGame} game Game.
+ * @param {!blk.game.client.ClientGame} game Game.
  */
 blk.ui.Console = function(game) {
   goog.base(this);
 
   /**
    * Game.
-   * @type {!blk.client.ClientGame}
+   * @type {!blk.game.client.ClientGame}
    */
   this.game = game;
 

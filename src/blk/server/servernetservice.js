@@ -32,14 +32,14 @@ goog.require('gf.net.PacketWriter');
  *
  * @constructor
  * @extends {gf.net.NetworkService}
- * @param {!blk.server.ServerGame} game Game.
+ * @param {!blk.game.server.ServerGame} game Game.
  */
 blk.server.ServerNetService = function(game) {
   goog.base(this, game.session);
 
   /**
    * Game.
-   * @type {!blk.server.ServerGame}
+   * @type {!blk.game.server.ServerGame}
    */
   this.game = game;
 };

@@ -14,35 +14,34 @@
  * limitations under the License.
  */
 
-goog.provide('blk.ui.Toolbar');
+goog.provide('blk.game.client.ClientPlayer');
 
-goog.require('blk.ui.Widget');
-goog.require('blk.ui.toolbar');
-goog.require('goog.style');
+goog.require('blk.game.Player');
 
 
 
 /**
- * Toolbar overlay.
+ * Client-side player.
  *
  * @constructor
- * @extends {blk.ui.Widget}
- * @param {!blk.game.client.ClientGame} game Client game.
+ * @extends {blk.game.Player}
+ * @param {!blk.game.client.ClientGame} game Game.
+ * @param {!gf.net.User} user Net user.
  */
-blk.ui.Toolbar = function(game) {
-  goog.base(this, game, blk.ui.toolbar.bar, {
-  });
+blk.game.client.ClientPlayer = function(game, user) {
+  goog.base(this, user);
 
-  goog.style.setUnselectable(this.root, true);
+  /**
+   * Current game.
+   * @type {!blk.game.client.ClientGame}
+   */
+  this.game = game;
 };
-goog.inherits(blk.ui.Toolbar, blk.ui.Widget);
+goog.inherits(blk.game.client.ClientPlayer, blk.game.Player);
 
 
 /**
  * @override
  */
-blk.ui.Toolbar.prototype.enterDocument = function() {
-  goog.base(this, 'enterDocument');
-
-  // TODO(benvanik): add block elements, wire up events, etc
+blk.game.client.ClientPlayer.prototype.update = function(frame) {
 };

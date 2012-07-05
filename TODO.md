@@ -198,11 +198,11 @@ blk.game.Player:
     abstract createView/deleteView/updateView/moveView/bindView(entity)
     abstract update
 
-blk.game.ServerPlayer:
+blk.game.server.ServerPlayer:
     impls of view stuff
     send queue
 
-blk.game.ClientPlayer:
+blk.game.client.ClientPlayer:
     impls of view stuff
 
 

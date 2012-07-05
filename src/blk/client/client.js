@@ -16,8 +16,8 @@
 
 goog.provide('blk.client.start');
 
-goog.require('blk.client.ClientGame');
 goog.require('blk.client.LaunchOptions');
+goog.require('blk.game.client.ClientGame');
 goog.require('blk.game.client.UserSettings');
 goog.require('blk.net.packets');
 goog.require('blk.ui.Popup');
@@ -131,7 +131,8 @@ blk.client.start = function(uri, sourceMode, doc, opt_args) {
     connectDialog.cancel();
 
     // Create game
-    var game = new blk.client.ClientGame(launchOptions, settings, dom, session);
+    var game = new blk.game.client.ClientGame(
+        launchOptions, settings, dom, session);
 
     // HACK: debug root - useful for inspecting the game state
     if (goog.DEBUG) {

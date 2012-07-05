@@ -28,13 +28,13 @@ goog.require('goog.Timer');
  *
  * @constructor
  * @extends {goog.Disposable}
- * @param {!blk.client.ClientGame} game Game.
+ * @param {!blk.game.client.ClientGame} game Game.
  */
 blk.game.client.MusicController = function(game) {
   goog.base(this);
 
   /**
-   * @type {!blk.client.ClientGame}
+   * @type {!blk.game.client.ClientGame}
    */
   this.game = game;
 

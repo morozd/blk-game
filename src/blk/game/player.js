@@ -17,7 +17,6 @@
 goog.provide('blk.game.Player');
 
 goog.require('goog.Disposable');
-goog.require('goog.asserts');
 
 
 
@@ -55,10 +54,6 @@ blk.game.Player = function(user) {
    * @type {blk.env.ChunkView}
    */
   this.view = null;
-
-  // Entangle us with the user
-  goog.asserts.assert(!user.data);
-  user.data = this;
 };
 goog.inherits(blk.game.Player, goog.Disposable);
 
@@ -72,6 +67,7 @@ blk.game.Player.prototype.getUser = function() {
 
 
 /**
- *
+ * Updates the player-related logic.
+ * @param {!gf.UpdateFrame} frame Current frame.
  */
 blk.game.Player.prototype.update = goog.abstractMethod;

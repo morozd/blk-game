@@ -31,7 +31,7 @@ goog.require('goog.style');
  *
  * @constructor
  * @extends {blk.ui.Widget}
- * @param {!blk.client.ClientGame} game Client game.
+ * @param {!blk.game.client.ClientGame} game Client game.
  */
 blk.ui.PlayerListing = function(game) {
   goog.base(this, game, blk.ui.playerlisting.listing, {

@@ -27,14 +27,14 @@ goog.require('blk.env.MapObserver');
  *
  * @constructor
  * @implements {blk.env.MapObserver}
- * @param {!blk.server.ServerGame} game Server game.
+ * @param {!blk.game.server.ServerGame} game Server game.
  * @param {!blk.game.Player} player Player.
  * @param {!blk.env.ChunkView} view Active view.
  */
 blk.server.ServerMapObserver = function(game, player, view) {
   /**
    * Server game.
-   * @type {!blk.server.ServerGame}
+   * @type {!blk.game.server.ServerGame}
    */
   this.game = game;
 

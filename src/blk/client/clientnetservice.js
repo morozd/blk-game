@@ -36,14 +36,14 @@ goog.require('goog.vec.Vec4');
  *
  * @constructor
  * @extends {gf.net.NetworkService}
- * @param {!blk.client.ClientGame} game Game.
+ * @param {!blk.game.client.ClientGame} game Game.
  */
 blk.client.ClientNetService = function(game) {
   goog.base(this, game.session);
 
   /**
    * Game.
-   * @type {!blk.client.ClientGame}
+   * @type {!blk.game.client.ClientGame}
    */
   this.game = game;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-goog.provide('blk.server.ServerGame');
+goog.provide('blk.game.server.ServerGame');
 
 goog.require('blk.GameState');
 goog.require('blk.env.ChunkView');
@@ -52,7 +52,7 @@ goog.require('goog.vec.Vec3');
  * @param {!blk.io.MapStore} mapStore Map storage provider, ownership
  *     transferred.
  */
-blk.server.ServerGame = function(launchOptions, session, mapStore) {
+blk.game.server.ServerGame = function(launchOptions, session, mapStore) {
   goog.base(this, launchOptions, session.clock);
 
   /**
@@ -142,13 +142,13 @@ blk.server.ServerGame = function(launchOptions, session, mapStore) {
   // Start accepting connections
   this.session.ready();
 };
-goog.inherits(blk.server.ServerGame, gf.Game);
+goog.inherits(blk.game.server.ServerGame, gf.Game);
 
 
 /**
  * @override
  */
-blk.server.ServerGame.prototype.disposeInternal = function() {
+blk.game.server.ServerGame.prototype.disposeInternal = function() {
   if (this.browserUpdateId_) {
     goog.global.clearTimeout(this.browserUpdateId_);
     this.browserUpdateId_ = null;
@@ -165,7 +165,7 @@ blk.server.ServerGame.prototype.disposeInternal = function() {
  * Updates the server browser with the current user info.
  * @private
  */
-blk.server.ServerGame.prototype.updateBrowser_ = function() {
+blk.game.server.ServerGame.prototype.updateBrowser_ = function() {
   if (!this.browserClient_) {
     return;
   }
@@ -190,7 +190,7 @@ blk.server.ServerGame.prototype.updateBrowser_ = function() {
 /**
  * @override
  */
-blk.server.ServerGame.prototype.update = function(frame) {
+blk.game.server.ServerGame.prototype.update = function(frame) {
   var state = this.state;
   var map = state.map;
 
@@ -234,13 +234,14 @@ blk.server.ServerGame.prototype.update = function(frame) {
  * Handles a new user.
  * @param {!gf.net.User} user User that connected.
  */
-blk.server.ServerGame.prototype.handleUserConnect = function(user) {
+blk.game.server.ServerGame.prototype.handleUserConnect = function(user) {
   var map = this.state.map;
 
   gf.log.write('client connected', user.sessionId, user.info, user.agent);
 
   // Create player
   var player = new blk.game.server.ServerPlayer(this, user);
+  user.data = player;
   this.state.addPlayer(player);
 
   // Add to chat channels
@@ -309,7 +310,7 @@ blk.server.ServerGame.prototype.handleUserConnect = function(user) {
  * Handles a dead user.
  * @param {!gf.net.User} user User that disconnected.
  */
-blk.server.ServerGame.prototype.handleUserDisconnect = function(user) {
+blk.game.server.ServerGame.prototype.handleUserDisconnect = function(user) {
   var map = this.state.map;
 
   gf.log.write('client disconnected', user.sessionId);
@@ -348,7 +349,8 @@ blk.server.ServerGame.prototype.handleUserDisconnect = function(user) {
  * @param {number} blockData Block data.
  * @return {boolean} False if an error occurred setting the block.
  */
-blk.server.ServerGame.prototype.setBlock = function(user, x, y, z, blockData) {
+blk.game.server.ServerGame.prototype.setBlock =
+    function(user, x, y, z, blockData) {
   var player = /** @type {blk.game.Player} */ (user.data);
   if (!player || !player.view) {
     return false;
@@ -384,7 +386,7 @@ blk.server.ServerGame.prototype.setBlock = function(user, x, y, z, blockData) {
  * @param {!Array.<!blk.physics.MoveCommand>} commands Move commands.
  * @return {boolean} False if an error occurred moving the player.
  */
-blk.server.ServerGame.prototype.movePlayer = function(user, commands) {
+blk.game.server.ServerGame.prototype.movePlayer = function(user, commands) {
   var player = /** @type {!blk.game.server.ServerPlayer} */ (user.data);
 
   if (player.movement) {
@@ -398,5 +400,5 @@ blk.server.ServerGame.prototype.movePlayer = function(user, commands) {
 /**
  * @override
  */
-blk.server.ServerGame.prototype.render = function(frame) {
+blk.game.server.ServerGame.prototype.render = function(frame) {
 };

@@ -34,7 +34,7 @@ goog.require('goog.style');
  *
  * @constructor
  * @extends {blk.ui.Popup}
- * @param {!blk.client.ClientGame} game Client game.
+ * @param {!blk.game.client.ClientGame} game Client game.
  * @param {goog.dom.DomHelper=} opt_domHelper The DOM helper used to
  *     create DOM nodes; defaults to {@code goog.dom.getDomHelper}.
  * @param {Element=} opt_parent Parent DOM element to render into.
@@ -49,7 +49,7 @@ blk.ui.popups.Settings = function(game, opt_domHelper, opt_parent) {
   /**
    * Client game.
    * @private
-   * @type {!blk.client.ClientGame}
+   * @type {!blk.game.client.ClientGame}
    */
   this.game_ = game;
 };
@@ -286,7 +286,7 @@ blk.ui.popups.Settings.prototype.beforeClose = function(buttonId) {
  * Shows the settings dialog and returns a deferred that is signalled when the
  * popup closes.
  *
- * @param {!blk.client.ClientGame} game Client game.
+ * @param {!blk.game.client.ClientGame} game Client game.
  * @param {goog.dom.DomHelper=} opt_domHelper The DOM helper used to
  *     create DOM nodes; defaults to {@code goog.dom.getDomHelper}.
  * @param {Element=} opt_parent Parent DOM element to render into.

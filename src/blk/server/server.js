@@ -16,11 +16,11 @@
 
 goog.provide('blk.server.start');
 
+goog.require('blk.game.server.ServerGame');
 goog.require('blk.io.FileMapStore');
 goog.require('blk.io.MemoryMapStore');
 goog.require('blk.net.packets');
 goog.require('blk.server.LaunchOptions');
-goog.require('blk.server.ServerGame');
 goog.require('gf');
 goog.require('gf.LaunchOptions');
 goog.require('gf.io.node');
@@ -122,7 +122,7 @@ blk.server.start = function(uri, args) {
 blk.server.launchServer_ = function(launchOptions, session, mapStore,
     deferred) {
   // Create game
-  var game = new blk.server.ServerGame(launchOptions, session, mapStore);
+  var game = new blk.game.server.ServerGame(launchOptions, session, mapStore);
 
   // HACK: debug root - useful for inspecting the game state
   if (goog.DEBUG) {

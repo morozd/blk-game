@@ -30,7 +30,7 @@ goog.require('goog.vec.Vec3');
  *
  * @constructor
  * @extends {blk.game.Player}
- * @param {!blk.server.ServerGame} game Game.
+ * @param {!blk.game.server.ServerGame} game Game.
  * @param {!gf.net.User} user Net user.
  */
 blk.game.server.ServerPlayer = function(game, user) {
@@ -38,7 +38,7 @@ blk.game.server.ServerPlayer = function(game, user) {
 
   /**
    * Current game.
-   * @type {!blk.server.ServerGame}
+   * @type {!blk.game.server.ServerGame}
    */
   this.game = game;
 
@@ -71,8 +71,7 @@ goog.inherits(blk.game.server.ServerPlayer, blk.game.Player);
 
 
 /**
- * Updates the server player, processing queued network actions/etc.
- * @param {!gf.UpdateFrame} frame Current frame.
+ * @override
  */
 blk.game.server.ServerPlayer.prototype.update = function(frame) {
   // Process movement
