@@ -28,7 +28,7 @@ goog.require('blk.env.MapObserver');
  * @constructor
  * @implements {blk.env.MapObserver}
  * @param {!blk.server.ServerGame} game Server game.
- * @param {!blk.Player} player Player.
+ * @param {!blk.game.Player} player Player.
  * @param {!blk.env.ChunkView} view Active view.
  */
 blk.server.ServerMapObserver = function(game, player, view) {
@@ -40,7 +40,7 @@ blk.server.ServerMapObserver = function(game, player, view) {
 
   /**
    * Player the target chunk view is associated with.
-   * @type {!blk.Player}
+   * @type {!blk.game.Player}
    */
   this.player = player;
 

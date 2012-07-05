@@ -151,7 +151,7 @@ blk.server.ServerNetService.prototype.handleRequestChunkData_ = function(packet,
   if (!user) {
     return false;
   }
-  var player = /** @type {blk.Player} */ (user.data);
+  var player = /** @type {blk.game.Player} */ (user.data);
   if (!player) {
     return false;
   }

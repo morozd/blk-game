@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-goog.provide('blk.client.MusicController');
+goog.provide('blk.game.client.MusicController');
 
 goog.require('blk.assets.audio.Music');
 goog.require('goog.Disposable');
@@ -30,7 +30,7 @@ goog.require('goog.Timer');
  * @extends {goog.Disposable}
  * @param {!blk.client.ClientGame} game Game.
  */
-blk.client.MusicController = function(game) {
+blk.game.client.MusicController = function(game) {
   goog.base(this);
 
   /**
@@ -77,13 +77,13 @@ blk.client.MusicController = function(game) {
   // Setup a first playback
   this.scheduleNextPlay_(0);
 };
-goog.inherits(blk.client.MusicController, goog.Disposable);
+goog.inherits(blk.game.client.MusicController, goog.Disposable);
 
 
 /**
  * @override
  */
-blk.client.MusicController.prototype.disposeInternal = function() {
+blk.game.client.MusicController.prototype.disposeInternal = function() {
   this.stop();
   goog.base(this, 'disposeInternal');
 };
@@ -93,7 +93,7 @@ blk.client.MusicController.prototype.disposeInternal = function() {
  * Sets whether music should be muted.
  * @param {boolean} value Whether music should be muted.
  */
-blk.client.MusicController.prototype.setMuted = function(value) {
+blk.game.client.MusicController.prototype.setMuted = function(value) {
   if (this.isMuted_ == value) {
     return;
   }
@@ -108,7 +108,7 @@ blk.client.MusicController.prototype.setMuted = function(value) {
 /**
  * Starts playing a track if none are playing or stops the playing track.
  */
-blk.client.MusicController.prototype.togglePlayback = function() {
+blk.game.client.MusicController.prototype.togglePlayback = function() {
   if (this.isPlaying_) {
     this.stop();
   } else {
@@ -123,7 +123,7 @@ blk.client.MusicController.prototype.togglePlayback = function() {
  * @const
  * @type {number}
  */
-blk.client.MusicController.MIN_PLAYBACK_INTERVAL_ = 10;
+blk.game.client.MusicController.MIN_PLAYBACK_INTERVAL_ = 10;
 
 
 /**
@@ -132,7 +132,7 @@ blk.client.MusicController.MIN_PLAYBACK_INTERVAL_ = 10;
  * @const
  * @type {number}
  */
-blk.client.MusicController.AVG_PLAYBACK_INTERVAL_ = 60;
+blk.game.client.MusicController.AVG_PLAYBACK_INTERVAL_ = 60;
 
 
 /**
@@ -141,9 +141,10 @@ blk.client.MusicController.AVG_PLAYBACK_INTERVAL_ = 60;
  * @param {number} minTime Minimum amount of time that must elapse before
  *     playback can begin, in ms.
  */
-blk.client.MusicController.prototype.scheduleNextPlay_ = function(minTime) {
-  var silence = (blk.client.MusicController.MIN_PLAYBACK_INTERVAL_ +
-      Math.random() * blk.client.MusicController.AVG_PLAYBACK_INTERVAL_);
+blk.game.client.MusicController.prototype.scheduleNextPlay_ =
+    function(minTime) {
+  var silence = (blk.game.client.MusicController.MIN_PLAYBACK_INTERVAL_ +
+      Math.random() * blk.game.client.MusicController.AVG_PLAYBACK_INTERVAL_);
   silence *= 1000;
   var nextStart = minTime + silence;
   goog.Timer.clear(this.nextTimerId_);
@@ -154,7 +155,7 @@ blk.client.MusicController.prototype.scheduleNextPlay_ = function(minTime) {
 /**
  * Starts playing a random track.
  */
-blk.client.MusicController.prototype.playRandom = function() {
+blk.game.client.MusicController.prototype.playRandom = function() {
   if (this.isMuted_) {
     return;
   }
@@ -184,7 +185,7 @@ blk.client.MusicController.prototype.playRandom = function() {
 /**
  * Stops any playback that may be occuring.
  */
-blk.client.MusicController.prototype.stop = function() {
+blk.game.client.MusicController.prototype.stop = function() {
   if (this.nextTimerId_ !== null) {
     goog.Timer.clear(this.nextTimerId_);
     this.nextTimerId_ = null;

@@ -436,7 +436,7 @@ blk.env.client.ViewManager.prototype.rebuildAll = function() {
  * Renders the map.
  * @param {!gf.RenderFrame} frame Render frame.
  * @param {!gf.vec.Viewport} viewport Current viewport.
- * @param {blk.Player=} opt_localPlayer Local player, to prevent rendering.
+ * @param {blk.game.Player=} opt_localPlayer Local player, to prevent rendering.
  */
 blk.env.client.ViewManager.prototype.render = function(frame, viewport,
     opt_localPlayer) {

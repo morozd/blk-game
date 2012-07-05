@@ -17,16 +17,16 @@
 goog.provide('blk.client.ClientGame');
 
 goog.require('blk.GameState');
-goog.require('blk.Player');
 goog.require('blk.assets.audio.Bank1');
 goog.require('blk.client.ClientNetService');
-goog.require('blk.client.MusicController');
 goog.require('blk.env');
 goog.require('blk.env.ChunkView');
 goog.require('blk.env.Entity');
 goog.require('blk.env.blocks.BlockID');
 goog.require('blk.env.client.ClientMap');
 goog.require('blk.env.client.ViewManager');
+goog.require('blk.game.Player');
+goog.require('blk.game.client.MusicController');
 goog.require('blk.graphics.RenderState');
 goog.require('blk.net.packets.SetBlock');
 goog.require('blk.physics.ClientMovement');
@@ -65,7 +65,7 @@ goog.require('goog.vec.Vec4');
  * @constructor
  * @extends {gf.Game}
  * @param {!blk.client.LaunchOptions} launchOptions Launch options.
- * @param {!blk.client.UserSettings} settings User settings.
+ * @param {!blk.game.client.UserSettings} settings User settings.
  * @param {!goog.dom.DomHelper} dom DOM helper.
  * @param {!gf.net.ClientSession} session Client session.
  */
@@ -80,7 +80,7 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
 
   /**
    * User settings.
-   * @type {!blk.client.UserSettings}
+   * @type {!blk.game.client.UserSettings}
    */
   this.settings = settings;
 
@@ -172,7 +172,7 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
   // Add all players currently in the session
   for (var n = 0; n < session.users.length; n++) {
     var user = session.users[n];
-    var player = new blk.Player(user);
+    var player = new blk.game.Player(user);
     this.state.addPlayer(player);
   }
 
@@ -236,9 +236,9 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
    * Music controller.
    * Handles automatic playback of music, track management, etc.
    * @private
-   * @type {!blk.client.MusicController}
+   * @type {!blk.game.client.MusicController}
    */
-  this.musicController_ = new blk.client.MusicController(this);
+  this.musicController_ = new blk.game.client.MusicController(this);
   this.registerDisposable(this.musicController_);
   this.musicController_.setMuted(this.settings.musicMuted);
 
@@ -297,7 +297,7 @@ blk.client.ClientGame = function(launchOptions, settings, dom, session) {
 
   /**
    * Local player.
-   * @type {blk.Player}
+   * @type {blk.game.Player}
    */
   this.localPlayer = null;
 
@@ -483,7 +483,7 @@ blk.client.ClientGame.prototype.update = function(frame) {
  */
 blk.client.ClientGame.prototype.handleUserConnect = function(user) {
   // Create player
-  var player = new blk.Player(user);
+  var player = new blk.game.Player(user);
   this.state.addPlayer(player);
 
   // TODO(benvanik): join/leave sound
@@ -505,7 +505,7 @@ blk.client.ClientGame.prototype.handleUserConnect = function(user) {
  * @param {!gf.net.User} user User.
  */
 blk.client.ClientGame.prototype.handleUserDisconnect = function(user) {
-  var player = /** @type {blk.Player} */ (user.data);
+  var player = /** @type {blk.game.Player} */ (user.data);
   goog.asserts.assert(player);
   if (!player) {
     return;
@@ -597,7 +597,7 @@ blk.client.ClientGame.prototype.createEntity = function(entityId, userId) {
     // Self
     gf.log.write('self create', entityId);
     // Bind entity and player
-    entity.player = /** @type {!blk.Player} */ (localUser.data);
+    entity.player = /** @type {!blk.game.Player} */ (localUser.data);
     entity.player.entity = entity;
   } else {
     // Others
@@ -612,7 +612,8 @@ blk.client.ClientGame.prototype.createEntity = function(entityId, userId) {
   if (entity) {
     this.state.map.addEntity(entity);
 
-    entity.title = entity.player ? entity.player.user.info.displayName : null;
+    var user = entity.player ? entity.player.getUser() : null;
+    entity.title = user ? user.info.displayName : null;
 
     if (entity == this.getLocalEntity()) {
       entity.confirmedState = entity.state.clone();

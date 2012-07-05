@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-goog.provide('blk.Player');
+goog.provide('blk.game.Player');
 
 goog.require('goog.Disposable');
 goog.require('goog.asserts');
@@ -28,20 +28,15 @@ goog.require('goog.asserts');
  * @extends {goog.Disposable}
  * @param {!gf.net.User} user Net user.
  */
-blk.Player = function(user) {
+blk.game.Player = function(user) {
   goog.base(this);
 
   /**
    * Net user.
+   * @protected
    * @type {!gf.net.User}
    */
   this.user = user;
-
-  /**
-   * Chunk view.
-   * @type {blk.env.ChunkView}
-   */
-  this.view = null;
 
   /**
    * Player color/skin.
@@ -55,9 +50,28 @@ blk.Player = function(user) {
    */
   this.entity = null;
 
+  /**
+   * Chunk view.
+   * @type {blk.env.ChunkView}
+   */
+  this.view = null;
+
   // Entangle us with the user
   goog.asserts.assert(!user.data);
   user.data = this;
 };
-goog.inherits(blk.Player, goog.Disposable);
+goog.inherits(blk.game.Player, goog.Disposable);
 
+
+/**
+ * @return {!gf.net.User} The net user the player is associated with.
+ */
+blk.game.Player.prototype.getUser = function() {
+  return this.user;
+};
+
+
+/**
+ *
+ */
+blk.game.Player.prototype.update = goog.abstractMethod;

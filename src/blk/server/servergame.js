@@ -21,6 +21,7 @@ goog.require('blk.env.ChunkView');
 goog.require('blk.env.Entity');
 goog.require('blk.env.MapParameters');
 goog.require('blk.env.server.ServerMap');
+goog.require('blk.game.server.ServerPlayer');
 goog.require('blk.io.ChunkSerializer');
 goog.require('blk.io.CompressionFormat');
 goog.require('blk.net.packets.EntityCreate');
@@ -31,7 +32,6 @@ goog.require('blk.net.packets.SetBlock');
 goog.require('blk.physics.ServerMovement');
 goog.require('blk.server.ServerMapObserver');
 goog.require('blk.server.ServerNetService');
-goog.require('blk.server.ServerPlayer');
 goog.require('gf');
 goog.require('gf.Game');
 goog.require('gf.log');
@@ -199,7 +199,8 @@ blk.server.ServerGame.prototype.update = function(frame) {
 
   // Player movement
   for (var n = 0; n < state.players.length; n++) {
-    var player = /** @type {!blk.server.ServerPlayer} */ (state.players[n]);
+    var player =
+        /** @type {!blk.game.server.ServerPlayer} */ (state.players[n]);
     player.update(frame);
   }
 
@@ -219,10 +220,11 @@ blk.server.ServerGame.prototype.update = function(frame) {
     }
   }
   for (var n = 0; n < this.state.players.length; n++) {
-    var player = /** @type {!blk.server.ServerPlayer} */ (state.players[n]);
+    var player =
+        /** @type {!blk.game.server.ServerPlayer} */ (state.players[n]);
     if (player.movement) {
       this.session.send(blk.net.packets.EntityPosition.createData(
-          player.movement.lastSequence, entityStates), player.user);
+          player.movement.lastSequence, entityStates), player.getUser());
     }
   }
 };
@@ -238,7 +240,7 @@ blk.server.ServerGame.prototype.handleUserConnect = function(user) {
   gf.log.write('client connected', user.sessionId, user.info, user.agent);
 
   // Create player
-  var player = new blk.server.ServerPlayer(this, user);
+  var player = new blk.game.server.ServerPlayer(this, user);
   this.state.addPlayer(player);
 
   // Add to chat channels
@@ -267,7 +269,7 @@ blk.server.ServerGame.prototype.handleUserConnect = function(user) {
     this.session.send(blk.net.packets.EntityCreate.createData(
         entity.id,
         entity.flags,
-        entity.player ? entity.player.user.wireId : 0xFF,
+        entity.player ? entity.player.getUser().wireId : 0xFF,
         entity.state.position,
         entity.state.rotation,
         entity.state.velocity), user);
@@ -291,7 +293,7 @@ blk.server.ServerGame.prototype.handleUserConnect = function(user) {
   this.session.send(blk.net.packets.EntityCreate.createData(
       entity.id,
       entity.flags,
-      entity.player ? entity.player.user.wireId : 0xFF,
+      entity.player ? entity.player.getUser().wireId : 0xFF,
       entity.state.position,
       entity.state.rotation,
       entity.state.velocity));
@@ -312,7 +314,7 @@ blk.server.ServerGame.prototype.handleUserDisconnect = function(user) {
 
   gf.log.write('client disconnected', user.sessionId);
 
-  var player = /** @type {blk.Player} */ (user.data);
+  var player = /** @type {blk.game.Player} */ (user.data);
   if (!player) {
     return;
   }
@@ -347,7 +349,7 @@ blk.server.ServerGame.prototype.handleUserDisconnect = function(user) {
  * @return {boolean} False if an error occurred setting the block.
  */
 blk.server.ServerGame.prototype.setBlock = function(user, x, y, z, blockData) {
-  var player = /** @type {blk.Player} */ (user.data);
+  var player = /** @type {blk.game.Player} */ (user.data);
   if (!player || !player.view) {
     return false;
   }
@@ -383,7 +385,7 @@ blk.server.ServerGame.prototype.setBlock = function(user, x, y, z, blockData) {
  * @return {boolean} False if an error occurred moving the player.
  */
 blk.server.ServerGame.prototype.movePlayer = function(user, commands) {
-  var player = /** @type {!blk.server.ServerPlayer} */ (user.data);
+  var player = /** @type {!blk.game.server.ServerPlayer} */ (user.data);
 
   if (player.movement) {
     player.movement.queueCommands(commands);

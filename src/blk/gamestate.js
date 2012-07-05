@@ -54,7 +54,7 @@ blk.GameState = function(runtime, session, map) {
 
   /**
    * Player listing.
-   * @type {!Array.<!blk.Player>}
+   * @type {!Array.<!blk.game.Player>}
    */
   this.players = [];
 };
@@ -63,7 +63,7 @@ goog.inherits(blk.GameState, goog.Disposable);
 
 /**
  * Adds a new player for the given user.
- * @param {!blk.Player} player New player.
+ * @param {!blk.game.Player} player New player.
  */
 blk.GameState.prototype.addPlayer = function(player) {
   this.players.push(player);
@@ -75,7 +75,7 @@ blk.GameState.prototype.addPlayer = function(player) {
  * @param {!gf.net.User} user User to remove.
  */
 blk.GameState.prototype.removePlayer = function(user) {
-  var player = /** @type {blk.Player} */ (user.data);
+  var player = /** @type {blk.game.Player} */ (user.data);
   goog.asserts.assert(player);
   if (!player) {
     return;
@@ -90,12 +90,12 @@ blk.GameState.prototype.removePlayer = function(user) {
 /**
  * Gets a player by session ID.
  * @param {string} sessionId User session ID.
- * @return {blk.Player} Player, if found.
+ * @return {blk.game.Player} Player, if found.
  */
 blk.GameState.prototype.getPlayerBySessionId = function(sessionId) {
   var user = this.session.getUserBySessionId(sessionId);
   if (user) {
-    return /** @type {blk.Player} */ (user.data);
+    return /** @type {blk.game.Player} */ (user.data);
   }
   return null;
 };
@@ -104,12 +104,12 @@ blk.GameState.prototype.getPlayerBySessionId = function(sessionId) {
 /**
  * Gets a player by wire ID.
  * @param {number} wireId User wire ID.
- * @return {blk.Player} Player, if found.
+ * @return {blk.game.Player} Player, if found.
  */
 blk.GameState.prototype.getPlayerByWireId = function(wireId) {
   var user = this.session.getUserByWireId(wireId);
   if (user) {
-    return /** @type {blk.Player} */ (user.data);
+    return /** @type {blk.game.Player} */ (user.data);
   }
   return null;
 };

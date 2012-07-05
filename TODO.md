@@ -185,7 +185,7 @@ Game
 
 blk.game.ServerGame
     game, netService, players
-    createMap/loadMap/setBlock(s?)
+    createMap/loadMap
     createEntity/deleteEntity/updateEntity/moveEntity
 blk.game.ClientGame
     game, netService, players
@@ -209,13 +209,12 @@ blk.game.ClientPlayer:
 Move existing ClientGame/ServerGame logic to:
 blk.game.building.ServerGameController|ClientGameController
 
-
-GameView
-=========
+blk.game.GameView:
     position, rotation
     boundEntity
     ChunkView
     update(): pull from boundEntity, if needed
+    setBlock(s?)
 
 ServerGameView|ClientGameView
 

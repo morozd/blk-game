@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-goog.provide('blk.client.UserSettings');
+goog.provide('blk.game.client.UserSettings');
 
 goog.require('blk.env.ChunkView');
 goog.require('goog.net.Cookies');
@@ -22,12 +22,13 @@ goog.require('goog.string');
 
 
 
+// TODO(benvanik): refactor into something cleaner/declarative
 /**
  * User settings that persist across sessions.
  * @constructor
  * @param {!goog.dom.DomHelper} dom DOM helper.
  */
-blk.client.UserSettings = function(dom) {
+blk.game.client.UserSettings = function(dom) {
   /**
    * @private
    * @type {!goog.dom.DomHelper}
@@ -38,19 +39,20 @@ blk.client.UserSettings = function(dom) {
    * User name used for display.
    * @type {string}
    */
-  this.userName = blk.client.UserSettings.DEFAULT_USER_NAME_;
+  this.userName = blk.game.client.UserSettings.DEFAULT_USER_NAME_;
 
   /**
    * Mouse sensitivity scalar. 1.0 is default, 1.0+ is more sensitive.
    * @type {number}
    */
-  this.mouseSensitivity = blk.client.UserSettings.DEFAULT_MOUSE_SENSITIVITY_;
+  this.mouseSensitivity =
+      blk.game.client.UserSettings.DEFAULT_MOUSE_SENSITIVITY_;
 
   /**
    * Whether to lock the mouse cursor on focus.
    * @type {boolean}
    */
-  this.mouseLock = blk.client.UserSettings.DEFAULT_MOUSE_LOCK_;
+  this.mouseLock = blk.game.client.UserSettings.DEFAULT_MOUSE_LOCK_;
 
   /**
    * View distance setting, in chunk units.
@@ -58,19 +60,19 @@ blk.client.UserSettings = function(dom) {
    * and {@see blk.env.ChunkView.MAX_CHUNK_RADIUS_XZ}.
    * @type {number}
    */
-  this.viewDistance = blk.client.UserSettings.DEFAULT_VIEW_DISTANCE_;
+  this.viewDistance = blk.game.client.UserSettings.DEFAULT_VIEW_DISTANCE_;
 
   /**
    * Whether sound FX playback is muted.
    * @type {boolean}
    */
-  this.soundFxMuted = blk.client.UserSettings.DEFAULT_SOUND_FX_MUTED_;
+  this.soundFxMuted = blk.game.client.UserSettings.DEFAULT_SOUND_FX_MUTED_;
 
   /**
    * Whether music playback is muted.
    * @type {boolean}
    */
-  this.musicMuted = blk.client.UserSettings.DEFAULT_MUSIC_MUTED_;
+  this.musicMuted = blk.game.client.UserSettings.DEFAULT_MUSIC_MUTED_;
 };
 
 
@@ -79,7 +81,7 @@ blk.client.UserSettings = function(dom) {
  * @const
  * @type {string}
  */
-blk.client.UserSettings.DEFAULT_USER_NAME_ = 'User';
+blk.game.client.UserSettings.DEFAULT_USER_NAME_ = 'User';
 
 
 /**
@@ -87,7 +89,7 @@ blk.client.UserSettings.DEFAULT_USER_NAME_ = 'User';
  * @const
  * @type {number}
  */
-blk.client.UserSettings.DEFAULT_MOUSE_SENSITIVITY_ = 1;
+blk.game.client.UserSettings.DEFAULT_MOUSE_SENSITIVITY_ = 1;
 
 
 /**
@@ -95,7 +97,7 @@ blk.client.UserSettings.DEFAULT_MOUSE_SENSITIVITY_ = 1;
  * @const
  * @type {boolean}
  */
-blk.client.UserSettings.DEFAULT_MOUSE_LOCK_ = true;
+blk.game.client.UserSettings.DEFAULT_MOUSE_LOCK_ = true;
 
 
 /**
@@ -103,7 +105,7 @@ blk.client.UserSettings.DEFAULT_MOUSE_LOCK_ = true;
  * @const
  * @type {number}
  */
-blk.client.UserSettings.DEFAULT_VIEW_DISTANCE_ =
+blk.game.client.UserSettings.DEFAULT_VIEW_DISTANCE_ =
     blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ;
 
 
@@ -112,7 +114,7 @@ blk.client.UserSettings.DEFAULT_VIEW_DISTANCE_ =
  * @const
  * @type {boolean}
  */
-blk.client.UserSettings.DEFAULT_SOUND_FX_MUTED_ = false;
+blk.game.client.UserSettings.DEFAULT_SOUND_FX_MUTED_ = false;
 
 
 /**
@@ -120,15 +122,15 @@ blk.client.UserSettings.DEFAULT_SOUND_FX_MUTED_ = false;
  * @const
  * @type {boolean}
  */
-blk.client.UserSettings.DEFAULT_MUSIC_MUTED_ = false;
+blk.game.client.UserSettings.DEFAULT_MUSIC_MUTED_ = false;
 
 
 /**
  * Clones the settings at their current values.
- * @return {!blk.client.UserSettings} A clone of the given instance.
+ * @return {!blk.game.client.UserSettings} A clone of the given instance.
  */
-blk.client.UserSettings.prototype.clone = function() {
-  var settings = new blk.client.UserSettings(this.dom_);
+blk.game.client.UserSettings.prototype.clone = function() {
+  var settings = new blk.game.client.UserSettings(this.dom_);
   settings.userName = this.userName;
   settings.mouseSensitivity = this.mouseSensitivity;
   settings.mouseLock = this.mouseLock;
@@ -142,13 +144,14 @@ blk.client.UserSettings.prototype.clone = function() {
 /**
  * Resets all settings to their defaults.
  */
-blk.client.UserSettings.prototype.reset = function() {
-  this.userName = blk.client.UserSettings.DEFAULT_USER_NAME_;
-  this.mouseSensitivity = blk.client.UserSettings.DEFAULT_MOUSE_SENSITIVITY_;
-  this.mouseLock = blk.client.UserSettings.DEFAULT_MOUSE_LOCK_;
-  this.viewDistance = blk.client.UserSettings.DEFAULT_VIEW_DISTANCE_;
-  this.soundFxMuted = blk.client.UserSettings.DEFAULT_SOUND_FX_MUTED_;
-  this.musicMuted = blk.client.UserSettings.DEFAULT_MUSIC_MUTED_;
+blk.game.client.UserSettings.prototype.reset = function() {
+  this.userName = blk.game.client.UserSettings.DEFAULT_USER_NAME_;
+  this.mouseSensitivity =
+      blk.game.client.UserSettings.DEFAULT_MOUSE_SENSITIVITY_;
+  this.mouseLock = blk.game.client.UserSettings.DEFAULT_MOUSE_LOCK_;
+  this.viewDistance = blk.game.client.UserSettings.DEFAULT_VIEW_DISTANCE_;
+  this.soundFxMuted = blk.game.client.UserSettings.DEFAULT_SOUND_FX_MUTED_;
+  this.musicMuted = blk.game.client.UserSettings.DEFAULT_MUSIC_MUTED_;
 };
 
 
@@ -156,17 +159,18 @@ blk.client.UserSettings.prototype.reset = function() {
  * Attempts to load settings from the persistent store.
  * Silently fails and sets defaults if they cannot be loaded.
  */
-blk.client.UserSettings.prototype.load = function() {
+blk.game.client.UserSettings.prototype.load = function() {
   var cookies = new goog.net.Cookies(this.dom_.getDocument());
   this.userName = /** @type {string} */ (cookies.get('s_un', this.userName));
   this.userName = goog.string.urlDecode(this.userName);
   if (this.userName.length < 1) {
-    this.userName = blk.client.UserSettings.DEFAULT_USER_NAME_;
+    this.userName = blk.game.client.UserSettings.DEFAULT_USER_NAME_;
   }
   this.mouseSensitivity =
       Number(cookies.get('s_ms', String(this.mouseSensitivity)));
   if (this.mouseSensitivity <= 0.0 || this.mouseSensitivity > 10) {
-    this.mouseSensitivity = blk.client.UserSettings.DEFAULT_MOUSE_SENSITIVITY_;
+    this.mouseSensitivity =
+        blk.game.client.UserSettings.DEFAULT_MOUSE_SENSITIVITY_;
   }
   this.mouseLock =
       cookies.get('s_ml', String(this.mouseLock)) == 'true';
@@ -174,7 +178,7 @@ blk.client.UserSettings.prototype.load = function() {
       Number(cookies.get('s_vd', String(this.viewDistance))) | 0;
   if (this.viewDistance <= blk.env.ChunkView.MIN_CHUNK_RADIUS_XZ ||
       this.viewDistance > blk.env.ChunkView.MAX_CHUNK_RADIUS_XZ) {
-    this.viewDistance = blk.client.UserSettings.DEFAULT_VIEW_DISTANCE_;
+    this.viewDistance = blk.game.client.UserSettings.DEFAULT_VIEW_DISTANCE_;
   }
   this.soundFxMuted =
       cookies.get('s_sm', String(this.soundFxMuted)) == 'true';
@@ -187,7 +191,7 @@ blk.client.UserSettings.prototype.load = function() {
  * Attempts to save settings to the persistent store.
  * Silently fails if they cannot be saved.
  */
-blk.client.UserSettings.prototype.save = function() {
+blk.game.client.UserSettings.prototype.save = function() {
   var cookies = new goog.net.Cookies(this.dom_.getDocument());
   cookies.set('s_un', goog.string.urlEncode(this.userName));
   cookies.set('s_ms', String(this.mouseSensitivity));

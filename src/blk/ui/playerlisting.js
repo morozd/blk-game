@@ -94,17 +94,18 @@ blk.ui.PlayerListing.prototype.refresh = function() {
   var players = this.game.state.players;
   goog.array.stableSort(players, function(a, b) {
     return goog.string.caseInsensitiveCompare(
-        a.user.info.displayName,
-        b.user.info.displayName);
+        a.getUser().info.displayName,
+        b.getUser().info.displayName);
   });
 
   for (var n = 0; n < players.length; n++) {
     var player = players[n];
+    var user = player.getUser();
     var playerEl = /** @type {Element} */ (goog.soy.renderAsFragment(
         blk.ui.playerlisting.player, {
-          sessionId: player.user.sessionId,
-          displayName: player.user.info.displayName,
-          latency: player.user.statistics.averageLatency
+          sessionId: user.sessionId,
+          displayName: user.info.displayName,
+          latency: user.statistics.averageLatency
         }, undefined, this.dom));
     goog.dom.appendChild(this.bodyEl_, playerEl);
   }

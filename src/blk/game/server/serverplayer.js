@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-goog.provide('blk.server.ServerPlayer');
+goog.provide('blk.game.server.ServerPlayer');
 
-goog.require('blk.Player');
 goog.require('blk.env.Chunk');
+goog.require('blk.game.Player');
 goog.require('blk.net.packets.ChunkData');
 goog.require('gf.net.PacketWriter');
 goog.require('goog.array');
@@ -29,11 +29,11 @@ goog.require('goog.vec.Vec3');
  * Server-side player.
  *
  * @constructor
- * @extends {blk.Player}
+ * @extends {blk.game.Player}
  * @param {!blk.server.ServerGame} game Game.
  * @param {!gf.net.User} user Net user.
  */
-blk.server.ServerPlayer = function(game, user) {
+blk.game.server.ServerPlayer = function(game, user) {
   goog.base(this, user);
 
   /**
@@ -67,14 +67,14 @@ blk.server.ServerPlayer = function(game, user) {
    */
   this.lastSortTime_ = 0;
 };
-goog.inherits(blk.server.ServerPlayer, blk.Player);
+goog.inherits(blk.game.server.ServerPlayer, blk.game.Player);
 
 
 /**
  * Updates the server player, processing queued network actions/etc.
  * @param {!gf.UpdateFrame} frame Current frame.
  */
-blk.server.ServerPlayer.prototype.update = function(frame) {
+blk.game.server.ServerPlayer.prototype.update = function(frame) {
   // Process movement
   if (this.movement) {
     this.movement.update(frame);
@@ -98,7 +98,7 @@ blk.server.ServerPlayer.prototype.update = function(frame) {
  * @const
  * @type {number}
  */
-blk.server.ServerPlayer.QUEUE_SORT_INTERVAL_ = 3;
+blk.game.server.ServerPlayer.QUEUE_SORT_INTERVAL_ = 3;
 
 
 /**
@@ -107,14 +107,14 @@ blk.server.ServerPlayer.QUEUE_SORT_INTERVAL_ = 3;
  * @const
  * @type {number}
  */
-blk.server.ServerPlayer.MAX_CHUNK_SENDS_ = 5;
+blk.game.server.ServerPlayer.MAX_CHUNK_SENDS_ = 5;
 
 
 /**
  * Queues chunk data for sending to the user.
  * @param {!blk.env.Chunk} chunk Chunk to send.
  */
-blk.server.ServerPlayer.prototype.queueChunkSend = function(chunk) {
+blk.game.server.ServerPlayer.prototype.queueChunkSend = function(chunk) {
   if (goog.array.contains(this.sendQueue_, chunk)) {
     return;
   }
@@ -128,13 +128,13 @@ blk.server.ServerPlayer.prototype.queueChunkSend = function(chunk) {
  * @private
  * @param {!gf.UpdateFrame} frame Current frame.
  */
-blk.server.ServerPlayer.prototype.processSendQueue_ = function(frame) {
-  var sendCount = Math.min(blk.server.ServerPlayer.MAX_CHUNK_SENDS_,
+blk.game.server.ServerPlayer.prototype.processSendQueue_ = function(frame) {
+  var sendCount = Math.min(blk.game.server.ServerPlayer.MAX_CHUNK_SENDS_,
       this.sendQueue_.length);
 
   // Re-sort the send list
   if (frame.time - this.lastSortTime_ >
-      blk.server.ServerPlayer.QUEUE_SORT_INTERVAL_) {
+      blk.game.server.ServerPlayer.QUEUE_SORT_INTERVAL_) {
     this.lastSortTime_ = frame.time;
     blk.env.Chunk.sortByDistanceFromPoint(this.sendQueue_, this.view.center);
   }
@@ -144,7 +144,7 @@ blk.server.ServerPlayer.prototype.processSendQueue_ = function(frame) {
 
     // Build the packet piece by piece
     // First write in the packet header
-    var writer = blk.server.ServerPlayer.packetWriter_;
+    var writer = blk.game.server.ServerPlayer.packetWriter_;
     var packet = blk.net.packets.ChunkData.writeInstance;
     packet.x = chunk.x;
     packet.y = chunk.y;
@@ -168,7 +168,7 @@ blk.server.ServerPlayer.prototype.processSendQueue_ = function(frame) {
  * @private
  * @type {!goog.vec.Vec3.Float32}
  */
-blk.server.ServerPlayer.tmpVec3_ = goog.vec.Vec3.createFloat32();
+blk.game.server.ServerPlayer.tmpVec3_ = goog.vec.Vec3.createFloat32();
 
 
 /**
@@ -176,4 +176,4 @@ blk.server.ServerPlayer.tmpVec3_ = goog.vec.Vec3.createFloat32();
  * @private
  * @type {!gf.net.PacketWriter}
  */
-blk.server.ServerPlayer.packetWriter_ = new gf.net.PacketWriter();
+blk.game.server.ServerPlayer.packetWriter_ = new gf.net.PacketWriter();

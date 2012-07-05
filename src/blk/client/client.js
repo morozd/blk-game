@@ -18,7 +18,7 @@ goog.provide('blk.client.start');
 
 goog.require('blk.client.ClientGame');
 goog.require('blk.client.LaunchOptions');
-goog.require('blk.client.UserSettings');
+goog.require('blk.game.client.UserSettings');
 goog.require('blk.net.packets');
 goog.require('blk.ui.Popup');
 goog.require('blk.ui.popups.status');
@@ -58,7 +58,7 @@ blk.client.start = function(uri, sourceMode, doc, opt_args) {
   var dom = new goog.dom.DomHelper(doc);
 
   var launchOptions = new blk.client.LaunchOptions(uri, opt_args);
-  var settings = new blk.client.UserSettings(dom);
+  var settings = new blk.game.client.UserSettings(dom);
   settings.load();
 
   //launchOptions.host = 'ws://127.0.0.1:1337';
