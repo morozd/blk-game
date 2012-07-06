@@ -92,12 +92,14 @@ copy_files(
 file_set(
     name='blk_audio_uncompiled_all',
     srcs=[
+        'assets/audio/base:base',
         'assets/audio/bank1:bank1',
         'assets/audio/music:music',
         ])
 file_set(
     name='blk_audio_compiled_all',
     srcs=[
+        'assets/audio/base:base_optimized',
         'assets/audio/bank1:bank1_optimized',
         'assets/audio/music:music_optimized',
         ])
