@@ -1,0 +1,122 @@
+/**
+ * Copyright 2012 Google, Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Templates used for the settings screen.
+ *
+ * @author benvanik@google.com (Ben Vanik)
+ */
+
+{namespace blk.ui.screens.settingsscreen}
+
+
+/**
+ * The settings dialog used for controlling user settings.
+ */
+{template .content}
+  {call blk.ui.popups.simplePopup data="all"}
+    {param header}
+      {msg desc="Settings and configuration header label."}
+        Settings
+      {/msg}
+    {/param}
+    {param body}
+      <div class="{css blkSettingsRow}">
+        <div class="{css blkSettingsLabel}">
+          {msg desc="User name settings header."}
+            Name:
+          {/msg}
+        </div>
+        <div class="{css blkSettingsValue}">
+          <input class="{css blkSettingsInput} {css blkSettingsNameValue}" type="text"/>
+        </div>
+      </div>
+      <div class="{css blkSettingsRow} {css blkSettingsSensitivitySlider}">
+        <div class="{css blkSettingsLabel}">
+          {msg desc="Settings related to mouse input."}
+            Mouse:
+          {/msg}
+        </div>
+        <div class="{css blkSettingsValue}">
+          <div class="{css blkSettingsCheckbox} {css blkSettingsMouseLock}">
+            <input type="checkbox" class="{css blkSettingsCheckboxInput}"/>
+            {msg desc="Enable mouse lock on focus to the control."}
+              Mouse Lock
+            {/msg}
+          </div>
+          <span class="{css blkSettingsLeft}">
+            {msg desc="Sensitivity of the mouse adjustment settings header."}
+              Sensitivity:
+            {/msg}
+            {sp}
+          </span>
+          <input class="{css blkSettingsSlider}" type="range" min="1" max="100" />
+          <div class="{css blkSettingsSliderLabel}"></div>
+          {sp}
+          <div class="{css blkSettingsSliderReset}">
+            {msg desc="Reset the value to the default."}
+              reset
+            {/msg}
+          </div>
+        </div>
+      </div>
+      <!--<div class="{css blkSettingsRow} {css blkSettingsDistanceSlider}">
+        <div class="{css blkSettingsLabel}">
+          {msg desc="View distance (how far the user can see) settings header."}
+            View Distance:
+          {/msg}
+        </div>
+        <div class="{css blkSettingsValue}">
+          <input class="{css blkSettingsSlider}" type="range" min="1" max="100" />
+          <div class="{css blkSettingsSliderLabel}"></div>
+          {sp}
+          <div class="{css blkSettingsSliderReset}">
+            {msg desc="Reset the value to the default."}
+              reset
+            {/msg}
+          </div>
+        </div>
+      </div>-->
+      <div class="{css blkSettingsRow} {css blkSettingsAudio}">
+        <div class="{css blkSettingsLabel}">
+          {msg desc="Audio/music settings header."}
+            Audio:
+          {/msg}
+        </div>
+        <div class="{css blkSettingsValue}">
+          <div class="{css blkSettingsCheckbox} {css blkSettingsSoundFx}">
+            <input type="checkbox" class="{css blkSettingsCheckboxInput}"/>
+            {msg desc="Enable sound effects."}
+              Sound FX
+            {/msg}
+          </div>
+          <div class="{css blkSettingsCheckbox} {css blkSettingsMusic}">
+            <input type="checkbox" class="{css blkSettingsCheckboxInput}"/>
+            {msg desc="Enable music."}
+              Music
+            {/msg}
+          </div>
+        </div>
+      </div>
+    {/param}
+    {param buttons}
+      {call blk.ui.popups.buttonSave}
+        {param focusDefault: true /}
+      {/call}
+      {call blk.ui.popups.buttonClose /}
+    {/param}
+  {/call}
+{/template}
