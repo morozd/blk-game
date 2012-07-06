@@ -8,12 +8,12 @@ GF = '../../../third_party/games-framework'
 include_rules(glob(GF + '/anvil_rules/**/*_rules.py'))
 
 audio_soundbank(
-    name='bank1',
-    class_name='blk.assets.audio.Bank1',
+    name='blocks',
+    class_name='blk.assets.audio.BlockSounds',
     srcs=glob('*.wav'))
 
 audio_soundbank(
-    name='bank1_optimized',
-    class_name='blk.assets.audio.Bank1',
+    name='blocks_optimized',
+    class_name='blk.assets.audio.BlockSounds',
     formats=['audio/wav', 'audio/ogg', 'audio/mpeg',],
     srcs=glob('*.wav'))
