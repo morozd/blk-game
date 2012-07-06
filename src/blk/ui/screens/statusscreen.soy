@@ -24,6 +24,34 @@
 
 
 /**
+ * An error dialog used when an unhandled error is encountered.
+ * @param location Location the error occurred ('setup', 'networking', etc).
+ * @param message Error message.
+ * @param arg Optional argument from a deferred callback.
+ */
+{template .error}
+  {call blk.ui.popups.simplePopup data="all"}
+    {param header}
+      {msg desc="Error occurred in a part of the program."}
+        Error in {$location}
+      {/msg}
+    {/param}
+    {param body}
+      {$message}
+      <br/>
+      {$arg}
+    {/param}
+    {param buttons}
+      {call blk.ui.popups.buttonReload}
+        {param focusDefault: true /}
+      {/call}
+      {call blk.ui.popups.buttonClose /}
+    {/param}
+  {/call}
+{/template}
+
+
+/**
  * A 'connecting...' dialog to use when initially connecting.
  * @param server_name Server host name the user is connecting to.
  */

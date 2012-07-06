@@ -30,6 +30,7 @@ goog.require('gf.graphics.RasterizerState');
 goog.require('gf.graphics.Resource');
 goog.require('gf.graphics.SpriteBuffer');
 goog.require('goog.asserts');
+goog.require('goog.async.DeferredList');
 goog.require('goog.vec.Vec3');
 goog.require('goog.webgl');
 
@@ -143,6 +144,20 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
   this.registerDisposable(this.blockBuilder);
 };
 goog.inherits(blk.graphics.RenderState, gf.graphics.Resource);
+
+
+/**
+ * Performs the initial setup of the render state.
+ * @return {!goog.async.Deferred} A deferred fulfilled when all render state is
+ *     ready for use.
+ */
+blk.graphics.RenderState.prototype.setup = function() {
+  // TODO(benvanik): wait for other textures/etc?
+  var deferreds = [
+    this.programCache_.setup()
+  ];
+  return new goog.async.DeferredList(deferreds);
+};
 
 
 /**

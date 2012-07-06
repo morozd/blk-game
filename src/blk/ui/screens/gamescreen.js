@@ -28,27 +28,15 @@ goog.require('gf.ui.Screen');
  * Game screen.
  * @constructor
  * @extends {gf.ui.Screen}
- * @param {!goog.dom.DomHelper} domHelper DOM helper used to create DOM nodes.
- * @param {!gf.dom.Display} display Display. Not retained.
+ * @param {!blk.game.client.ClientGame} game Client game.
+ * @param {!gf.net.ClientSession} session Connected network session.
  */
-blk.ui.screens.GameScreen = function(dom, parentElement, display) {
+blk.ui.screens.GameScreen = function(game, session) {
   goog.base(this,
       gf.ui.Screen.Flags.COVERS_DISPLAY |
       gf.ui.Screen.Flags.OPAQUE |
       gf.ui.Screen.Flags.MODAL_INPUT);
 
-  /**
-   * @private
-   * @type {!goog.dom.DomHelper}
-   */
-  this.dom_ = dom;
-
-  /**
-   * Display.
-   * Not disposed on screen close.
-   * @private
-   * @type {!gf.dom.Display}
-   */
-  this.display_ = display;
+  //
 };
 goog.inherits(blk.ui.screens.GameScreen, gf.ui.Screen);

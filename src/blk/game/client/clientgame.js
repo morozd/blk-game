@@ -16,61 +16,45 @@
 
 goog.provide('blk.game.client.ClientGame');
 
-goog.require('blk.GameState');
-goog.require('blk.assets.audio.Bank1');
-goog.require('blk.env');
-goog.require('blk.env.ChunkView');
-goog.require('blk.env.Entity');
-goog.require('blk.env.blocks.BlockID');
-goog.require('blk.env.client.ClientMap');
-goog.require('blk.env.client.ViewManager');
-goog.require('blk.game.client.ClientNetService');
-goog.require('blk.game.client.ClientPlayer');
+goog.require('blk.assets.audio.BaseSounds');
 goog.require('blk.game.client.MusicController');
 goog.require('blk.graphics.RenderState');
-goog.require('blk.net.packets.SetBlock');
-goog.require('blk.physics.ClientMovement');
-goog.require('blk.ui.Console');
-goog.require('blk.ui.Menubar');
-goog.require('blk.ui.PlayerListing');
-goog.require('blk.ui.Popup');
-goog.require('blk.ui.popups.Settings');
-goog.require('blk.ui.popups.help');
-goog.require('blk.ui.popups.status');
+goog.require('blk.net.packets');
+goog.require('blk.ui.screens.GameScreen');
+goog.require('blk.ui.screens.HelpScreen');
+goog.require('blk.ui.screens.MainMenuScreen');
+goog.require('blk.ui.screens.SettingsScreen');
+goog.require('blk.ui.screens.SplashScreen');
+goog.require('blk.ui.screens.StatusScreen');
 goog.require('gf.Game');
 goog.require('gf.assets.AssetManager');
 goog.require('gf.audio.AudioManager');
 goog.require('gf.dom.Display');
 goog.require('gf.graphics.GraphicsContext');
-goog.require('gf.input.Data');
 goog.require('gf.input.InputManager');
-goog.require('gf.input.MouseButton');
 goog.require('gf.log');
-goog.require('gf.net.DisconnectReason');
-goog.require('gf.net.SessionState');
-goog.require('gf.net.chat.ClientChatService');
-goog.require('gf.vec.Viewport');
+goog.require('gf.net');
+goog.require('gf.net.AuthToken');
+goog.require('gf.net.UserInfo');
+goog.require('gf.ui.ScreenManager');
+goog.require('goog.Uri');
 goog.require('goog.asserts');
-goog.require('goog.events.KeyCodes');
-goog.require('goog.vec.Mat4');
-goog.require('goog.vec.Quaternion');
-goog.require('goog.vec.Vec3');
-goog.require('goog.vec.Vec4');
+goog.require('goog.async.Deferred');
 
 
 
 /**
- * Test game client instance.
+ * Main game instance.
+ * This manages the game state and all modes.
  *
  * @constructor
  * @extends {gf.Game}
+ * @param {!goog.dom.DomHelper} dom DOM helper.
  * @param {!blk.client.LaunchOptions} launchOptions Launch options.
  * @param {!blk.game.client.UserSettings} settings User settings.
- * @param {!goog.dom.DomHelper} dom DOM helper.
- * @param {!gf.net.ClientSession} session Client session.
  */
-blk.game.client.ClientGame = function(launchOptions, settings, dom, session) {
-  goog.base(this, launchOptions, session.clock);
+blk.game.client.ClientGame = function(dom, launchOptions, settings) {
+  goog.base(this, launchOptions);
 
   /**
    * DOM helper.
@@ -85,153 +69,58 @@ blk.game.client.ClientGame = function(launchOptions, settings, dom, session) {
   this.settings = settings;
 
   /**
-   * Client session.
-   * @type {!gf.net.ClientSession}
-   */
-  this.session = session;
-
-  /**
-   * Client net service.
-   * @type {!blk.game.client.ClientNetService}
-   */
-  this.netService = new blk.game.client.ClientNetService(this);
-  this.session.registerService(this.netService);
-
-  /**
-   * Chat client.
-   * @type {!gf.net.chat.ClientChatService}
-   */
-  this.chat = new gf.net.chat.ClientChatService(session);
-  this.session.registerService(this.chat);
-
-  /**
    * Asset manager.
+   * @private
    * @type {!gf.assets.AssetManager}
    */
-  this.assetManager = new gf.assets.AssetManager(this, dom);
-  this.registerDisposable(this.assetManager);
+  this.assetManager_ = new gf.assets.AssetManager(this, this.dom);
+  this.registerDisposable(this.assetManager_);
+  this.addComponent(this.assetManager_);
 
   /**
    * Game display window.
+   * @private
    * @type {!gf.dom.Display}
    */
-  this.display = new gf.dom.Display(this.dom);
-  this.registerDisposable(this.display);
-
-  var attributes = /** @type {!WebGLContextAttributes} */ ({
-    alpha: false,
-    // TODO(benvanik): make configurable - right now makes things ugly and
-    //     and slow as hell on OSX (Air)
-    antialias: false
-  });
-  var graphicsContext = new gf.graphics.GraphicsContext(
-      this.dom, this.display.canvas.el);
-  var graphicsDeferred = graphicsContext.setup(attributes);
-  graphicsDeferred.addCallbacks(function() {
-    // Graphics ready
-  }, function(arg) {
-    // Graphics failed
-    goog.global.alert('Unable to initialize WebGL');
-  }, this);
-
-  /**
-   * Graphics context.
-   * @type {!gf.graphics.GraphicsContext}
-   */
-  this.graphicsContext = graphicsContext;
-  this.registerDisposable(this.graphicsContext);
-
-  /**
-   * Current viewport.
-   * @type {!gf.vec.Viewport}
-   */
-  this.viewport = new gf.vec.Viewport();
-
-  /**
-   * Current render state tracker.
-   * @type {!blk.graphics.RenderState}
-   */
-  this.renderState = new blk.graphics.RenderState(
-      this, this.assetManager, this.graphicsContext);
-  this.registerDisposable(this.renderState);
-
-  /**
-   * Map.
-   * @type {!blk.env.client.ClientMap}
-   */
-  this.map = new blk.env.client.ClientMap();
-  this.registerDisposable(this.map);
-
-  /**
-   * Current game state.
-   * @type {!blk.GameState}
-   */
-  this.state = new blk.GameState(this, session, this.map);
-  this.registerDisposable(this.state);
-
-  // Add all players currently in the session
-  for (var n = 0; n < session.users.length; n++) {
-    var user = session.users[n];
-    var player = new blk.game.client.ClientPlayer(this, user);
-    user.data = player;
-    this.state.addPlayer(player);
-  }
-
-  /**
-   * Local chunk view.
-   * @type {!blk.env.ChunkView}
-   */
-  this.localView = new blk.env.ChunkView(this.map,
-      blk.env.ChunkView.HIGH_CHUNK_RADIUS_XZ);
-  //blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ);
-  //this.settings.viewDistance);
-  this.map.addChunkView(this.localView);
-
-  /**
-   * Map view renderer.
-   * @type {!blk.env.client.ViewManager}
-   */
-  this.viewManager = new blk.env.client.ViewManager(
-      this.renderState, this.map, this.localView);
-  this.registerDisposable(this.viewManager);
-  this.localView.addObserver(this.viewManager);
-
-  this.localView.initialize(goog.vec.Vec3.createFloat32());
+  this.display_ = new gf.dom.Display(this.dom);
+  this.registerDisposable(this.display_);
 
   /**
    * Input manager.
    * @type {!gf.input.InputManager}
    */
-  this.input = new gf.input.InputManager(this,
-      this.display.getInputElement());
-  this.registerDisposable(this.input);
-  this.addComponent(this.input);
-  this.input.mouse.setSensitivity(this.settings.mouseSensitivity);
-  this.input.mouse.setLockOnFocus(this.settings.mouseLock);
-  this.input.keyboard.setFullScreenHandler(
+  this.inputManager_ = new gf.input.InputManager(this,
+      this.display_.getInputElement());
+  this.registerDisposable(this.inputManager_);
+  this.addComponent(this.inputManager_);
+  this.inputManager_.keyboard.setFullScreenHandler(
       goog.bind(this.toggleFullscreen, this));
 
   /**
-   * Input data storage.
-   * @type {!gf.input.Data}
+   * Graphics context.
+   * @private
+   * @type {!gf.graphics.GraphicsContext}
    */
-  this.inputData = new gf.input.Data(this.input);
+  this.graphicsContext_ = new gf.graphics.GraphicsContext(
+      this.dom, this.display_.canvas.el);
+  this.registerDisposable(this.graphicsContext_);
+
+  /**
+   * BLK render state.
+   * @type {!blk.graphics.RenderState}
+   */
+  this.renderState_ = new blk.graphics.RenderState(
+      this, this.assetManager_, this.graphicsContext_);
+  this.registerDisposable(this.renderState_);
 
   /**
    * Audio manager.
+   * @private
    * @type {!gf.audio.AudioManager}
    */
-  this.audio = new gf.audio.AudioManager(this, this.dom);
-  this.registerDisposable(this.audio);
-  this.addComponent(this.audio);
-
-  /**
-   * Sound bank for game sounds.
-   * @type {!gf.audio.SoundBank}
-   */
-  this.sounds = blk.assets.audio.Bank1.create(
-      this.assetManager, this.audio.context);
-  this.audio.loadSoundBank(this.sounds);
+  this.audioManager_ = new gf.audio.AudioManager(this, this.dom);
+  this.registerDisposable(this.audioManager_);
+  this.addComponent(this.audioManager_);
 
   /**
    * Music controller.
@@ -241,431 +130,226 @@ blk.game.client.ClientGame = function(launchOptions, settings, dom, session) {
    */
   this.musicController_ = new blk.game.client.MusicController(this);
   this.registerDisposable(this.musicController_);
-  this.musicController_.setMuted(this.settings.musicMuted);
 
   /**
-   * Sprite buffer used for UI drawing.
+   * Sound bank for base game sounds (UI/etc).
+   * @type {!gf.audio.SoundBank}
+   */
+  this.baseSounds_ = blk.assets.audio.BaseSounds.create(
+      this.assetManager_, this.audioManager_.context);
+  this.audioManager_.loadSoundBank(this.baseSounds_);
+
+  /**
+   * Screen manager.
    * @private
-   * @type {!gf.graphics.SpriteBuffer}
+   * @type {!gf.ui.ScreenManager}
    */
-  this.spriteBuffer_ = this.renderState.createSpriteBuffer();
-  this.registerDisposable(this.spriteBuffer_);
+  this.screenManager_ = new gf.ui.ScreenManager(this.dom);
+  this.registerDisposable(this.screenManager_);
 
   /**
-   * UI widgets.
+   * Whether the game is currently running.
    * @private
-   * @type {!Array.<blk.ui.Widget>}
-   */
-  this.widgets_ = [];
-
-  /**
-   * Console.
-   * @type {!blk.ui.Console}
-   */
-  this.console = new blk.ui.Console(this);
-  this.registerDisposable(this.console);
-  //this.addWidget_(this.console);
-
-  /**
-   * Player listing.
-   * @private
-   * @type {!blk.ui.PlayerListing}
-   */
-  this.playerListing_ = new blk.ui.PlayerListing(this);
-  this.registerDisposable(this.playerListing_);
-  this.addWidget_(this.playerListing_);
-  if (this.session.isLocal()) {
-    this.playerListing_.toggleVisibility();
-  }
-
-  /**
-   * Menubar.
-   * @private
-   * @type {!blk.ui.Menubar}
-   */
-  this.menubar_ = new blk.ui.Menubar(this);
-  this.registerDisposable(this.menubar_);
-  this.addWidget_(this.menubar_);
-
-  // /**
-  //  * Toolbar.
-  //  * @private
-  //  * @type {!blk.ui.Toolbar}
-  //  */
-  // this.toolbar_ = new blk.ui.Toolbar(this);
-  // this.registerDisposable(this.toolbar_);
-  // this.addWidget_(this.toolbar_);
-
-  /**
-   * Local player.
-   * @type {blk.game.Player}
-   */
-  this.localPlayer = null;
-
-  /**
-   * God mode toggle.
    * @type {boolean}
    */
-  this.godMode = true;
+  this.inGame_ = false;
 
-  /**
-   * Movement controller.
-   * @private
-   * @type {!blk.physics.ClientMovement}
-   */
-  this.movement_ = new blk.physics.ClientMovement(this.localView, this.session);
-
-  /**
-   * Accumulated mouse movement delta.
-   * @private
-   * @type {number}
-   */
-  this.dragDelta_ = 0;
-
-  /**
-   * Last time an action was repeated.
-   * @private
-   * @type {number}
-   */
-  this.repeatTime_ = 0;
-
-  /**
-   * @private
-   * @type {number}
-   */
-  this.blockIndex_ = 0;
-
-  /**
-   * @private
-   * @type {!Array.<!blk.env.Block>}
-   */
-  this.blockTypes_ = [
-    this.map.blockSet.get(blk.env.blocks.BlockID.DIRT),
-    this.map.blockSet.get(blk.env.blocks.BlockID.STONE),
-    this.map.blockSet.get(blk.env.blocks.BlockID.BRICK),
-    this.map.blockSet.get(blk.env.blocks.BlockID.WOOD),
-    this.map.blockSet.get(blk.env.blocks.BlockID.GLASS)
-  ];
-
-  // Say hi
-  this.console.log('wsad to move');
-  this.console.log('left click to place blocks, right click to remove');
-  if (!this.session.isLocal()) {
-    this.console.log('t to chat');
-  }
-
-  // Simulated latency
-  this.session.socket.simulatedLatency = launchOptions.simulatedLatency;
+  this.beginSetup_();
 };
 goog.inherits(blk.game.client.ClientGame, gf.Game);
-
-
-/**
- * Interpolation delay time, in seconds.
- * Higher values will cause greater time shifting beheavior but help to smooth
- * out laggy players.
- * @private
- * @const
- * @type {number}
- */
-blk.game.client.ClientGame.INTERPOLATION_DELAY_ = 300 / 1000;
 
 
 /**
  * @override
  */
 blk.game.client.ClientGame.prototype.disposeInternal = function() {
-  // Cleanup view
-  this.map.removeChunkView(this.localView);
-  goog.dispose(this.localView);
-
   goog.base(this, 'disposeInternal');
 };
 
 
 /**
- * Adds a widget to the game screen.
+ * @return {!gf.assets.AssetManager} Asset manager.
+ */
+blk.game.client.ClientGame.prototype.getAssetManager = function() {
+  return this.assetManager_;
+};
+
+
+/**
+ * @return {!gf.dom.Display} Display.
+ */
+blk.game.client.ClientGame.prototype.getDisplay = function() {
+  return this.display_;
+};
+
+
+/**
+ * @return {!gf.input.InputManager} Input manager.
+ */
+blk.game.client.ClientGame.prototype.getInputManager = function() {
+  return this.inputManager_;
+};
+
+
+/**
+ * @return {!gf.graphics.GraphicsContext} Graphics context.
+ */
+blk.game.client.ClientGame.prototype.getGraphicsContext = function() {
+  return this.graphicsContext_;
+};
+
+
+/**
+ * @return {!blk.graphics.RenderState} BLK render state.
+ */
+blk.game.client.ClientGame.prototype.getRenderState = function() {
+  return this.renderState_;
+};
+
+
+/**
+ * @return {!gf.audio.AudioManager} Audio manager.
+ */
+blk.game.client.ClientGame.prototype.getAudioManager = function() {
+  return this.audioManager_;
+};
+
+
+/**
+ * @return {!blk.game.client.MusicController} Music controller.
+ */
+blk.game.client.ClientGame.prototype.getMusicController = function() {
+  return this.musicController_;
+};
+
+
+/**
+ * @return {!gf.ui.ScreenManager} Screen manager.
+ */
+blk.game.client.ClientGame.prototype.getScreenManager = function() {
+  return this.screenManager_;
+};
+
+
+/**
+ * @return {boolean} True if a game is currently in progress.
+ */
+blk.game.client.ClientGame.prototype.isInGame = function() {
+  return this.inGame_;
+};
+
+
+/**
+ * Refreshes settings from the user settings object.
  * @private
- * @param {!blk.ui.Widget} widget Widget to add.
  */
-blk.game.client.ClientGame.prototype.addWidget_ = function(widget) {
-  // TODO(benvanik): add more logic around widget lifetimes/etc
-  this.widgets_.push(widget);
-  this.registerDisposable(widget);
-  widget.enterDocument();
+blk.game.client.ClientGame.prototype.refreshSettings_ = function() {
+  // Reset input settings
+  var inputManager = this.inputManager_;
+  inputManager.mouse.setSensitivity(this.settings.mouseSensitivity);
+  inputManager.mouse.setLockOnFocus(this.settings.mouseLock);
+  if (this.inGame_ && this.settings.mouseLock) {
+    inputManager.mouse.lock();
+  } else {
+    inputManager.mouse.unlock();
+  }
+
+  // Toggle global mutes
+  this.musicController_.setMuted(this.settings.musicMuted);
+
+  // TODO(benvanik): set multiplayer info if connected
+  // var user = this.session.getLocalUser();
+  // goog.asserts.assert(user);
+  // var userInfo = user.info.clone();
+  // userInfo.displayName = this.settings.userName;
+  // this.session.updateUserInfo(userInfo);
 };
 
 
 /**
- * Gets the entity representing the local player.
- * HACK: this will be removed soon
- * @return {blk.env.Entity} Entity, if any.
+ * Begins the async setup chain.
+ * A splash screen will be shown while setup is processing. Depending on the
+ * outcome of the setup either {@see #setupSucceeded_} or {@see setupFailed_}
+ * will be called.
+ * @private
  */
-blk.game.client.ClientGame.prototype.getLocalEntity = function() {
-  return this.localPlayer ? this.localPlayer.entity : null;
+blk.game.client.ClientGame.prototype.beginSetup_ = function() {
+  var deferred = new goog.async.Deferred();
+
+  // Show the splash screen
+  var splashScreen = new blk.ui.screens.SplashScreen(
+      this.dom, this.display_.getDomElement());
+  this.screenManager_.setScreen(splashScreen);
+
+  // Setup graphics
+  var attributes = /** @type {!WebGLContextAttributes} */ ({
+    alpha: false,
+    // TODO(benvanik): make configurable - right now makes things ugly and
+    //     and slow as hell on OSX (Air)
+    antialias: false
+  });
+  this.graphicsContext_.setup(attributes).addCallbacks(function() {
+    // Graphics ready, setup render state
+    this.renderState_.setup().addCallbacks(function() {
+      this.setupSucceeded_();
+    }, function(arg) {
+      // Render state failed
+      this.setupFailed_('Unable to setup graphics resources', arg);
+    }, this);
+  }, function(arg) {
+    // Graphics failed
+    this.setupFailed_('Unable to create the graphics context', arg);
+  }, this);
+
+  return deferred;
 };
 
 
 /**
- * Signals that the game is in a good state and can be started.
+ * Handles successful async setup and next-steps on launch.
+ * @private
  */
-blk.game.client.ClientGame.prototype.makeReady = function() {
-  // Grab local player
-  var player = this.state.getPlayerBySessionId(this.session.id);
-  goog.asserts.assert(player);
-  this.localPlayer = player;
+blk.game.client.ClientGame.prototype.setupSucceeded_ = function() {
+  // Clear all screens (should be just the splash)
+  this.screenManager_.popAllScreens();
 
-  // Bind view to player
-  player.view = this.localView;
+  // Start ticking the game
+  this.startTicking();
 
-  // Setup movement
-  var localEntity = this.getLocalEntity();
-  if (localEntity) {
-    this.movement_.attach(localEntity);
+  // Determine if we are launching directly into a game or if we should drop to
+  // the main menu
+  if (this.launchOptions.host) {
+    // Connect to host
+    this.connectToHost(this.launchOptions.host);
+  } else {
+    // Main menu
+    this.gotoMainMenuScreen();
   }
 };
 
 
 /**
- * Maximum amount of time, in ms, the network poll is allowed to take.
+ * Handles failed async setup.
  * @private
- * @const
- * @type {number}
+ * @param {string} message Error message.
+ * @param {*} arg Deferred callback error argument.
  */
-blk.game.client.ClientGame.MAX_NETWORK_POLL_TIME_ = 2;
+blk.game.client.ClientGame.prototype.setupFailed_ = function(message, arg) {
+  // Clear all screens (should be just the splash)
+  this.screenManager_.popAllScreens();
+
+  // Show an error dialog
+  this.showErrorPopup('setup', message, arg);
+
+  // NOTE: since we don't do any more work after this, nothing else will happen
+};
 
 
 /**
  * @override
  */
 blk.game.client.ClientGame.prototype.update = function(frame) {
-  // Networking
-  this.session.poll(blk.game.client.ClientGame.MAX_NETWORK_POLL_TIME_);
-
-  // Only update state if still connected
-  if (this.session.state != gf.net.SessionState.DISCONNECTED) {
-    // State updates
-    this.state.update(frame);
-  } else {
-    // Done! Die!
-    // TODO(benvanik): disconnection
-    gf.log.write('disconnected');
-    this.console.log('disconnected!');
-
-    if (!this.settings.soundFxMuted) {
-      this.sounds.playAmbient('player_leave');
-    }
-    this.stopTicking();
-
-    var d = blk.ui.Popup.show(blk.ui.popups.status.disconnected, {
-      reason: this.session.disconnectReason
-    }, this.dom, this.display.mainFrame);
-    d.addCallback(
-        function(buttonId) {
-          if (buttonId == 'reload') {
-            window.location.reload(false);
-          } else {
-            window.location.href = 'http://google.com';
-          }
-        });
-  }
-
-  // Update UI bits
-  this.console.update(frame);
-
-  // Update views
-  this.localView.update(frame, this.viewport.position);
-};
-
-
-/**
- * Handles a user connect event.
- * @param {!gf.net.User} user User.
- */
-blk.game.client.ClientGame.prototype.handleUserConnect = function(user) {
-  // Create player
-  var player = new blk.game.client.ClientPlayer(this, user);
-  user.data = player;
-  this.state.addPlayer(player);
-
-  // TODO(benvanik): join/leave sound
-  this.sounds.playAmbient('player_join');
-
-  gf.log.write('client connected',
-      user.sessionId, user.info.displayName, user.agent);
-
-  this.console.log(
-      user.info.displayName + ' (' + user.sessionId + ') connected on ' +
-      user.agent.toString());
-
-  this.playerListing_.refresh();
-};
-
-
-/**
- * Handles a user disconnect event.
- * @param {!gf.net.User} user User.
- */
-blk.game.client.ClientGame.prototype.handleUserDisconnect = function(user) {
-  var player = /** @type {blk.game.Player} */ (user.data);
-  goog.asserts.assert(player);
-  if (!player) {
-    return;
-  }
-
-  // Remove from roster
-  this.state.removePlayer(user);
-  goog.dispose(player);
-
-  // TODO(benvanik): join/leave sound
-  if (!this.settings.soundFxMuted) {
-    this.sounds.playAmbient('player_leave');
-  }
-
-  gf.log.write('client disconnected',
-      user.sessionId, user.disconnectReason);
-
-  this.console.log(
-      user.info.displayName + ' (' + user.sessionId + ') disconnected:',
-      gf.net.DisconnectReason.toString(user.disconnectReason));
-
-  this.playerListing_.refresh();
-};
-
-
-/**
- * Handles a user update event.
- * @param {!gf.net.User} user User.
- */
-blk.game.client.ClientGame.prototype.handleUserUpdate = function(user) {
-  var player = this.state.getPlayerBySessionId(user.sessionId);
-  if (player && player.entity) {
-    player.entity.title = user.info.displayName;
-  }
-
-  this.playerListing_.refresh();
-};
-
-
-/**
- * Sets a block and plays sound if required.
- * Note that the block specified may have originated from the network and as
- * such it may not be in our view but may be in the cache. Because of this, we
- * must pass the change off to the map, which will try to update the chunk.
- *
- * @param {number} x Block X.
- * @param {number} y Block Y.
- * @param {number} z Block Z.
- * @param {number} blockData Block Data.
- */
-blk.game.client.ClientGame.prototype.setBlock = function(x, y, z, blockData) {
-  var map = this.state.map;
-  var oldData = 0;
-  if (!blockData) {
-    oldData = map.getBlock(x, y, z);
-  }
-  var changed = map.setBlock(x, y, z, blockData);
-
-  // Play block sound, if any and only if needed
-  if (!this.settings.soundFxMuted && changed) {
-    var soundData = blockData ? blockData : oldData;
-    if (soundData >> 8) {
-      var block = map.blockSet.get(soundData >> 8);
-      var cue = block ? block.material.actionCue : null;
-      if (cue) {
-        var viewport = this.viewport;
-        var soundPosition = goog.vec.Vec3.createFloat32FromValues(x, y, z);
-        var distance = goog.vec.Vec3.distance(viewport.position, soundPosition);
-        if (distance < blk.env.MAX_SOUND_DISTANCE) {
-          this.sounds.playPoint(cue, soundPosition);
-        }
-      }
-    }
-  }
-};
-
-
-/**
- * Creates an entity.
- * @param {number} entityId Entity ID.
- * @param {number} userId Wire ID of the user the entity represents, or 0xFF.
- * @return {blk.env.Entity} New entity.
- */
-blk.game.client.ClientGame.prototype.createEntity = function(entityId, userId) {
-  var entity = new blk.env.Entity(entityId);
-
-  var localUser = this.session.getLocalUser();
-  if (userId == localUser.wireId) {
-    // Self
-    gf.log.write('self create', entityId);
-    // Bind entity and player
-    entity.player = /** @type {!blk.game.Player} */ (localUser.data);
-    entity.player.entity = entity;
-  } else {
-    // Others
-    gf.log.write('other create', entityId, userId);
-    var player = this.state.getPlayerByWireId(userId);
-    if (player) {
-      player.entity = entity;
-      entity.player = player;
-    }
-  }
-
-  if (entity) {
-    this.state.map.addEntity(entity);
-
-    var user = entity.player ? entity.player.getUser() : null;
-    entity.title = user ? user.info.displayName : null;
-
-    if (entity == this.getLocalEntity()) {
-      entity.confirmedState = entity.state.clone();
-    }
-  }
-
-  return entity;
-};
-
-
-/**
- * Deletes an entity.
- * @param {number} entityId Entity ID.
- */
-blk.game.client.ClientGame.prototype.deleteEntity = function(entityId) {
-  gf.log.write('entity delete', entityId);
-  var entity = this.state.map.getEntity(entityId);
-  if (entity) {
-    this.state.map.removeEntity(entity);
-  }
-};
-
-
-/**
- * Updates an entities position.
- * @param {number} sequence Confirmed movement sequence number.
- * @param {!Array.<!blk.env.EntityState>} entityStates Entity states.
- */
-blk.game.client.ClientGame.prototype.updateEntityPosition = function(
-    sequence, entityStates) {
-  // Confirm user commands
-  this.movement_.confirmCommands(sequence);
-
-  var localEntity = this.getLocalEntity();
-  for (var n = 0; n < entityStates.length; n++) {
-    var entityState = entityStates[n];
-    if (localEntity && localEntity.id == entityState.entityId) {
-      // Self
-      //gf.log.write('self update', entityPositionData);
-      localEntity.confirmedState = entityState.clone();
-    } else {
-      // Others
-      //gf.log.write('other update', entityPositionData);
-      // TODO(benvanik): lerp
-      var entity = this.state.map.getEntity(entityState.entityId);
-      if (entity) {
-        entity.updateState(entityState);
-      }
-    }
-  }
+  this.screenManager_.update(frame);
 };
 
 
@@ -673,186 +357,17 @@ blk.game.client.ClientGame.prototype.updateEntityPosition = function(
  * @override
  */
 blk.game.client.ClientGame.prototype.render = function(frame) {
-  if (this.session.state == gf.net.SessionState.DISCONNECTED) {
-    return;
-  }
-
-  var graphicsContext = this.graphicsContext;
-  var renderState = this.renderState;
-  var map = this.state.map;
-  var viewport = this.viewport;
-
-  viewport.far = this.localView.getDrawDistance();
-  viewport.reset(this.display.getSize());
-
-  // Grab input
-  this.inputData.poll();
-
-  // Process user input if required, and update viewport matrices
-  // NOTE: this is done without the interpolation delay applied so that real
-  // times get used
-  this.movement_.update(frame, viewport, this.inputData);
-  if (this.movement_.hasDied) {
-    gf.log.write('network failure - movement backup');
-    this.console.log('network failure');
-    this.session.disconnect();
-    this.stopTicking();
-    return;
-  }
-
-  // Compute updated view matrix based on user entity
-  var localEntity = this.getLocalEntity();
-  if (localEntity) {
-    // Run client-side prediction
-    this.movement_.predictMovement(frame);
-
-    var state = localEntity.state;
-    var vm = viewport.viewMatrix;
-    goog.vec.Quaternion.toRotationMatrix4(state.rotation, vm);
-    goog.vec.Mat4.transpose(vm, vm);
-    goog.vec.Mat4.translate(vm,
-        -state.position[0], -state.position[1], -state.position[2]);
-  }
-
-  // Update viewport matrices/etc now that the controller logic has been applied
-  viewport.calculate();
-
-  // Handle input
-  if (!this.console.processInput(frame, this.inputData)) {
-    this.handleInput_(frame);
-  }
-
-  // Update audio - must be done after the viewport is updated
-  this.audio.listener.update(viewport.inverseViewMatrix);
-
-  // Timeshift by interpolation delay
-  frame.time -= blk.game.client.ClientGame.INTERPOLATION_DELAY_;
-
-  // Render the game
-  if (graphicsContext.begin()) {
-    // Reset render state
-    renderState.reset(viewport, map.environment.skyColor, true);
-
-    // Render the map and entities
-    this.viewManager.render(frame, viewport, this.localPlayer);
-
-    // Draw UI
-    var mapStats = this.map.getStatisticsString();
-    var renderStats = this.viewManager.getStatisticsString();
-    // var movement = this.localPlayer ? [
-    //   this.localPlayer.entity.state.velocity[0].toFixed(8),
-    //   this.localPlayer.entity.state.velocity[1].toFixed(8),
-    //   this.localPlayer.entity.state.velocity[2].toFixed(8)].join(',') : '';
-    this.console.render(frame, viewport, mapStats, renderStats);//, movement);
-    this.drawInputUI_(frame);
-    this.drawBlockTypes_(frame);
-
-    graphicsContext.end();
-  }
-
-  this.inputData.reset();
+  this.screenManager_.render(frame);
 };
 
 
 /**
- * Draws the input UI.
- * @private
- * @param {!gf.RenderFrame} frame Current frame.
+ * Plays the 'click' sound (if sound is enabled).
  */
-blk.game.client.ClientGame.prototype.drawInputUI_ = function(frame) {
-  var viewport = this.viewport;
-  var uiAtlas = this.renderState.uiAtlas;
-
-  var spriteBuffer = this.spriteBuffer_;
-  spriteBuffer.clear();
-
-  var slotCoords = blk.game.client.ClientGame.tmpVec4_;
-
-  // If using mouse lock, draw a crosshair in the center of the screen
-  if (this.inputData.mouse.isLocked) {
-    var x = viewport.width / 2 / 2 - 8;
-    var y = viewport.height / 2 / 2 - 8;
-    uiAtlas.getSlotCoords(11, slotCoords);
-    spriteBuffer.add(
-        slotCoords[0], slotCoords[1],
-        slotCoords[2] - slotCoords[0], slotCoords[3] - slotCoords[1],
-        0xFFFFFFFF,
-        x, y, 16, 16);
+blk.game.client.ClientGame.prototype.playClick = function() {
+  if (!this.settings.soundFxMuted) {
+    this.baseSounds_.playAmbient('click');
   }
-
-  // TODO(benvanik): draw onscreen dpad/etc for touch
-
-  var worldMatrix = blk.game.client.ClientGame.tmpMat4_;
-  goog.vec.Mat4.setFromValues(worldMatrix,
-      2, 0, 0, 0,
-      0, 2, 0, 0,
-      0, 0, 1, 0,
-      0, 0, 0, 1);
-
-  this.renderState.beginSprites(uiAtlas, false);
-  this.spriteBuffer_.draw(viewport.orthoMatrix, worldMatrix);
-};
-
-
-/**
- * Draws block type UI.
- * @private
- * @param {!gf.RenderFrame} frame Current frame.
- */
-blk.game.client.ClientGame.prototype.drawBlockTypes_ = function(frame) {
-  var viewport = this.viewport;
-  var blockAtlas = this.renderState.blockAtlas;
-
-  var spriteBuffer = this.spriteBuffer_;
-  spriteBuffer.clear();
-
-  // TODO(benvanik): add block types
-  var x = 0;
-  var width = this.blockTypes_.length * (16 + 1);
-  var height = 16;
-  var texCoords = blk.game.client.ClientGame.tmpVec4_;
-  for (var n = 0; n < this.blockTypes_.length; n++) {
-    var block = this.blockTypes_[n];
-    blockAtlas.getSlotCoords(block.atlasSlot, texCoords);
-    spriteBuffer.add(
-        texCoords[0], texCoords[1],
-        texCoords[2] - texCoords[0], texCoords[3] - texCoords[1],
-        this.blockIndex_ == n ? 0xFFFFFFFF : 0xFF777777,
-        x, 0, 16, 16);
-    x += 16 + 1;
-  }
-
-  var worldMatrix = blk.game.client.ClientGame.tmpMat4_;
-  goog.vec.Mat4.setFromValues(worldMatrix,
-      2, 0, 0, 0,
-      0, 2, 0, 0,
-      0, 0, 1, 0,
-      viewport.width / 2 - width, viewport.height - height * 2 - 2, 0, 1);
-
-  this.renderState.beginSprites(blockAtlas, false);
-  this.spriteBuffer_.draw(viewport.orthoMatrix, worldMatrix);
-};
-
-
-/**
- * Hit tests the block type UI.
- * @private
- * @param {!gf.input.MouseData} mouseData Mouse input data.
- * @return {number|undefined} Block index selected or undefined if non clicked.
- */
-blk.game.client.ClientGame.prototype.hitTestBlockTypes_ = function(mouseData) {
-  var scale = 2;
-  var itemSize = (16 + 1) * scale;
-  var width = this.blockTypes_.length * itemSize;
-  var height = 16 * scale;
-  if (mouseData.clientY >= this.viewport.height - height - 2) {
-    var left = this.viewport.width / 2 - width / 2;
-    var right = this.viewport.width / 2 + width / 2;
-    if (mouseData.clientX >= left && mouseData.clientX <= right) {
-      return Math.floor((mouseData.clientX - left) / itemSize);
-    }
-  }
-  return undefined;
 };
 
 
@@ -861,338 +376,366 @@ blk.game.client.ClientGame.prototype.hitTestBlockTypes_ = function(mouseData) {
  * This only works when called from a key or mouse handler.
  */
 blk.game.client.ClientGame.prototype.toggleFullscreen = function() {
-  var goingFullScreen = !this.display.isFullScreen;
-  this.display.toggleFullScreen();
-  if (goingFullScreen &&
-      this.input.mouse.supportsLocking &&
+  this.playClick();
+
+  // Toggle fullscreen
+  var goingFullScreen = !this.display_.isFullScreen;
+  this.display_.toggleFullScreen();
+
+  // Attempt to lock the mouse if we are transitioning into fullscreen
+  if (this.inGame_ &&
+      goingFullScreen &&
+      this.inputManager_.mouse.supportsLocking &&
       this.settings.mouseLock) {
-    this.input.mouse.lock();
+    this.inputManager_.mouse.lock();
   }
 };
 
 
 /**
- * Shows the settings dialog.
+ * Navigates to the main menu screen, replacing all other screens.
  */
-blk.game.client.ClientGame.prototype.showSettings = function() {
-  if (!this.settings.soundFxMuted) {
-    this.sounds.playAmbient('click');
+blk.game.client.ClientGame.prototype.gotoMainMenuScreen = function() {
+  if (this.isInGame()) {
+    this.exitGame_();
   }
 
-  this.input.setEnabled(false);
+  var mainMenuScreen = new blk.ui.screens.MainMenuScreen(
+      this.dom, this.display_.getDomElement());
+  this.screenManager_.setScreen(mainMenuScreen);
+};
 
-  // TODO(benvanik): proper dynamic view adjustment
-  var oldViewDistance = this.settings.viewDistance;
 
-  var d = blk.ui.popups.Settings.show(this, this.dom, this.display.mainFrame);
-  d.addCallback(
-      function(buttonId) {
+/**
+ * Navigates to the single-player game selection screen.
+ */
+blk.game.client.ClientGame.prototype.pushSinglePlayerMenuScreen = function() {
+  goog.asserts.assert(!this.isInGame());
+
+  // var singlePlayerMenuScreen = new blk.ui.screens.SinglePlayerMenuScreen(
+  //     this.dom, this.display_.getDomElement());
+  // this.screenManager_.pushScreen(singlePlayerMenuScreen);
+};
+
+
+/**
+ * Navigates to the multi-player game selection screen.
+ */
+blk.game.client.ClientGame.prototype.pushMultiPlayerMenuScreen = function() {
+  goog.asserts.assert(!this.isInGame());
+
+  // var multiPlayerMenuScreen = new blk.ui.screens.MultiPlayerMenuScreen(
+  //     this.dom, this.display_.getDomElement());
+  // this.screenManager_.pushScreen(multiPlayerMenuScreen);
+};
+
+
+/**
+ * Navigates to the single-player map creation screen.
+ */
+blk.game.client.ClientGame.prototype.pushCreateMapMenuScreen = function() {
+  goog.asserts.assert(!this.isInGame());
+
+  // var createMapMenuScreen = new blk.ui.screens.CreateMapMenuScreen(
+  //     this.dom, this.display_.getDomElement());
+  // this.screenManager_.pushScreen(createMapMenuScreen);
+};
+
+
+/**
+ * Pauses display state before a popup dialog is displayed.
+ * @private
+ */
+blk.game.client.ClientGame.prototype.prePopup_ = function() {
+  this.playClick();
+
+  // Disable input if in game
+  if (this.isInGame()) {
+    this.inputManager_.setEnabled(false);
+  }
+};
+
+
+/**
+ * Resumes display state after a popup dialog is displayed.
+ * @private
+ */
+blk.game.client.ClientGame.prototype.postPopup_ = function() {
+  this.playClick();
+
+  // Re-enable input if in game
+  if (this.isInGame()) {
+    this.inputManager_.setEnabled(true);
+  }
+};
+
+
+/**
+ * Shows the settings popup.
+ */
+blk.game.client.ClientGame.prototype.showSettingsPopup = function() {
+  this.prePopup_();
+
+  var settingsScreen = new blk.ui.screens.SettingsScreen(
+      this.dom, this.display_.getDomElement());
+  this.screenManager_.pushScreen(settingsScreen);
+
+  settingsScreen.deferred.addCallback(
+      function(buttonid) {
         if (buttonId == 'save') {
-          // HACK: reload with new settings if view distance changed
-          if (this.settings.viewDistance != oldViewDistance) {
-            window.location.reload();
-            return;
-          }
-
-          var user = this.session.getLocalUser();
-          goog.asserts.assert(user);
-          var userInfo = user.info.clone();
-          userInfo.displayName = this.settings.userName;
-          this.session.updateUserInfo(userInfo);
-
-          this.input.mouse.setSensitivity(this.settings.mouseSensitivity);
-          this.input.mouse.setLockOnFocus(this.settings.mouseLock);
-          if (this.settings.mouseLock) {
-            this.input.mouse.lock();
-          } else {
-            this.input.mouse.unlock();
-          }
-
-          // Toggle global mutes
-          this.musicController_.setMuted(this.settings.musicMuted);
+          this.refreshSettings_();
         }
 
-        this.input.setEnabled(true);
+        this.postPopup_();
       }, this);
 };
 
 
 /**
- * Shows the help dialog.
+ * Shows the help popup.
  */
-blk.game.client.ClientGame.prototype.showHelp = function() {
-  if (!this.settings.soundFxMuted) {
-    this.sounds.playAmbient('click');
-  }
+blk.game.client.ClientGame.prototype.showHelpPopup = function() {
+  this.prePopup_();
 
-  this.input.setEnabled(false);
+  var helpScreen = new blk.ui.screens.HelpScreen(
+      this.dom, this.display_.getDomElement());
+  this.screenManager_.pushScreen(helpScreen);
 
-  var d = blk.ui.Popup.show(blk.ui.popups.help.popup, {
-  }, this.dom, this.display.mainFrame);
-  d.addCallback(
-      function(buttonId) {
-        this.input.setEnabled(true);
+  helpScreen.deferred.addBoth(
+      function() {
+        this.postPopup_();
       }, this);
 };
 
 
 /**
- * Handles local user input.
- * @private
- * @param {!gf.RenderFrame} frame Current frame.
+ * Shows the error popup.
+ * @param {string} location Location the error occurred ('setup', 'networking').
+ * @param {string} message Error message.
+ * @param {*=} opt_arg Optional argument from a deferred callback.
  */
-blk.game.client.ClientGame.prototype.handleInput_ = function(frame) {
-  var viewport = this.viewport;
-  var map = this.state.map;
-  var keyboardData = this.inputData.keyboard;
-  var mouseData = this.inputData.mouse;
-
-  // TODO(benvanik): track goog.events.KeyCodes.PAUSE to pause update loop
-
-  // Show settings
-  if (keyboardData.didKeyGoDown(goog.events.KeyCodes.O)) {
-    this.showSettings();
-    return;
-  } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.H)) {
-    this.showHelp();
-    return;
-  } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.TAB)) {
-    this.playerListing_.toggleVisibility();
-    return;
-  }
-
-  // Block switching
-  var didSwitchBlock = false;
-  if (mouseData.dz) {
-    didSwitchBlock = true;
-    // TODO(benvanik): mac touchpad scroll
-    var dz = mouseData.dz > 0 ? 1 : -1;
-    this.blockIndex_ = (this.blockIndex_ + dz) % this.blockTypes_.length;
-    if (this.blockIndex_ < 0) {
-      this.blockIndex_ = this.blockTypes_.length - 1;
-    }
-  }
-  if (keyboardData.didKeyGoDown(goog.events.KeyCodes.ONE)) {
-    didSwitchBlock = true;
-    this.blockIndex_ = 0;
-  } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.TWO)) {
-    didSwitchBlock = true;
-    this.blockIndex_ = 1;
-  } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.THREE)) {
-    didSwitchBlock = true;
-    this.blockIndex_ = 2;
-  } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.FOUR)) {
-    didSwitchBlock = true;
-    this.blockIndex_ = 3;
-  } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.FIVE)) {
-    didSwitchBlock = true;
-    this.blockIndex_ = 4;
-  }
-  if (mouseData.buttonsUp & gf.input.MouseButton.LEFT) {
-    var clickedIndex = this.hitTestBlockTypes_(mouseData);
-    if (goog.isDef(clickedIndex)) {
-      didSwitchBlock = true;
-      this.blockIndex_ = clickedIndex;
-    }
-  }
-  if (didSwitchBlock) {
-    if (!this.settings.soundFxMuted) {
-      this.sounds.playAmbient('click');
-    }
-  }
-
-  if (keyboardData.didKeyGoDown(goog.events.KeyCodes.M)) {
-    this.musicController_.togglePlayback();
-  }
-
-  // Chunk rebuild
-  if (keyboardData.didKeyGoDown(goog.events.KeyCodes.BACKSPACE)) {
-    this.viewManager.rebuildAll();
-  }
-
-  // Debug visuals
-  if (keyboardData.didKeyGoDown(goog.events.KeyCodes.V)) {
-    this.viewManager.setDebugVisuals(!this.viewManager.debugVisuals);
-  }
-
-  // Actions - only if no other input event has eaten the input
-  if (!didSwitchBlock) {
-    if (this.getLocalEntity()) {
-      this.handleInputActions_(frame);
-    }
-  }
+blk.game.client.ClientGame.prototype.showErrorPopup = function(
+    location, message, opt_arg) {
+  blk.ui.screens.StatusScreen.showError(
+      this.screenManager_, this.display_.getDomElement(),
+      location, message, opt_arg || null);
 };
 
 
 /**
- * Seconds between action repeats when buttons are held.
+ * Connects to the given host.
+ * @param {string} address Host address, either local or remote.
+ */
+blk.game.client.ClientGame.prototype.connectToHost = function(address) {
+  // Show the connecting dialog
+  var dialogDeferred = blk.ui.screens.StatusScreen.showConnecting(
+      this.screenManager_, this.display_.getDomElement(),
+      address);
+
+  var deferred = new goog.async.Deferred();
+
+  // Create a URI
+  var uri = new goog.Uri(address);
+  var validAddress =
+      uri.getScheme() != '' &&
+      uri.getDomain() != '' &&
+      uri.getPort() != '';
+  if (!validAddress) {
+    deferred.errback('Invalid address format: \"' + address + '\"');
+  }
+
+  // Prepare auth/user info
+  var authToken = new gf.net.AuthToken(); // = new gf.net.auth.GplusToken();
+  var userInfo = new gf.net.UserInfo();
+  //userInfo.authType = gf.net.AuthType.GPLUS;
+  //userInfo.authId = 'gplus_id';
+  userInfo.displayName = gf.net.UserInfo.sanitizeDisplayName(settings.userName);
+
+  // Attempt connection
+  if (!deferred.hasFired()) {
+    switch (uri.getScheme()) {
+      case 'ws':
+        // Remote
+        this.connectToRemoteHost_(uri, authToken, userInfo, deferred);
+        break;
+      case 'local':
+        // Local
+        this.connectToLocalHost_(uri, authToken, userInfo, deferred);
+        break;
+      default:
+        deferred.errback('Unsupported scheme \"' + uri.getScheme() + '\"');
+        break;
+    }
+  }
+
+  deferred.addCallbacks(
+      function(session) {
+        gf.log.write('Connection established to ' + address);
+        // Connection ready!
+        dialogDeferred.cancel();
+
+        // Start the game
+        this.gotoGameScreen_(session);
+      }, function(arg) {
+        gf.log.write('Error connecting to ' + address, arg);
+
+        // Connection failed
+        dialogDeferred.cancel();
+
+        // Show error dialog
+        // TODO(benvanik): allow this to loop back around to the main screen?
+        blk.ui.screens.StatusScreen.showConnectionFailed(
+            this.screenManager_, this.display_.getDomElement(),
+            arg);
+      }, this);
+};
+
+
+/**
+ * Shared workers are harder to debug than dedicated workers - disable when
+ * developing.
  * @private
  * @const
- * @type {number}
+ * @type {boolean}
  */
-blk.game.client.ClientGame.ACTION_REPEAT_INTERVAL_ = (250 / 1000);
+blk.game.client.ClientGame.ENABLE_SHARED_WORKERS_ = false;
 
 
 /**
- * Handles local user input for performing actions.
+ * Connects to the given local host.
  * @private
- * @param {!gf.RenderFrame} frame Current frame.
+ * @param {!goog.Uri} uri Local host URI.
+ * @param {!gf.net.AuthToken} authToken Authentication information.
+ * @param {!gf.net.UserInfo} userInfo Client user information.
+ * @param {!goog.async.Deferred} deferred A deferred to callback with the
+ *     session once it has been established.
  */
-blk.game.client.ClientGame.prototype.handleInputActions_ = function(frame) {
-  var viewport = this.viewport;
-  var map = this.state.map;
-  var view = this.localPlayer.view;
-  goog.asserts.assert(view);
+blk.game.client.ClientGame.prototype.connectToLocalHost_ =
+    function(uri, authToken, userInfo, deferred) {
+  // // Request quota
+  // // TODO(benvanik): pull from somewhere?
+  // var quotaSize = 1024 * 1024 * 1024;
+  // deferred = new goog.async.Deferred();
+  // gf.io.requestQuota(
+  //     gf.io.FileSystemType.PERSISTENT, quotaSize).addCallbacks(
+  //     function(grantedBytes) {
+  //       if (grantedBytes < quotaSize) {
+  //         deferred.errback(null);
+  //       } else {
+  //         blk.client.launchLocalServer_(
+  //             sourceMode,
+  //             launchOptions.host,
+  //             authToken,
+  //             userInfo).chainDeferred(/** @type {!goog.async.Deferred} */ (
+  //             deferred));
+  //       }
+  //     },
+  //     function(arg) {
+  //       gf.log.write('unable to get quota - no saving!');
+  //       blk.client.launchLocalServer_(
+  //           sourceMode,
+  //           launchOptions.host,
+  //           authToken,
+  //           userInfo).chainDeferred(/** @type {!goog.async.Deferred} */ (
+  //           deferred));
+  //     });
 
-  var keyboardData = this.inputData.keyboard;
-  var mouseData = this.inputData.mouse;
+  // // Launch worker
+  // var deferred = new goog.async.Deferred();
+  // goog.asserts.assert(!!goog.global.Worker);
 
-  var addButton = keyboardData.didKeyGoDown(goog.events.KeyCodes.E);
-  var removeButton = false;
+  // // TODO(benvanik): name servers so there can be multiple/etc
+  // var serverId = goog.uri.utils.getDomain(uri);
+  // var name = 'server-' + serverId + (sourceMode ? '-uncompiled' : '');
 
-  if (!mouseData.isLocked) {
-    // Drag mode
-    if (mouseData.buttonsUp & gf.input.MouseButton.LEFT) {
-      if (this.dragDelta_ < 4) {
-        addButton = true;
-      }
-    }
-    removeButton = mouseData.buttonsUp & gf.input.MouseButton.RIGHT;
-    if (keyboardData.ctrlKey &&
-        mouseData.buttonsUp & gf.input.MouseButton.LEFT) {
-      removeButton = true;
-      this.dragDelta_ = Number.MAX_VALUE;
-    }
-    if (mouseData.buttons) {
-      this.dragDelta_ += Math.abs(mouseData.dx) + Math.abs(mouseData.dy);
-    } else {
-      this.dragDelta_ = 0;
-    }
-  } else {
-    // Lock mode
-    if (mouseData.buttonsDown & gf.input.MouseButton.LEFT) {
-      this.repeatTime_ = frame.time;
-      addButton |= true;
-    } else if (mouseData.buttons & gf.input.MouseButton.LEFT) {
-      var dt = frame.time - this.repeatTime_;
-      if (dt > blk.game.client.ClientGame.ACTION_REPEAT_INTERVAL_) {
-        addButton = true;
-        this.repeatTime_ = frame.time;
-      }
-    } else if (mouseData.buttonsDown & gf.input.MouseButton.RIGHT) {
-      this.repeatTime_ = frame.time;
-      removeButton |= true;
-    } else if (mouseData.buttons & gf.input.MouseButton.RIGHT) {
-      var dt = frame.time - this.repeatTime_;
-      if (dt > blk.game.client.ClientGame.ACTION_REPEAT_INTERVAL_) {
-        removeButton = true;
-        this.repeatTime_ = frame.time;
-      }
-    }
-  }
-  // If ctrl is held, turn adds into removes
-  if (addButton && keyboardData.ctrlKey) {
-    addButton = false;
-    removeButton = true;
-  }
-  if (removeButton) {
-    // Remove button takes priority
-    addButton = false;
-  }
-
-  if (addButton || removeButton) {
-    var mx = mouseData.clientX;
-    var my = mouseData.clientY;
-    if (mouseData.isLocked) {
-      mx = viewport.width / 2;
-      my = viewport.height / 2;
-    }
-    var ray = viewport.getRay(mx, my);
-    var maxDistance = (this.godMode || keyboardData.shiftKey) ?
-        blk.env.MAX_ACTION_DISTANCE_GOD : blk.env.MAX_ACTION_DISTANCE;
-    var intersection = view.intersectBlock(ray, maxDistance);
-    // TODO(benvanik): check on new add position, not existing position
-    if (intersection && intersection.distance <= maxDistance) {
-      // Find the block on the side we care about
-      var wx = intersection.blockX;
-      var wy = intersection.blockY;
-      var wz = intersection.blockZ;
-      if (addButton) {
-        // Determine the face intersected and add the block there
-        var dx = 0;
-        var dy = 0;
-        var dz = 0;
-        var ipt = intersection.point;
-        if (ipt[0] == wx) {
-          dx--;
-        } else if (ipt[0] == wx + 1) {
-          dx++;
-        }
-        if (ipt[1] == wy) {
-          dy--;
-        } else if (ipt[1] == wy + 1) {
-          dy++;
-        }
-        if (ipt[2] == wz) {
-          dz--;
-        } else if (ipt[2] == wz + 1) {
-          dz++;
-        }
-        var nx = wx + dx;
-        var ny = wy + dy;
-        var nz = wz + dz;
-        var block = this.blockTypes_[this.blockIndex_];
-
-        // Client-side action
-        this.setBlock(nx, ny, nz, block.id << 8);
-
-        // Send to server
-        this.session.send(blk.net.packets.SetBlock.createData(
-            nx, ny, nz, block.id << 8));
-      } else if (removeButton) {
-        // Client-side action
-        this.setBlock(wx, wy, wz, 0);
-
-        // Send to server
-        this.session.send(blk.net.packets.SetBlock.createData(
-            wx, wy, wz, 0));
-      }
-    }
-  }
-
-  // This code will draw a block along a ray
-  // var ray = viewport.getRay(mouseData.clientX, mouseData.clientY);
-  // var maxDistance = blk.env.MAX_ACTION_DISTANCE_GOD;
-  // var intersection = map.intersectBlock(ray, maxDistance);
-  // // TODO(benvanik): check on new add position, not existing position
-  // if (intersection && intersection.distance <= maxDistance) {
-  //   var wx = intersection.blockX;
-  //   var wy = intersection.blockY;
-  //   var wz = intersection.blockZ;
-  //   var block = this.blockTypes_[this.blockIndex_];
-  //   map.drawBlocks(
-  //       ray[0], ray[1], ray[2],
-  //       wx, wy, wz,
-  //       block.id << 8);
-  //   if (block.material.actionCue) {
-  //     this.sounds.playPoint(block.material.actionCue,
-  //         goog.vec.Vec3.createFloat32FromValues(ray[0], ray[1], ray[2]));
-  //   }
+  // // Launch worker
+  // // Attempt to create a shared worker if it's supported - otherwise go
+  // // dedicated so we at least work
+  // var workerUri = sourceMode ?
+  //     'worker-server-uncompiled.js' :
+  //     'worker-server.js';
+  // var worker;
+  // var port;
+  // // HACK: SharedWorker exists in WebKit, but is not working
+  // if (blk.game.client.ClientGame.ENABLE_SHARED_WORKERS_ &&
+  //     goog.userAgent.product.CHROME &&
+  //     goog.global['SharedWorker']) {
+  //   worker = new SharedWorker(workerUri, name);
+  //   port = worker.port;
+  // } else {
+  //   worker = new Worker(workerUri);
+  //   port = worker;
   // }
+
+  // // Connect
+  // var connectDeferred = gf.net.connect(
+  //     /** @type {gf.net.Endpoint} */ (port),
+  //     blk.net.packets.PROTOCOL_VERSION,
+  //     authToken,
+  //     userInfo);
+  // connectDeferred.addCallbacks(function(session) {
+  //   // Wait until here otherwise it will steal events from the session
+  //   gf.log.installListener(port, '{server}');
+
+  //   // TODO(benvanik): send server init
+
+  //   deferred.callback(session);
+  // }, function(arg) {
+  //   deferred.errback(arg);
+  // });
 };
 
 
 /**
- * Temp mat4 for math.
+ * Connects to the given remote host.
  * @private
- * @type {!goog.vec.Mat4.Type}
+ * @param {!goog.Uri} uri Remote host URI.
+ * @param {!gf.net.AuthToken} authToken Authentication information.
+ * @param {!gf.net.UserInfo} userInfo Client user information.
+ * @param {!goog.async.Deferred} deferred A deferred to callback with the
+ *     session once it has been established.
  */
-blk.game.client.ClientGame.tmpMat4_ = goog.vec.Mat4.createFloat32();
+blk.game.client.ClientGame.prototype.connectToRemoteHost_ =
+    function(uri, authToken, userInfo, deferred) {
+  var endpoint = /** @type {gf.net.Endpoint} */ (uri.toString());
+
+  // Attempt connection
+  var connectDeferred = gf.net.connect(
+      endpoint,
+      blk.net.packets.PROTOCOL_VERSION,
+      authToken, userInfo);
+  connectDeferred.chainDeferred(deferred);
+};
 
 
 /**
- * Temp vec4 for math.
+ * Navigates to the game screen, removing all other screens.
  * @private
- * @type {!goog.vec.Vec4.Float32}
+ * @param {!gf.net.ClientSession} session Connected network session.
  */
-blk.game.client.ClientGame.tmpVec4_ = goog.vec.Vec4.createFloat32();
+blk.game.client.ClientGame.prototype.gotoGameScreen_ = function(session) {
+  this.enterGame_();
+
+  var gameScreen = new blk.ui.screens.GameScreen(this, session);
+  this.screenManager_.setScreen(gameScreen);
+};
+
+
+/**
+ * Handles pre-game logic.
+ * @private
+ */
+blk.game.client.ClientGame.prototype.enterGame_ = function() {
+  goog.asserts.assert(!this.isInGame());
+  this.inGame_ = true;
+};
+
+
+/**
+ * Handles post-game logic.
+ * @private
+ */
+blk.game.client.ClientGame.prototype.exitGame_ = function() {
+  goog.asserts.assert(this.isInGame());
+  this.inGame_ = false;
+};

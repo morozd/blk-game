@@ -38,16 +38,10 @@ blk.client.LaunchOptions = function(uri, opt_args) {
   this.simulatedLatency = this.getNumberAlways('simulatedLatency');
 
   /**
-   * User name for multiplayer.
-   * @type {string?}
-   */
-  this.userName = this.getString('userName');
-
-  /**
    * Host endpoint for connections.
-   * @type {string}
+   * @type {?string}
    */
-  this.host = this.getStringAlways('host');
+  this.host = this.getString('host');
 };
 goog.inherits(blk.client.LaunchOptions, gf.LaunchOptions);
 
@@ -72,7 +66,7 @@ blk.client.LaunchOptions.getArgumentInfo = function() {
     'host': {
       help: 'Host endpoint for connections.',
       type: String,
-      defaultValue: 'local://blk-0'
+      defaultValue: null
     }
   };
 };

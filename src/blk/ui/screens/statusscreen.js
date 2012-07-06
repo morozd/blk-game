@@ -42,6 +42,29 @@ goog.inherits(blk.ui.screens.StatusScreen, blk.ui.PopupScreen);
 
 
 /**
+ * Shows an error popup.
+ * @param {!gf.ui.ScreenManager} screenManager Screen manager.
+ * @param {!Element} parentElement Parement DOM element to render into.
+ * @param {string} location Location the error occurred ('setup', 'networking').
+ * @param {string} message Error message.
+ * @param {*=} opt_arg Optional argument from a deferred callback.
+ * @return {!goog.async.Deferred} A deferred fulfilled when the popup closes.
+ *     Cancel to close the popup.
+ */
+blk.ui.screens.StatusScreen.showError =
+    function(screenManager, parentElement, location, message, opt_arg) {
+  var screen = new blk.ui.screens.StatusScreen(screenManager.dom, parentElement,
+      blk.ui.screens.statusscreen.error, {
+        location: location,
+        message: message,
+        arg: opt_arg
+      });
+  screenManager.pushScreen(screen);
+  return screen.deferred;
+};
+
+
+/**
  * Shows a 'connecting' popup.
  * @param {!gf.ui.ScreenManager} screenManager Screen manager.
  * @param {!Element} parentElement Parement DOM element to render into.
