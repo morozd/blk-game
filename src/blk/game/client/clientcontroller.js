@@ -20,6 +20,9 @@
 
 goog.provide('blk.game.client.ClientController');
 
+goog.require('blk.assets.audio.BlockSounds');
+goog.require('blk.env');
+goog.require('blk.env.Entity');
 goog.require('blk.env.client.ClientMap');
 goog.require('blk.game.client.ClientPlayer');
 goog.require('blk.io.ChunkSerializer');
@@ -39,7 +42,11 @@ goog.require('gf.net.NetworkService');
 goog.require('gf.net.SessionState');
 goog.require('gf.net.chat.ClientChatService');
 goog.require('goog.Disposable');
+goog.require('goog.array');
+goog.require('goog.asserts');
 goog.require('goog.async.Deferred');
+goog.require('goog.vec.Vec3');
+goog.require('goog.vec.Vec4');
 
 
 
@@ -206,7 +213,7 @@ blk.game.client.ClientController.prototype.getPlayerByWireId =
  * @protected
  */
 blk.game.client.ClientController.prototype.handlePlayersChanged =
-    goog.nullMethod;
+    goog.nullFunction;
 
 
 /**
@@ -489,8 +496,8 @@ blk.game.client.ClientController.prototype.playPointSound =
     function(soundBank, cue, position) {
   // TODO(benvanik): add dampening factor/etc based on line of sight
 
-  var viewport = this.viewport;
-  var distance = goog.vec.Vec3.distance(viewport.position, position);
+  var listener = this.game.getAudioManager().listener;
+  var distance = listener.getDistance(position);
   if (distance < blk.env.MAX_SOUND_DISTANCE) {
     if (!this.game.settings.soundFxMuted) {
       soundBank.playPoint(cue, position);
@@ -797,9 +804,9 @@ blk.game.client.ClientController.NetService_.prototype.handleEntityCreate_ =
 
   // Update movement prediction
   // TODO(benvanik): abstract this out
-  if (entity == this.getLocalEntity()) {
-    entity.confirmedState = entity.state.clone();
-  }
+  // if (entity == this.getLocalEntity()) {
+  //   entity.confirmedState = entity.state.clone();
+  // }
 
   return true;
 };
@@ -848,11 +855,12 @@ blk.game.client.ClientController.NetService_.prototype.handleEntityPosition_ =
   }
 
   // Confirm user commands
-  this.movement_.confirmCommands(entityPosition.sequence);
+  //this.movement_.confirmCommands(entityPosition.sequence);
 
   // Update entity positions
   var map = this.controller_.getMap();
-  var localEntity = this.getLocalEntity();
+  //var localEntity = this.getLocalEntity();
+  var localEntity = null;
   for (var n = 0; n < entityPosition.states.length; n++) {
     var entityState = entityPosition.states[n];
     if (localEntity && localEntity.id == entityState.entityId) {
