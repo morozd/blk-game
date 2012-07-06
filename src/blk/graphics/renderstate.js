@@ -154,7 +154,7 @@ goog.inherits(blk.graphics.RenderState, gf.graphics.Resource);
 blk.graphics.RenderState.prototype.setup = function() {
   // TODO(benvanik): wait for other textures/etc?
   var deferreds = [
-    this.programCache_.setup()
+    //this.programCache_.setup()
   ];
   return new goog.async.DeferredList(deferreds);
 };

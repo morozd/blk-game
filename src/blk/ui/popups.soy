@@ -59,17 +59,32 @@
 
 
 /**
- * A simple dialog.
+ * A simple dialog with a body.
+ * @param contents Unsafe body contents.
+ */
+{template .popupContainer}
+  <div class="{css blkPopupOuter}">
+    <div class="{css blkPopup}">
+      {$contents|noAutoescape}
+    </div>
+  </div>
+{/template}
+
+
+/**
+ * A dialog with a header, body, and footer.
  * @param header Header contents.
  * @param body Body contents.
  * @param buttons Footer button bar contents.
  */
-{template .simplePopup}
-  <div class="{css blkPopup}">
-    {call .header_ data="all" /}
-    {call .body_ data="all" /}
-    {call .footer_ data="all" /}
-  </div>
+{template .simpleDialog}
+  {call .popupContainer data="all"}
+    {param contents}
+      {call .header_ data="all" /}
+      {call .body_ data="all" /}
+      {call .footer_ data="all" /}
+    {/param}
+  {/call}
 {/template}
 
 

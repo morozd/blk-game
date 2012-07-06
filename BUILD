@@ -19,6 +19,7 @@ include_rules(glob(GF + '/anvil_rules/**/*_rules.py'))
 closure_gss_library(
     name='blk_css_debug_compiled',
     mode='DEBUG_COMPILED',
+    pretty_print=True,
     srcs='assets/css:all_client_css',
     compiler_jar=GSS_COMPILER_JAR)
 

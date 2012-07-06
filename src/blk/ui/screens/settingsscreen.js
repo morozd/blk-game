@@ -35,7 +35,7 @@ goog.require('goog.style');
  * Settings popup dialog.
  * @constructor
  * @extends {blk.ui.PopupScreen}
- * @param {!goog.dom.DomHelper} domHelper DOM helper used to create DOM nodes.
+ * @param {!goog.dom.DomHelper} dom DOM helper used to create DOM nodes.
  * @param {!Element} parentElement Parent DOM element to render into.
  * @param {!blk.game.client.UserSettings} settings User settings.
  */

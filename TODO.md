@@ -25,6 +25,10 @@ M3: Replace UI with DOM
     * need rendering of names to canvas, uploading to texture
     * gf.graphics.Texture#drawText?
 
+* HTML location API
+    * update ?host= when joining/leaving a game
+    * update # with position (every once in awhile? focus loss?)
+
 M4: Infinite Maps
 ================================================================================
 

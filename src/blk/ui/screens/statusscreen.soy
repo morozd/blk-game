@@ -30,7 +30,7 @@
  * @param arg Optional argument from a deferred callback.
  */
 {template .error}
-  {call blk.ui.popups.simplePopup data="all"}
+  {call blk.ui.popups.simpleDialog data="all"}
     {param header}
       {msg desc="Error occurred in a part of the program."}
         Error in {$location}
@@ -56,7 +56,7 @@
  * @param server_name Server host name the user is connecting to.
  */
 {template .connecting}
-  {call blk.ui.popups.simplePopup data="all"}
+  {call blk.ui.popups.simpleDialog data="all"}
     {param header}
       {msg desc="User is connecting to the server."}
         Connecting...
@@ -76,7 +76,7 @@
  * @param reason Reason code from gf.net.DisconnectReason.
  */
 {template .connectionFailed}
-  {call blk.ui.popups.simplePopup data="all"}
+  {call blk.ui.popups.simpleDialog data="all"}
     {param header}
       {msg desc="The user could not connect to the server."}
         Connection Failed
@@ -128,7 +128,7 @@
  * @param reason Reason code from gf.net.DisconnectReason.
  */
 {template .disconnected}
-  {call blk.ui.popups.simplePopup data="all"}
+  {call blk.ui.popups.simpleDialog data="all"}
     {param header}
       {msg desc="The user's connection to the server was lost."}
         Connection Lost

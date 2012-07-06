@@ -29,7 +29,7 @@ goog.require('blk.ui.screens.statusscreen');
  * Temporary popup status screen.
  * @constructor
  * @extends {blk.ui.PopupScreen}
- * @param {!goog.dom.DomHelper} domHelper DOM helper used to create DOM nodes.
+ * @param {!goog.dom.DomHelper} dom DOM helper used to create DOM nodes.
  * @param {!Element} parentElement Parent DOM element to render into.
  * @param {!Function} template The Soy template defining the element's content.
  * @param {Object=} opt_templateData The data for the template.

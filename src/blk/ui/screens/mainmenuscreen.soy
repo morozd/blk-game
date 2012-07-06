@@ -27,5 +27,53 @@
  * Main menu screen.
  */
 {template .content}
-  main menu
+  <div class="{css blkMainMenuOuter}">
+    <div class="{css blkMainMenu}">
+      <div class="{css blkMainMenuHeader}">
+        BLK, by <a href="http://twitter.com/benvanik" target="_blank">@benvanik</a>
+      </div>
+      <div class="{css blkMainMenuBody}">
+        TODO: some awesome logo or something
+        <br/>
+        {msg desc="Introduction text."}
+          Welcome to my 20% project hacky game tech demo thingie!
+        {/msg}
+        <br/>
+        <a href="." target="_blank">
+          {msg desc="Link for more information about the game."}
+            More Information
+          {/msg}
+        </a>
+        <br/>
+        <table class="{css blkMainMenuModes}">
+          <tr>
+            <td class="{css blkMainMenuSinglePlayerButton}">
+              {msg desc="Single-player game button label."}
+                Single-player
+              {/msg}
+            </td>
+            <td class="{css blkMainMenuMultiPlayerButton}">
+              {msg desc="Multi-player game button label."}
+                Multi-player
+              {/msg}
+            </td>
+          </tr>
+        </table>
+      </div>
+      <table class="{css blkMainMenuTools}">
+        <tr>
+          <td class="{css blkMainMenuSettingsButton}">
+            {msg desc="Settings and configuration button label."}
+              Settings
+            {/msg}
+          </td>
+          <td class="{css blkMainMenuHelpButton}">
+            {msg desc="Help button label."}
+              Help
+            {/msg}
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
 {/template}

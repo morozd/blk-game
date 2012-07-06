@@ -23,13 +23,23 @@
 @def BLK_POPUP_DIALOG_WIDTH     500px;
 @def BLK_POPUP_HEADER_HEIGHT    45px;
 
-.blkPopup {
-  position: relative;
-  margin-top: 100px;
-  margin-left: auto;
-  margin-right: auto;
+.blkPopupOuter {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+
+  display: table;
 
   width: BLK_POPUP_DIALOG_WIDTH;
+}
+
+.blkPopup {
+  position: relative;
+  text-align: left;
+
   border: 2px solid #353535;
   background-position: 0 BLK_POPUP_HEADER_HEIGHT;
 
@@ -45,10 +55,21 @@
 
   @mixin blkPopupHeaderBackground();
 }
+.blkPopupHeaderTaller {
+  font-size: 37px;
+  height: 53px;
+  background-position: 0;
+}
 
 .blkPopupBody {
   padding: 10px;
   min-height: 80px;
+
+  max-height: 600px;
+  overflow-y: auto;
+}
+.blkPopupBody a, .blkPopupBody a:visited {
+  @mixin bitLightLinkColors();
 }
 
 .blkPopupFooter {
@@ -79,9 +100,4 @@
   text-shadow: #888 1px 1px;
 
   @mixin blkPopupButtonDefaultBackground();
-}
-
-a.blkPopupLink,  a.blkPopupLink:visited {
-  color: #D1D1D1;
-  text-shadow: #555555 1px 1px;
 }

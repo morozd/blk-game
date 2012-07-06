@@ -29,7 +29,7 @@ goog.require('blk.ui.screens.helpscreen');
  * Help popup.
  * @constructor
  * @extends {blk.ui.PopupScreen}
- * @param {!goog.dom.DomHelper} domHelper DOM helper used to create DOM nodes.
+ * @param {!goog.dom.DomHelper} dom DOM helper used to create DOM nodes.
  * @param {!Element} parentElement Parent DOM element to render into.
  */
 blk.ui.screens.HelpScreen = function(dom, parentElement) {

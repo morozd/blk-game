@@ -20,19 +20,31 @@
  * @author benvanik@google.com (Ben Vanik)
  */
 
-.blkSplashScreen {
-  position: relative;
-  margin-top: auto;
-  margin-bottom: auto;
-  margin-left: auto;
-  margin-right: auto;
+@def BLK_SPLASHSCREEN_DIALOG_WIDTH    150px;
+@def BLK_SPLASHSCREEN_DIALOG_HEIGHT   40px;
 
-  width: 400px;
-  height: 400px;
+.blkSplashScreen {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+
+  width: BLK_SPLASHSCREEN_DIALOG_WIDTH;
+  height: BLK_SPLASHSCREEN_DIALOG_HEIGHT;
+  display: table;
 
   border: 2px solid #353535;
 
   @mixin bitDropShadow();
   @mixin bitFont(18px);
   @mixin blkPopupBackground();
+  @mixin noSelect();
+}
+
+.blkSplashScreenInner {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
 }

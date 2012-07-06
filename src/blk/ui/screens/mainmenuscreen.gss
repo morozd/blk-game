@@ -19,3 +19,106 @@
  *
  * @author benvanik@google.com (Ben Vanik)
  */
+
+@def BLK_MAINMENU_WIDTH     700px;
+
+.blkMainMenuOuter {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+
+  display: table;
+
+  width: BLK_MAINMENU_WIDTH;
+}
+
+.blkMainMenu {
+  position: relative;
+  text-align: left;
+
+  border: 2px solid #353535;
+
+  cursor: default;
+
+  @mixin noSelect();
+  @mixin bitDropShadow();
+  @mixin bitFont(18px);
+  @mixin blkPopupBackground();
+}
+
+.blkMainMenuHeader {
+  height: 53px;
+  padding: 5px 10px 5px 10px;
+
+  font-size: 37px;
+  text-align: center;
+
+  @mixin blkPopupHeaderBackground();
+  /* @alternate */ background-position: 0;
+}
+
+.blkMainMenuHeader a, .blkMainMenuHeader a:visited {
+  color: #DD5500;
+  text-shadow: #993300 1px 1px;
+}
+
+.blkMainMenuBody {
+  padding: 10px;
+  min-height: 80px;
+
+  max-height: 600px;
+  overflow-y: auto;
+}
+.blkMainMenuBody a, .blkMainMenuBody a:visited {
+  @mixin bitLightLinkColors();
+}
+
+.blkMainMenuModes {
+  margin-top: 25px;
+  margin-bottom: 25px;
+  margin-left: auto;
+  margin-right: auto;
+  border-spacing: 10px 0;
+
+  text-align: center;
+
+  @mixin noSelect();
+}
+.blkMainMenuModes td {
+  width: 192px;
+  height: 128px;
+  border: 2px solid white;
+  background: rgba(200, 200, 200, 0.5);
+
+  cursor: pointer;
+
+  @mixin noSelect();
+  @mixin transitionBackground();
+}
+.blkMainMenuModes td:hover {
+  background: rgba(200, 200, 200, 0.7);
+}
+.blkMainMenuSinglePlayerButton {}
+.blkMainMenuMultiPlayerButton {}
+
+.blkMainMenuTools {
+  height: 28px;
+  margin-bottom: 3px;
+  margin-right: 3px;
+  margin-left: auto;
+}
+.blkMainMenuTools td {
+  padding: 3px;
+  border: 2px solid #CCC;
+  font-size: 18px;
+
+  cursor: pointer;
+
+  @mixin noSelect();
+  @mixin blkPopupButtonBackground();
+}
+.blkMainMenuSettingsButton {}
+.blkMainMenuHelpButton {}

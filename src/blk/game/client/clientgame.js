@@ -17,7 +17,6 @@
 goog.provide('blk.game.client.ClientGame');
 
 goog.require('blk.assets.audio.BaseSounds');
-goog.require('blk.game.client.MusicController');
 goog.require('blk.graphics.RenderState');
 goog.require('blk.net.packets');
 goog.require('blk.ui.screens.GameScreen');
@@ -29,6 +28,7 @@ goog.require('blk.ui.screens.StatusScreen');
 goog.require('gf.Game');
 goog.require('gf.assets.AssetManager');
 goog.require('gf.audio.AudioManager');
+goog.require('gf.audio.MusicController');
 goog.require('gf.dom.Display');
 goog.require('gf.graphics.GraphicsContext');
 goog.require('gf.input.InputManager');
@@ -84,6 +84,7 @@ blk.game.client.ClientGame = function(dom, launchOptions, settings) {
    */
   this.display_ = new gf.dom.Display(this.dom);
   this.registerDisposable(this.display_);
+  this.display_.setVisible(false);
 
   /**
    * Input manager.
@@ -126,10 +127,13 @@ blk.game.client.ClientGame = function(dom, launchOptions, settings) {
    * Music controller.
    * Handles automatic playback of music, track management, etc.
    * @private
-   * @type {!blk.game.client.MusicController}
+   * @type {!gf.audio.MusicController}
    */
-  this.musicController_ = new blk.game.client.MusicController(this);
+  this.musicController_ = new gf.audio.MusicController(
+      this.assetManager_, this.audioManager_);
   this.registerDisposable(this.musicController_);
+  //.setTrackList(blk.assets.audio.Music.create(
+  //    assetManager, audioManager.context));
 
   /**
    * Sound bank for base game sounds (UI/etc).
@@ -153,8 +157,6 @@ blk.game.client.ClientGame = function(dom, launchOptions, settings) {
    * @type {boolean}
    */
   this.inGame_ = false;
-
-  this.beginSetup_();
 };
 goog.inherits(blk.game.client.ClientGame, gf.Game);
 
@@ -216,7 +218,7 @@ blk.game.client.ClientGame.prototype.getAudioManager = function() {
 
 
 /**
- * @return {!blk.game.client.MusicController} Music controller.
+ * @return {!gf.audio.MusicController} Music controller.
  */
 blk.game.client.ClientGame.prototype.getMusicController = function() {
   return this.musicController_;
@@ -263,6 +265,16 @@ blk.game.client.ClientGame.prototype.refreshSettings_ = function() {
   // var userInfo = user.info.clone();
   // userInfo.displayName = this.settings.userName;
   // this.session.updateUserInfo(userInfo);
+};
+
+
+/**
+ * Starts the main game UI logic.
+ * Must be called when the hosting application is ready for the game logic to
+ * take over.
+ */
+blk.game.client.ClientGame.prototype.start = function() {
+  this.beginSetup_();
 };
 
 
@@ -401,7 +413,7 @@ blk.game.client.ClientGame.prototype.gotoMainMenuScreen = function() {
   }
 
   var mainMenuScreen = new blk.ui.screens.MainMenuScreen(
-      this.dom, this.display_.getDomElement());
+      this, this.display_.getDomElement());
   this.screenManager_.setScreen(mainMenuScreen);
 };
 
@@ -415,6 +427,9 @@ blk.game.client.ClientGame.prototype.pushSinglePlayerMenuScreen = function() {
   // var singlePlayerMenuScreen = new blk.ui.screens.SinglePlayerMenuScreen(
   //     this.dom, this.display_.getDomElement());
   // this.screenManager_.pushScreen(singlePlayerMenuScreen);
+
+  // HACK: for now
+  this.connectToHost('local://blk-0');
 };
 
 
@@ -427,6 +442,9 @@ blk.game.client.ClientGame.prototype.pushMultiPlayerMenuScreen = function() {
   // var multiPlayerMenuScreen = new blk.ui.screens.MultiPlayerMenuScreen(
   //     this.dom, this.display_.getDomElement());
   // this.screenManager_.pushScreen(multiPlayerMenuScreen);
+
+  // HACK: for now
+  this.connectToHost('ws://localhost:1337');
 };
 
 
@@ -447,8 +465,6 @@ blk.game.client.ClientGame.prototype.pushCreateMapMenuScreen = function() {
  * @private
  */
 blk.game.client.ClientGame.prototype.prePopup_ = function() {
-  this.playClick();
-
   // Disable input if in game
   if (this.isInGame()) {
     this.inputManager_.setEnabled(false);
@@ -461,8 +477,6 @@ blk.game.client.ClientGame.prototype.prePopup_ = function() {
  * @private
  */
 blk.game.client.ClientGame.prototype.postPopup_ = function() {
-  this.playClick();
-
   // Re-enable input if in game
   if (this.isInGame()) {
     this.inputManager_.setEnabled(true);
@@ -477,11 +491,14 @@ blk.game.client.ClientGame.prototype.showSettingsPopup = function() {
   this.prePopup_();
 
   var settingsScreen = new blk.ui.screens.SettingsScreen(
-      this.dom, this.display_.getDomElement());
+      this.dom, this.display_.getDomElement(),
+      this.settings);
   this.screenManager_.pushScreen(settingsScreen);
 
   settingsScreen.deferred.addCallback(
-      function(buttonid) {
+      function(buttonId) {
+        this.playClick();
+
         if (buttonId == 'save') {
           this.refreshSettings_();
         }
@@ -503,6 +520,8 @@ blk.game.client.ClientGame.prototype.showHelpPopup = function() {
 
   helpScreen.deferred.addBoth(
       function() {
+        this.playClick();
+
         this.postPopup_();
       }, this);
 };
@@ -549,7 +568,8 @@ blk.game.client.ClientGame.prototype.connectToHost = function(address) {
   var userInfo = new gf.net.UserInfo();
   //userInfo.authType = gf.net.AuthType.GPLUS;
   //userInfo.authId = 'gplus_id';
-  userInfo.displayName = gf.net.UserInfo.sanitizeDisplayName(settings.userName);
+  userInfo.displayName =
+      gf.net.UserInfo.sanitizeDisplayName(this.settings.userName);
 
   // Attempt connection
   if (!deferred.hasFired()) {

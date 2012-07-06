@@ -31,7 +31,7 @@ goog.require('blk.ui.screens.splashscreen');
  * Ideally, it would hide the latency of loading all of the extra resources.
  * @constructor
  * @extends {blk.ui.PopupScreen}
- * @param {!goog.dom.DomHelper} domHelper DOM helper used to create DOM nodes.
+ * @param {!goog.dom.DomHelper} dom DOM helper used to create DOM nodes.
  * @param {!Element} parentElement Parent DOM element to render into.
  */
 blk.ui.screens.SplashScreen = function(dom, parentElement) {
@@ -39,25 +39,3 @@ blk.ui.screens.SplashScreen = function(dom, parentElement) {
   });
 };
 goog.inherits(blk.ui.screens.SplashScreen, blk.ui.PopupScreen);
-
-
-/**
- * Auto-close delay, in ms.
- * @private
- * @const
- * @type {number}
- */
-blk.ui.screens.SplashScreen.CLOSE_TIMEOUT_ = 2 * 1000;
-
-
-/**
- * @override
- */
-blk.ui.screens.SplashScreen.prototype.enterDocument = function() {
-  goog.base(this, 'enterDocument');
-
-  // Setup auto-close
-  goog.global.setTimeout(goog.bind(function() {
-    this.close();
-  }, this), blk.ui.screens.SplashScreen.CLOSE_TIMEOUT_);
-};

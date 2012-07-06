@@ -37,6 +37,40 @@ blk.ui.screens.GameScreen = function(game, session) {
       gf.ui.Screen.Flags.OPAQUE |
       gf.ui.Screen.Flags.MODAL_INPUT);
 
-  //
+  /**
+   * @private
+   * @type {!blk.game.client.ClientGame}
+   */
+  this.game_ = game;
+
+  /**
+   * @private
+   * @type {!gf.dom.Display}
+   */
+  this.display_ = game.getDisplay();
 };
 goog.inherits(blk.ui.screens.GameScreen, gf.ui.Screen);
+
+
+/**
+ * @override
+ */
+blk.ui.screens.GameScreen.prototype.enterDocument = function() {
+  goog.base(this, 'enterDocument');
+
+  // Show the (already created) main display
+  this.display_.setVisible(true);
+  this.game_.startTicking();
+};
+
+
+/**
+ * @override
+ */
+blk.ui.screens.GameScreen.prototype.exitDocument = function() {
+  // Hide the main display - we don't remove/kill it here
+  this.display_.setVisible(false);
+  this.game_.stopTicking();
+
+  goog.base(this, 'exitDocument');
+};
