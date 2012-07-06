@@ -226,59 +226,24 @@ ServerGameViewObserver(MapObserver):
 
 
 
-Entity
-======
+blk.game.client.ClientController:
+    getGame
 
-* refactor:
-    *
+    load() -> deferred
+    handleDisconnect()
 
+    update(frame)
 
-blk.game.client.ClientGame:
-    screenManager
-    gotoSplashScreen_(afterwards)
-    gotoMainMenuScreen()
-    gotoSinglePlayerScreen()
-    gotoCreateMapScreen()
-    gotoMultiplayerScreen()
-    gotoExternalLink()
-    showSettingsPopup()
-    showHelpPopup()
-    connectToLocalHost(addr, mapPath)
-    connectToRemoteHost(addr)
+    render(frame)
+    processPhysics()
+    processInput(frame, inputData)
+    beginRendering()
+    drawWorld()
+    drawOverlays()
+    endRendering()
 
+    handleNewPlayer()
+    handleUpdatedPlayer()
+    handleDeletedPlayer()
 
-blk.game.client.ScreenManager:
-    screens
-    push(screen, modal)
-    pop
-    clear
-    update()
-    render()
-
-blk.game.client.Screen:
-    game
-    active
-    update()
-    render()
-
-blk.game.client.screens...:
-- splash screen
-- main menu screen
-    singleplayer
-    multiplayer
-    settings
-    help
-- local map picker
-- server browser
-- settings screen
-- help screen
-- game screen
-
-blk.game.client.GameContext:
-    assetManager
-    display
-    graphicsContext
-    renderState
-    audioManager
-    musicController
-    audio something?
+    blocksChanged

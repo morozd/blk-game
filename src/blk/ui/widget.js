@@ -54,7 +54,7 @@ blk.ui.Widget = function(game, template, opt_templateData) {
    * @type {Element}
    */
   this.parentElement =
-      goog.dom.getParentElement(game.display.getInputElement());
+      goog.dom.getParentElement(game.getDisplay().getInputElement());
 
   /**
    * @protected

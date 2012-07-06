@@ -377,8 +377,33 @@ blk.game.client.ClientGame.prototype.render = function(frame) {
  * Plays the 'click' sound (if sound is enabled).
  */
 blk.game.client.ClientGame.prototype.playClick = function() {
+  this.playSound('click');
+};
+
+
+/**
+ * Plays the 'player_join' sound (if sound is enabled).
+ */
+blk.game.client.ClientGame.prototype.playPlayerJoin = function() {
+  this.playSound('player_join');
+};
+
+
+/**
+ * Plays the 'player_leave' sound (if sound is enabled).
+ */
+blk.game.client.ClientGame.prototype.playPlayerLeave = function() {
+  this.playSound('player_leave');
+};
+
+
+/**
+ * Plays the given base sound sound (if sound is enabled).
+ * @param {string} cue Cue name.
+ */
+blk.game.client.ClientGame.prototype.playSound = function(cue) {
   if (!this.settings.soundFxMuted) {
-    this.baseSounds_.playAmbient('click');
+    this.baseSounds_.playAmbient(cue);
   }
 };
 
@@ -591,6 +616,7 @@ blk.game.client.ClientGame.prototype.connectToHost = function(address) {
   deferred.addCallbacks(
       function(session) {
         gf.log.write('Connection established to ' + address);
+
         // Connection ready!
         dialogDeferred.cancel();
 

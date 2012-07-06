@@ -58,10 +58,12 @@ blk.ui.Menubar.prototype.enterDocument = function() {
                   this.game.toggleFullscreen();
                   break;
                 case 'settings':
-                  this.game.showSettings();
+                  this.game.playClick();
+                  this.game.showSettingsPopup();
                   break;
                 case 'help':
-                  this.game.showHelp();
+                  this.game.playClick();
+                  this.game.showHelpPopup();
                   break;
               }
             });

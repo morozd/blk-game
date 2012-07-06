@@ -31,13 +31,19 @@ goog.require('goog.style');
  *
  * @constructor
  * @extends {blk.ui.Widget}
- * @param {!blk.game.client.ClientGame} game Client game.
+ * @param {!blk.game.client.ClientController} controller Client game controller.
  */
-blk.ui.PlayerListing = function(game) {
-  goog.base(this, game, blk.ui.playerlisting.listing, {
+blk.ui.PlayerListing = function(controller) {
+  goog.base(this, controller.game, blk.ui.playerlisting.listing, {
   });
 
   goog.style.setUnselectable(this.root, true);
+
+  /**
+   * @private
+   * @type {!blk.game.client.ClientController}
+   */
+  this.controller_ = controller;
 
   /**
    * @private
@@ -91,7 +97,7 @@ blk.ui.PlayerListing.prototype.refresh = function() {
   goog.dom.removeChildren(this.bodyEl_);
 
   // Sort players by name
-  var players = this.game.state.players;
+  var players = this.controller_.getPlayerList();
   goog.array.stableSort(players, function(a, b) {
     return goog.string.caseInsensitiveCompare(
         a.getUser().info.displayName,

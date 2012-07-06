@@ -16,6 +16,7 @@
 
 goog.provide('blk.ui.Console');
 
+goog.require('gf.log');
 goog.require('gf.net.chat.EventType');
 goog.require('goog.Disposable');
 goog.require('goog.dom.TagName');
@@ -35,34 +36,44 @@ goog.require('goog.vec.Vec4');
  * @constructor
  * @extends {goog.Disposable}
  * @param {!blk.game.client.ClientGame} game Game.
+ * @param {!gf.net.chat.ClientChatService} chatService Chat service.
  */
-blk.ui.Console = function(game) {
+blk.ui.Console = function(game, chatService) {
   goog.base(this);
 
   /**
-   * Game.
-   * @type {!blk.game.client.ClientGame}
+   * Chat service.
+   * @private
+   * @type {!gf.net.chat.ClientChatService}
    */
-  this.game = game;
+  this.chatService_ = chatService;
+
+  /**
+   * Input manager
+   * @type {!gf.input.InputManager}
+   */
+  this.inputManager_ = game.getInputManager();
 
   /**
    * Graphics context.
+   * @private
    * @type {!gf.graphics.GraphicsContext}
    */
-  this.graphicsContext = game.graphicsContext;
+  this.graphicsContext_ = game.getGraphicsContext();
 
   /**
    * Render state.
+   * @private
    * @type {!blk.graphics.RenderState}
    */
-  this.renderState = game.renderState;
+  this.renderState_ = game.getRenderState();
 
   /**
    * Sprite buffer used for text drawing.
    * @private
    * @type {!gf.graphics.SpriteBuffer}
    */
-  this.textBuffer_ = this.renderState.createSpriteBuffer();
+  this.textBuffer_ = this.renderState_.createSpriteBuffer();
   this.registerDisposable(this.textBuffer_);
 
   /**
@@ -102,7 +113,7 @@ blk.ui.Console = function(game) {
   });
   inputEl.appendChild(textBox);
 
-  var rootEl = game.display.getInputElement();
+  var rootEl = game.getDisplay().getInputElement();
   rootEl.parentNode.appendChild(inputEl);
 
   /**
@@ -168,7 +179,7 @@ blk.ui.Console.prototype.handleKeyDown_ = function(e) {
       var message = goog.string.normalizeSpaces(goog.string.normalizeWhitespace(
           goog.string.trim(this.textBox_.value)));
       if (message.length) {
-        this.game.chat.postMessage('main', message);
+        this.chatService_.postMessage('main', message);
       }
       this.hideInputBox_();
       e.preventDefault();
@@ -189,7 +200,7 @@ blk.ui.Console.prototype.showInputBox_ = function() {
   });
 
   // Disable input system, for now
-  this.game.input.setEnabled(false);
+  this.inputManager_.setEnabled(false);
 
   // Focus
   goog.global.setTimeout(goog.bind(function() {
@@ -211,10 +222,10 @@ blk.ui.Console.prototype.hideInputBox_ = function() {
   });
 
   // Re-enable input system
-  this.game.input.setEnabled(true);
+  this.inputManager_.setEnabled(true);
 
   // Re-focus the input element
-  this.game.input.inputElement.focus();
+  this.inputManager_.inputElement.focus();
 };
 
 
@@ -229,8 +240,8 @@ blk.ui.Console.prototype.processInput = function(frame, inputData) {
   var keyboardData = inputData.keyboard;
   if (keyboardData.didKeyGoDown(goog.events.KeyCodes.T)) {
     this.showInputBox_();
-    if (this.game.input.keyboard) {
-      this.game.input.keyboard.reset();
+    if (this.inputManager_.keyboard) {
+      this.inputManager_.keyboard.reset();
     }
     return true;
   }
@@ -247,7 +258,7 @@ blk.ui.Console.prototype.update = function(frame) {
   // TODO(benvanik): expire messages, etc
 
   // Poll messages from chat dispatch
-  var events = this.game.chat.poll();
+  var events = this.chatService_.poll();
   if (events) {
     for (var n = 0; n < events.length; n++) {
       var e = events[n];
@@ -272,7 +283,7 @@ blk.ui.Console.prototype.update = function(frame) {
  * @param {...string} var_args Header strings.
  */
 blk.ui.Console.prototype.render = function(frame, viewport, var_args) {
-  var font = this.renderState.font;
+  var font = this.renderState_.font;
 
   var buffer = this.textBuffer_;
   buffer.clear();
@@ -317,7 +328,7 @@ blk.ui.Console.prototype.render = function(frame, viewport, var_args) {
       0, 0, 1, 0,
       10, 40, 0, 1);
 
-  this.renderState.beginSprites(font.atlas, false);
+  this.renderState_.beginSprites(font.atlas, false);
 
   // Draw shadow
   worldMatrix[12] += 2;
@@ -357,6 +368,7 @@ blk.ui.Console.prototype.log = function(var_args) {
     }
   }
   this.add(message);
+  gf.log.write(message);
 };
 
 

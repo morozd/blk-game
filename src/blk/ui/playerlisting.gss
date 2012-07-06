@@ -30,6 +30,8 @@
 
   cursor: default;
 
+  pointer-events: none;
+
   @mixin bitFont(18px);
 }
 

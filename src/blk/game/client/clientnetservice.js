@@ -108,7 +108,7 @@ blk.game.client.ClientNetService.prototype.disconnected = function() {
  * @override
  */
 blk.game.client.ClientNetService.prototype.userConnected = function(user) {
-  this.game.handleUserConnect(user);
+  //this.game.handleUserConnect(user);
 };
 
 
@@ -116,7 +116,7 @@ blk.game.client.ClientNetService.prototype.userConnected = function(user) {
  * @override
  */
 blk.game.client.ClientNetService.prototype.userDisconnected = function(user) {
-  this.game.handleUserDisconnect(user);
+  //this.game.handleUserDisconnect(user);
 };
 
 
@@ -124,7 +124,7 @@ blk.game.client.ClientNetService.prototype.userDisconnected = function(user) {
  * @override
  */
 blk.game.client.ClientNetService.prototype.userUpdated = function(user) {
-  this.game.handleUserUpdate(user);
+  //this.game.handleUserUpdate(user);
 };
 
 
@@ -143,7 +143,7 @@ blk.game.client.ClientNetService.prototype.handleMapInfo_ =
     return false;
   }
 
-  var map = this.game.state.map;
+  //var map = this.game.state.map;
 
   gf.log.write('map info');
 
@@ -166,14 +166,14 @@ blk.game.client.ClientNetService.prototype.handleChunkData_ =
     return false;
   }
 
-  var map = this.game.state.map;
+  // var map = this.game.state.map;
 
-  // Grab chunk from the cache, load
-  var chunk = map.getChunk(chunkData.x, chunkData.y, chunkData.z);
-  if (!this.chunkSerializer_.deserializeFromReader(chunk, reader)) {
-    // TODO(benvanik): signal load failure? set state?
-    return false;
-  }
+  // // Grab chunk from the cache, load
+  // var chunk = map.getChunk(chunkData.x, chunkData.y, chunkData.z);
+  // if (!this.chunkSerializer_.deserializeFromReader(chunk, reader)) {
+  //   // TODO(benvanik): signal load failure? set state?
+  //   return false;
+  // }
 
   // TODO(benvanik): maybe fade in?
 
@@ -197,7 +197,7 @@ blk.game.client.ClientNetService.prototype.handleReadyPlayer_ =
   }
 
   // All map data has been transferred, ready!
-  this.game.makeReady();
+  //this.game.makeReady();
 
   return true;
 };
@@ -218,8 +218,8 @@ blk.game.client.ClientNetService.prototype.handleSetBlock_ =
     return false;
   }
 
-  this.game.setBlock(
-      setBlock.x, setBlock.y, setBlock.z, setBlock.blockData);
+  // this.game.setBlock(
+  //     setBlock.x, setBlock.y, setBlock.z, setBlock.blockData);
 
   return true;
 };
@@ -243,12 +243,12 @@ blk.game.client.ClientNetService.prototype.handleEntityCreate_ =
   var entityId = entityCreate.id;
   var userId = entityCreate.playerWireId;
 
-  var entity = this.game.createEntity(entityId, userId);
-  if (entity) {
-    goog.vec.Vec3.setFromArray(entity.state.position, entityCreate.position);
-    goog.vec.Vec4.setFromArray(entity.state.rotation, entityCreate.rotation);
-    goog.vec.Vec3.setFromArray(entity.state.velocity, entityCreate.velocity);
-  }
+  // var entity = this.game.createEntity(entityId, userId);
+  // if (entity) {
+  //   goog.vec.Vec3.setFromArray(entity.state.position, entityCreate.position);
+  //   goog.vec.Vec4.setFromArray(entity.state.rotation, entityCreate.rotation);
+  //   goog.vec.Vec3.setFromArray(entity.state.velocity, entityCreate.velocity);
+  // }
 
   return true;
 };
@@ -271,7 +271,7 @@ blk.game.client.ClientNetService.prototype.handleEntityDelete_ =
 
   var entityId = entityDelete.id;
 
-  this.game.deleteEntity(entityId);
+  //this.game.deleteEntity(entityId);
 
   return true;
 };
@@ -292,8 +292,8 @@ blk.game.client.ClientNetService.prototype.handleEntityPosition_ =
     return false;
   }
 
-  this.game.updateEntityPosition(
-      entityPosition.sequence, entityPosition.states);
+  // this.game.updateEntityPosition(
+  //     entityPosition.sequence, entityPosition.states);
 
   return true;
 };

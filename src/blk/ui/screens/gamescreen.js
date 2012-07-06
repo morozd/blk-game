@@ -20,6 +20,7 @@
 
 goog.provide('blk.ui.screens.GameScreen');
 
+goog.require('blk.modes.basic.client.BasicClientController');
 goog.require('gf.ui.Screen');
 
 
@@ -37,6 +38,9 @@ blk.ui.screens.GameScreen = function(game, session) {
       gf.ui.Screen.Flags.OPAQUE |
       gf.ui.Screen.Flags.MODAL_INPUT);
 
+  // TODO(benvanik): pull from options? etc
+  var controllerCtor = blk.modes.basic.client.BasicClientController;
+
   /**
    * @private
    * @type {!blk.game.client.ClientGame}
@@ -48,6 +52,14 @@ blk.ui.screens.GameScreen = function(game, session) {
    * @type {!gf.dom.Display}
    */
   this.display_ = game.getDisplay();
+
+  /**
+   * Client controller instance.
+   * @private
+   * @type {!blk.game.client.ClientController}
+   */
+  this.controller_ = new controllerCtor(game, session);
+  this.registerDisposable(this.controller_);
 };
 goog.inherits(blk.ui.screens.GameScreen, gf.ui.Screen);
 
@@ -58,9 +70,18 @@ goog.inherits(blk.ui.screens.GameScreen, gf.ui.Screen);
 blk.ui.screens.GameScreen.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
 
-  // Show the (already created) main display
-  this.display_.setVisible(true);
-  this.game_.startTicking();
+  // Load the game and start when ready
+  var deferred = this.controller_.load();
+  deferred.addCallbacks(
+      function() {
+        // Show the (already created) main display
+        this.display_.setVisible(true);
+
+        // Start the game
+        this.game_.startTicking();
+      }, function(arg) {
+        // Throw?
+      }, this);
 };
 
 
@@ -70,7 +91,27 @@ blk.ui.screens.GameScreen.prototype.enterDocument = function() {
 blk.ui.screens.GameScreen.prototype.exitDocument = function() {
   // Hide the main display - we don't remove/kill it here
   this.display_.setVisible(false);
+
+  // Stop ticking
   this.game_.stopTicking();
 
   goog.base(this, 'exitDocument');
+};
+
+
+/**
+ * @override
+ */
+blk.ui.screens.GameScreen.prototype.update = function(frame) {
+  goog.base(this, 'update', frame);
+  this.controller_.update(frame);
+};
+
+
+/**
+ * @override
+ */
+blk.ui.screens.GameScreen.prototype.render = function(frame) {
+  goog.base(this, 'render', frame);
+  this.controller_.render(frame);
 };
