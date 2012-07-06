@@ -25,17 +25,10 @@ goog.require('blk.game.Player');
  *
  * @constructor
  * @extends {blk.game.Player}
- * @param {!blk.game.client.ClientGame} game Game.
  * @param {!gf.net.User} user Net user.
  */
-blk.game.client.ClientPlayer = function(game, user) {
+blk.game.client.ClientPlayer = function(user) {
   goog.base(this, user);
-
-  /**
-   * Current game.
-   * @type {!blk.game.client.ClientGame}
-   */
-  this.game = game;
 };
 goog.inherits(blk.game.client.ClientPlayer, blk.game.Player);
 

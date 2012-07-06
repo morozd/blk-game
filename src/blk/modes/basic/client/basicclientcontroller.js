@@ -23,8 +23,6 @@ goog.provide('blk.modes.basic.client.BasicClientController');
 goog.require('blk.game.client.ClientController');
 goog.require('blk.ui.Menubar');
 goog.require('blk.ui.PlayerListing');
-goog.require('goog.vec.Mat4');
-goog.require('goog.vec.Quaternion');
 
 
 
@@ -66,6 +64,17 @@ blk.modes.basic.client.BasicClientController = function(game, session) {
 };
 goog.inherits(blk.modes.basic.client.BasicClientController,
     blk.game.client.ClientController);
+
+
+/**
+ * @override
+ */
+blk.modes.basic.client.BasicClientController.prototype.handlePlayersChanged =
+    function() {
+  goog.base(this, 'handlePlayersChanged');
+
+  this.playerListing_.refresh();
+};
 
 
 /**
