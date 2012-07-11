@@ -169,8 +169,20 @@ blk.env.client.ViewManager = function(renderState, map, view) {
    * @type {number}
    */
   this.lastFrameNumber_ = 0;
+
+  // Tie to view
+  this.view.addObserver(this);
 };
 goog.inherits(blk.env.client.ViewManager, goog.Disposable);
+
+
+/**
+ * @override
+ */
+blk.env.client.ViewManager.prototype.disposeInternal = function() {
+  this.view.removeObserver(this);
+  goog.base(this, 'disposeInternal');
+};
 
 
 /**

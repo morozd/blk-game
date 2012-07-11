@@ -83,9 +83,6 @@ blk.modes.basic.client.BasicClientController.prototype.handlePlayersChanged =
 blk.modes.basic.client.BasicClientController.prototype.update =
     function(frame) {
   goog.base(this, 'update', frame);
-
-  // Update views
-  //this.localView.update(frame, this.viewport.position);
 };
 
 
@@ -95,30 +92,6 @@ blk.modes.basic.client.BasicClientController.prototype.update =
 blk.modes.basic.client.BasicClientController.prototype.processPhysics =
     function(frame) {
   goog.base(this, 'processPhysics', frame);
-
-  // // Handle movement
-  // this.movement_.update(frame, viewport, this.inputData);
-  // if (this.movement_.hasDied) {
-  //   this.handleError('Movement predictor backup, network too slow/broken');
-  //   return;
-  // }
-
-  // // Compute updated view matrix based on user entity
-  // var localEntity = this.getLocalEntity();
-  // if (localEntity) {
-  //   // Run client-side prediction
-  //   this.movement_.predictMovement(frame);
-
-  //   var state = localEntity.state;
-  //   var vm = viewport.viewMatrix;
-  //   goog.vec.Quaternion.toRotationMatrix4(state.rotation, vm);
-  //   goog.vec.Mat4.transpose(vm, vm);
-  //   goog.vec.Mat4.translate(vm,
-  //       -state.position[0], -state.position[1], -state.position[2]);
-  // }
-
-  // // Update viewport matrices/etc now that the controller logic has been applied
-  // viewport.calculate();
 };
 
 
@@ -169,5 +142,3 @@ blk.modes.basic.client.BasicClientController.prototype.drawOverlays =
   // this.drawInputUI_(frame);
   // this.drawBlockTypes_(frame);
 };
-
-

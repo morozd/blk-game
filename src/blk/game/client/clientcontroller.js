@@ -25,6 +25,7 @@ goog.require('blk.env');
 goog.require('blk.env.Entity');
 goog.require('blk.env.client.ClientMap');
 goog.require('blk.game.client.ClientPlayer');
+goog.require('blk.game.client.LocalPlayer');
 goog.require('blk.io.ChunkSerializer');
 goog.require('blk.net.packets.ChunkData');
 goog.require('blk.net.packets.EntityCreate');
@@ -96,26 +97,6 @@ blk.game.client.ClientController = function(game, session) {
   this.map_ = new blk.env.client.ClientMap();
   this.registerDisposable(this.map_);
 
-  // TODO(benvanik): move this someplace else - feels wrong here
-  /**
-   * Block sound effects.
-   * @private
-   * @type {!gf.audio.SoundBank}
-   */
-  this.blockSoundBank_ = blk.assets.audio.BlockSounds.create(
-      this.game.getAssetManager(), this.game.getAudioManager().context);
-  this.game.getAudioManager().loadSoundBank(this.blockSoundBank_);
-
-  /**
-   * Player listing.
-   * @private
-   * @type {!Array.<!blk.game.client.ClientPlayer>}
-   */
-  this.players_ = [];
-
-  // Add all players currently in the session
-  this.addInitialPlayers_();
-
   /**
    * Input data storage.
    * @private
@@ -137,6 +118,36 @@ blk.game.client.ClientController = function(game, session) {
   this.console_ = new blk.ui.Console(this.game, this.chatService_);
   this.registerDisposable(this.console_);
   //this.addWidget(this.console_);
+
+  // TODO(benvanik): move this someplace else - feels wrong here
+  /**
+   * Block sound effects.
+   * @private
+   * @type {!gf.audio.SoundBank}
+   */
+  this.blockSoundBank_ = blk.assets.audio.BlockSounds.create(
+      this.game.getAssetManager(), this.game.getAudioManager().context);
+  this.game.getAudioManager().loadSoundBank(this.blockSoundBank_);
+
+  /**
+   * Player listing.
+   * @private
+   * @type {!Array.<!blk.game.client.ClientPlayer>}
+   */
+  this.players_ = [];
+
+  // Add all players currently in the session
+  this.addInitialPlayers_();
+  var localPlayer = /** @type {blk.game.client.LocalPlayer} */ (
+      this.getPlayerBySessionId(this.session.id));
+  goog.asserts.assert(localPlayer);
+
+  /**
+   * The local player.
+   * @private
+   * @type {!blk.game.client.LocalPlayer}
+   */
+  this.localPlayer_ = localPlayer;
 
   // Simulated latency
   var launchOptions = this.game.launchOptions;
@@ -160,7 +171,12 @@ blk.game.client.ClientController.prototype.getMap = function() {
 blk.game.client.ClientController.prototype.addInitialPlayers_ = function() {
   for (var n = 0; n < this.session.users.length; n++) {
     var user = this.session.users[n];
-    var player = new blk.game.client.ClientPlayer(user);
+    var player;
+    if (user == this.session.getLocalUser()) {
+      player = new blk.game.client.LocalPlayer(this, user);
+    } else {
+      player = new blk.game.client.ClientPlayer(user);
+    }
     user.data = player;
     this.players_.push(player);
   }
@@ -383,18 +399,18 @@ blk.game.client.ClientController.prototype.render = function(frame) {
 
   // Process physics (and user input)
   // NOTE: this is done without the interpolation delay so real times get used
+  if (!this.localPlayer_.processPhysics(frame, this.inputData_)) {
+    // Physics inconsistency - no way to proceed
+    this.handleError('Network physics backup');
+    return;
+  }
   this.processPhysics(frame);
-  // TODO(benvanik): handle input backup?
 
   // Handle user input (for UI/actions/etc)
   // Let the console eat the data first, if it wants to
   if (!this.console_.processInput(frame, this.inputData_)) {
     this.processInput(frame, this.inputData_);
   }
-
-  // Update audio listener with the latest viewport
-  // var audioManager = this.game.getAudioManager();
-  // audioManager.listener.update(viewport.inverseViewMatrix);
 
   // Timeshift by interpolation delay
   // This ensures we render at the time we should be
