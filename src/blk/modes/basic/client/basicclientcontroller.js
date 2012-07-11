@@ -20,6 +20,7 @@
 
 goog.provide('blk.modes.basic.client.BasicClientController');
 
+goog.require('blk.assets.audio.Music');
 goog.require('blk.game.client.ClientController');
 goog.require('blk.ui.Menubar');
 goog.require('blk.ui.PlayerListing');
@@ -75,6 +76,19 @@ blk.modes.basic.client.BasicClientController = function(game, session) {
   //  */
   // this.toolbar_ = new blk.ui.Toolbar(this);
   // this.addWidget(this.toolbar_);
+
+  /**
+   * Background music track list.
+   * @private
+   * @type {!gf.audio.TrackList}
+   */
+  this.musicTrackList_ = blk.assets.audio.Music.create(
+      this.game.getAssetManager(), this.game.getAudioManager().context);
+  this.registerDisposable(this.musicTrackList_);
+
+  // Setup music
+  var musicController = this.game.getMusicController();
+  musicController.setTrackList(this.musicTrackList_);
 };
 goog.inherits(blk.modes.basic.client.BasicClientController,
     blk.game.client.ClientController);
@@ -114,9 +128,37 @@ blk.modes.basic.client.BasicClientController.prototype.processPhysics =
  */
 blk.modes.basic.client.BasicClientController.prototype.processInput =
     function(frame, inputData) {
-  goog.base(this, 'processInput', frame, inputData);
+  if (goog.base(this, 'processInput', frame, inputData)) {
+    return true;
+  }
 
-  //
+  var keyboardData = inputData.keyboard;
+
+  // TODO(benvanik): track goog.events.KeyCodes.PAUSE to pause update loop
+
+  // Show settings/etc
+  if (keyboardData.didKeyGoDown(goog.events.KeyCodes.O)) {
+    this.game.playClick();
+    this.game.showSettingsPopup();
+    return true;
+  } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.H)) {
+    this.game.playClick();
+    this.game.showHelpPopup();
+    return true;
+  } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.TAB)) {
+    this.game.playClick();
+    this.playerListing_.toggleVisibility();
+    return true;
+  }
+
+  // Toggle audio
+  if (keyboardData.didKeyGoDown(goog.events.KeyCodes.M)) {
+    this.game.playClick();
+    var musicController = this.game.getMusicController();
+    musicController.togglePlayback();
+  }
+
+  return false;
 };
 
 

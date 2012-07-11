@@ -132,8 +132,6 @@ blk.game.client.ClientGame = function(dom, launchOptions, settings) {
   this.musicController_ = new gf.audio.MusicController(
       this.assetManager_, this.audioManager_);
   this.registerDisposable(this.musicController_);
-  //.setTrackList(blk.assets.audio.Music.create(
-  //    assetManager, audioManager.context));
 
   /**
    * Sound bank for base game sounds (UI/etc).
@@ -274,6 +272,7 @@ blk.game.client.ClientGame.prototype.refreshSettings_ = function() {
  * take over.
  */
 blk.game.client.ClientGame.prototype.start = function() {
+  this.refreshSettings_();
   this.beginSetup_();
 };
 

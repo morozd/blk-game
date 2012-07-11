@@ -463,9 +463,11 @@ blk.game.client.ClientController.prototype.processPhysics = function(frame) {
  * @protected
  * @param {!gf.RenderFrame} frame Current render frame.
  * @param {!gf.input.Data} inputData Updated input data.
+ * @return {boolean} True if the input was handled exclusively.
  */
 blk.game.client.ClientController.prototype.processInput =
     function(frame, inputData) {
+  return this.localPlayer_.processInput(frame, this.inputData_);
 };
 
 
@@ -529,6 +531,43 @@ blk.game.client.ClientController.prototype.playPointSound =
   if (distance < blk.env.MAX_SOUND_DISTANCE) {
     if (!this.game.settings.soundFxMuted) {
       soundBank.playPoint(cue, position);
+    }
+  }
+};
+
+
+/**
+ * Sets a block and plays sound if required.
+ * Note that the block specified may have originated from the network and as
+ * such it may not be in our view but may be in the cache. Because of this, we
+ * must pass the change off to the map, which will try to update the chunk.
+ *
+ * @param {number} x Block X.
+ * @param {number} y Block Y.
+ * @param {number} z Block Z.
+ * @param {number} blockData Block Data.
+ */
+blk.game.client.ClientController.prototype.setBlock =
+    function(x, y, z, blockData) {
+  var map = this.getMap();
+
+  var oldData = 0;
+  if (!blockData) {
+    oldData = map.getBlock(x, y, z);
+  }
+  var changed = map.setBlock(x, y, z, blockData);
+
+  // Play block sound, if any and only if needed
+  if (changed) {
+    var soundData = blockData ? blockData : oldData;
+    if (soundData >> 8) {
+      var block = map.blockSet.get(soundData >> 8);
+      var cue = block ? block.material.actionCue : null;
+      if (cue) {
+        var soundPosition = goog.vec.Vec3.createFloat32FromValues(x, y, z);
+        var soundBank = this.blockSoundBank_;
+        this.playPointSound(soundBank, cue, soundPosition);
+      }
     }
   }
 };
@@ -767,26 +806,7 @@ blk.game.client.ClientController.NetService_.prototype.handleSetBlock_ =
   var z = setBlock.z;
   var blockData = setBlock.blockData;
 
-  var map = this.controller_.getMap();
-  var oldData = 0;
-  if (!blockData) {
-    oldData = map.getBlock(x, y, z);
-  }
-  var changed = map.setBlock(x, y, z, blockData);
-
-  // Play block sound, if any and only if needed
-  if (changed) {
-    var soundData = blockData ? blockData : oldData;
-    if (soundData >> 8) {
-      var block = map.blockSet.get(soundData >> 8);
-      var cue = block ? block.material.actionCue : null;
-      if (cue) {
-        var soundPosition = goog.vec.Vec3.createFloat32FromValues(x, y, z);
-        var soundBank = this.controller_.blockSoundBank_;
-        this.controller_.playPointSound(soundBank, cue, soundPosition);
-      }
-    }
-  }
+  this.controller_.setBlock(x, y, z, blockData);
 
   return true;
 };

@@ -18,6 +18,14 @@ goog.provide('blk.env');
 
 
 /**
+ * Seconds between action repeats when buttons are held.
+ * @const
+ * @type {number}
+ */
+blk.env.ACTION_REPEAT_INTERVAL = 250 / 1000;
+
+
+/**
  * Maximum world units that an action can take place at.
  * @const
  * @type {number}
