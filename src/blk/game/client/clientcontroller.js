@@ -476,11 +476,6 @@ blk.game.client.ClientController.prototype.processInput =
  * @param {!gf.RenderFrame} frame Current render frame.
  */
 blk.game.client.ClientController.prototype.beginDrawing = function(frame) {
-  var renderState = this.game.getRenderState();
-
-  // Reset render state
-  var map = this.getMap();
-  renderState.reset(map.environment.skyColor, true);
 };
 
 
@@ -490,8 +485,6 @@ blk.game.client.ClientController.prototype.beginDrawing = function(frame) {
  * @param {!gf.RenderFrame} frame Current render frame.
  */
 blk.game.client.ClientController.prototype.drawWorld = function(frame) {
-  var player = this.localPlayer_;
-  player.renderViewport(frame);
 };
 
 
@@ -713,14 +706,14 @@ blk.game.client.ClientController.NetService_.prototype.handleChunkData_ =
     return false;
   }
 
-  // var map = this.game.state.map;
+  var map = this.controller_.getMap();
 
-  // // Grab chunk from the cache, load
-  // var chunk = map.getChunk(chunkData.x, chunkData.y, chunkData.z);
-  // if (!this.chunkSerializer_.deserializeFromReader(chunk, reader)) {
-  //   // TODO(benvanik): signal load failure? set state?
-  //   return false;
-  // }
+  // Grab chunk from the cache, load
+  var chunk = map.getChunk(chunkData.x, chunkData.y, chunkData.z);
+  if (!this.chunkSerializer_.deserializeFromReader(chunk, reader)) {
+    // TODO(benvanik): signal load failure? set state?
+    return false;
+  }
 
   // TODO(benvanik): maybe fade in?
 
@@ -764,6 +757,8 @@ blk.game.client.ClientController.NetService_.prototype.handleSetBlock_ =
   if (!setBlock) {
     return false;
   }
+
+  // TODO(benvanik): all of this should be made predicted behavior
 
   var x = setBlock.x;
   var y = setBlock.y;

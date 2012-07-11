@@ -115,7 +115,10 @@ blk.modes.basic.client.BasicClientController.prototype.beginDrawing =
 
   // Reset render state
   var renderState = this.game.getRenderState();
-  //renderState.reset(this.viewport, map.environment.skyColor, true);
+
+  // Reset render state
+  var map = this.getMap();
+  renderState.reset(map.environment.skyColor, true);
 };
 
 
@@ -127,7 +130,8 @@ blk.modes.basic.client.BasicClientController.prototype.drawWorld =
   goog.base(this, 'drawWorld', frame);
 
   // Render the map and entities
-  //this.viewManager.render(frame, viewport, this.localPlayer);
+  var player = this.getLocalPlayer();
+  player.renderViewport(frame);
 };
 
 
