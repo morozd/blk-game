@@ -224,6 +224,14 @@ blk.game.client.ClientController.prototype.getPlayerByWireId =
 
 
 /**
+ * @return {!blk.game.client.LocalPlayer} The local player.
+ */
+blk.game.client.ClientController.prototype.getLocalPlayer = function() {
+  return this.localPlayer_;
+};
+
+
+/**
  * Handles player change events.
  * Called when a player joins, leaves, or updates their metadata.
  * @protected
@@ -803,26 +811,14 @@ blk.game.client.ClientController.NetService_.prototype.handleEntityCreate_ =
   goog.vec.Vec3.setFromArray(entity.state.velocity, entityCreate.velocity);
 
   // Bind the entity and its player together
-  // TODO(benvanik): something more elegant
   var player = this.controller_.getPlayerByWireId(userId);
   if (player) {
-    player.entity = entity;
-    entity.player = player;
-
-    // Update the entity title if it is bound to a user
-    var user = player.getUser();
-    entity.title = user.info.displayName;
+    player.attachEntity(entity);
   }
 
   // Add the entity to the map
   var map = this.controller_.getMap();
   map.addEntity(entity);
-
-  // Update movement prediction
-  // TODO(benvanik): abstract this out
-  // if (entity == this.getLocalEntity()) {
-  //   entity.confirmedState = entity.state.clone();
-  // }
 
   return true;
 };
@@ -870,23 +866,22 @@ blk.game.client.ClientController.NetService_.prototype.handleEntityPosition_ =
     return false;
   }
 
-  // Confirm user commands
-  //this.movement_.confirmCommands(entityPosition.sequence);
+  // Update local movement
+  var localPlayer = this.controller_.getLocalPlayer();
+  localPlayer.confirmMovementSequence(entityPosition.sequence);
 
   // Update entity positions
   var map = this.controller_.getMap();
-  //var localEntity = this.getLocalEntity();
-  var localEntity = null;
   for (var n = 0; n < entityPosition.states.length; n++) {
     var entityState = entityPosition.states[n];
-    if (localEntity && localEntity.id == entityState.entityId) {
-      // Self
-      localEntity.confirmedState = entityState.clone();
-    } else {
-      // Others
-      // TODO(benvanik): lerp
-      var entity = map.getEntity(entityState.entityId);
-      if (entity) {
+    var entity = map.getEntity(entityState.entityId);
+    if (entity) {
+      if (entity.player == localPlayer) {
+        // Update entity confirmed state
+        entity.confirmedState.setFromState(entityState);
+      } else {
+        // Others
+        // TODO(benvanik): lerp
         entity.updateState(entityState);
       }
     }

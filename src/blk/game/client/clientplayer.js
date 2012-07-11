@@ -34,6 +34,21 @@ goog.inherits(blk.game.client.ClientPlayer, blk.game.Player);
 
 
 /**
+ * Attaches an entity to a player.
+ * @param {!blk.env.Entity} entity Player entity.
+ */
+blk.game.client.ClientPlayer.prototype.attachEntity = function(entity) {
+  // Bind
+  this.entity = entity;
+  entity.player = this;
+
+  // Update the entity title if it is bound to a user
+  var user = this.getUser();
+  entity.title = user.info.displayName;
+};
+
+
+/**
  * @override
  */
 blk.game.client.ClientPlayer.prototype.update = function(frame) {

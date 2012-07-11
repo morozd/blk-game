@@ -43,6 +43,12 @@ blk.physics.ServerMovement = function(view) {
    * @type {number}
    */
   this.lastSequence = -1;
+
+  /**
+   * Last sequence confirmation sent to the client.
+   * @type {number}
+   */
+  this.lastSequenceSent = -1;
 };
 goog.inherits(blk.physics.ServerMovement, blk.physics.Movement);
 

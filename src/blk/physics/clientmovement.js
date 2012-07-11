@@ -474,6 +474,10 @@ blk.physics.ClientMovement.prototype.sampleActions_ = function(frame, viewport,
  */
 blk.physics.ClientMovement.prototype.predictMovement = function(frame) {
   var entity = this.target;
+  if (!entity) {
+    return;
+  }
+
   if (entity.confirmedState) {
     entity.state.setFromState(entity.confirmedState);
   } else {

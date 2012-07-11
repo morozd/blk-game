@@ -81,19 +81,6 @@ blk.game.client.LocalPlayer = function(controller, user) {
 };
 goog.inherits(blk.game.client.LocalPlayer, blk.game.client.ClientPlayer);
 
-/**
-  on create entity:
-  var localEntity = this.getLocalEntity();
-  if (localEntity) {
-    this.movement_.attach(localEntity);
-  }
-  entity.confirmedState = entity.state.clone();
-
-  on update entity position:
-  this.movement_.confirmCommands(sequence);
-  localEntity.confirmedState = entityState.clone();
-  */
-
 
 /**
  * @override
@@ -107,6 +94,29 @@ blk.game.client.LocalPlayer.prototype.disposeInternal = function() {
   }
 
   goog.base(this, 'disposeInternal');
+};
+
+
+/**
+ * @override
+ */
+blk.game.client.LocalPlayer.prototype.attachEntity = function(entity) {
+  goog.base(this, 'attachEntity', entity);
+
+  // Setup movement prediction
+  this.movement_.attach(entity);
+  entity.confirmedState = entity.state.clone();
+};
+
+
+/**
+ * Confirms a movement sequence number.
+ * @param {number} sequence Movement sequence number.
+ */
+blk.game.client.LocalPlayer.prototype.confirmMovementSequence = function(
+    sequence) {
+  // Confirm user commands
+  this.movement_.confirmCommands(sequence);
 };
 
 

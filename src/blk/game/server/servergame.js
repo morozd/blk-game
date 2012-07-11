@@ -220,11 +220,24 @@ blk.game.server.ServerGame.prototype.update = function(frame) {
     }
   }
   for (var n = 0; n < this.state.players.length; n++) {
+    // Determine if we need to send a sequence ID
+    var sequence = -1;
     var player =
         /** @type {!blk.game.server.ServerPlayer} */ (state.players[n]);
-    if (player.movement) {
+    var movement = player.movement;
+    var needsSequenceUpdate = false;
+    if (movement) {
+      needsSequenceUpdate = movement.lastSequence != movement.lastSequenceSent;
+      sequence = movement.lastSequence;
+      movement.lastSequenceSent = movement.lastSequence;
+    }
+
+    // Only send packet if we need to confirm a sequence or update entities
+    // TODO(benvanik): delay confirming sequences a bit to reduce network
+    //     traffic when nothing is moving
+    if (entityStates.length || needsSequenceUpdate) {
       this.session.send(blk.net.packets.EntityPosition.createData(
-          player.movement.lastSequence, entityStates), player.getUser());
+          sequence, entityStates), player.getUser());
     }
   }
 };
