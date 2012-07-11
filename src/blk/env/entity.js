@@ -64,7 +64,7 @@ blk.env.Entity = function(entityId) {
    * @private
    * @type {!Array.<!blk.env.EntityState>}
    */
-  this.stateHistory_ = [];
+  this.stateHistory_ = [this.state];
 
   /**
    * Whether the latest state has been broadcast yet.
@@ -178,8 +178,10 @@ blk.env.Entity.prototype.interpolate = function(time) {
   // Need at least two states to interpolate
   if (!this.stateHistory_.length) {
     return;
-  } else if (this.stateHistory_.length < 2) {
-    this.state = this.stateHistory_[this.stateHistory_.length - 1];
+  } else if (this.stateHistory_.length == 1) {
+    var state = this.stateHistory_[this.stateHistory_.length - 1];
+    state.time = time;
+    this.state.setFromState(state);
     return;
   }
 
@@ -192,17 +194,24 @@ blk.env.Entity.prototype.interpolate = function(time) {
     }
   }
   if (!futureState) {
-    this.state = this.stateHistory_[this.stateHistory_.length - 1];
+    var state = this.stateHistory_[this.stateHistory_.length - 1];
+    state.time = time;
+    this.state.setFromState(state);
+    this.state.time = time;
     return;
   }
   var pastState = this.stateHistory_[n - 1];
-  this.stateHistory_.splice(0, n - 1);
 
   // Find interpolation factor t
   var duration = futureState.time - pastState.time;
   var baseTime = time - pastState.time;
   var t = baseTime / (futureState.time - pastState.time);
   t = goog.math.clamp(t, 0, 1);
+
+  // Remove past state only if we go over it
+  if (t >= 1) {
+    this.stateHistory_.splice(0, n - 1);
+  }
 
   // Interpolate
   blk.env.EntityState.interpolate(pastState, futureState, t, this.state);

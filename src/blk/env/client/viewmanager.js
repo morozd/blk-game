@@ -545,7 +545,8 @@ blk.env.client.ViewManager.prototype.render = function(frame, viewport,
   }
 
   // Draw entities
-  // TODO(benvanik): switch to player skin cache
+  renderState.beginEntities();
+  // TODO(benvanik): switch to player skin cache/etc
   for (var n = 0; n < visibleEntities.length; n++) {
     var entity = visibleEntities[n];
     if (entity.player == opt_localPlayer) {

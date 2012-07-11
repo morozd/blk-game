@@ -356,12 +356,10 @@ blk.graphics.RenderState.prototype.restore = function() {
 
 /**
  * Resets all render state, such at the beginning of a frame.
- * @param {!gf.vec.Viewport} viewport Viewport instance.
  * @param {!goog.vec.Vec4.Float32} clearColor RGBA color.
  * @param {boolean} clear True to clear the color buffer.
  */
-blk.graphics.RenderState.prototype.reset = function(
-    viewport, clearColor, clear) {
+blk.graphics.RenderState.prototype.reset = function(clearColor, clear) {
   var ctx = this.graphicsContext;
   var gl = ctx.getGL();
 
@@ -440,6 +438,15 @@ blk.graphics.RenderState.prototype.beginChunkPass2 = function() {
   gl.enableVertexAttribArray(0);
   gl.enableVertexAttribArray(1);
   gl.enableVertexAttribArray(2);
+};
+
+
+/**
+ * Begins the entity drawing mode.
+ */
+blk.graphics.RenderState.prototype.beginEntities = function() {
+  // HACK: just chunk pass 1 for now
+  this.beginChunkPass1();
 };
 
 

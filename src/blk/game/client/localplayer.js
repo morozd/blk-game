@@ -141,6 +141,7 @@ blk.game.client.LocalPlayer.prototype.processPhysics =
     function(frame, inputData) {
   var viewport = this.viewport_;
 
+  // Prepare viewport for updating
   var display = this.controller_.game.getDisplay();
   viewport.far = this.view.getDrawDistance();
   viewport.reset(display.getSize());
@@ -173,4 +174,13 @@ blk.game.client.LocalPlayer.prototype.processPhysics =
   audioManager.listener.update(viewport.inverseViewMatrix);
 
   return true;
+};
+
+
+/**
+ * Renders the local player's viewport.
+ * @param {!gf.RenderFrame} frame Current render frame.
+ */
+blk.game.client.LocalPlayer.prototype.renderViewport = function(frame) {
+  this.viewManager_.render(frame, this.viewport_, this);
 };

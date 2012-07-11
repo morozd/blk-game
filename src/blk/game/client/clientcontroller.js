@@ -61,6 +61,9 @@ goog.require('goog.vec.Vec4');
 blk.game.client.ClientController = function(game, session) {
   goog.base(this);
 
+  // Reset runtime clock
+  game.clock = session.clock;
+
   /**
    * Client game this instance is controlling.
    * @protected
@@ -473,6 +476,11 @@ blk.game.client.ClientController.prototype.processInput =
  * @param {!gf.RenderFrame} frame Current render frame.
  */
 blk.game.client.ClientController.prototype.beginDrawing = function(frame) {
+  var renderState = this.game.getRenderState();
+
+  // Reset render state
+  var map = this.getMap();
+  renderState.reset(map.environment.skyColor, true);
 };
 
 
@@ -482,7 +490,8 @@ blk.game.client.ClientController.prototype.beginDrawing = function(frame) {
  * @param {!gf.RenderFrame} frame Current render frame.
  */
 blk.game.client.ClientController.prototype.drawWorld = function(frame) {
-  //this.viewManager.render(frame, this.viewport, this.localPlayer);
+  var player = this.localPlayer_;
+  player.renderViewport(frame);
 };
 
 
@@ -874,6 +883,7 @@ blk.game.client.ClientController.NetService_.prototype.handleEntityPosition_ =
   var map = this.controller_.getMap();
   for (var n = 0; n < entityPosition.states.length; n++) {
     var entityState = entityPosition.states[n];
+    entityState.time /= 1000;
     var entity = map.getEntity(entityState.entityId);
     if (entity) {
       if (entity.player == localPlayer) {

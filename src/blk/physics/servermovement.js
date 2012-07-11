@@ -131,7 +131,7 @@ blk.physics.ServerMovement.prototype.update = function(frame) {
     for (var n = 0; n < commands.length; n++) {
       var cmd = commands[n];
       cmd.havePredicted = false;
-      this.executeCommand(frame.time / 1000, cmd);
+      this.executeCommand(frame.time, cmd);
 
       this.lastSequence = cmd.sequence;
     }

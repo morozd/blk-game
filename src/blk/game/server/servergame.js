@@ -214,7 +214,7 @@ blk.game.server.ServerGame.prototype.update = function(frame) {
   for (var n = 0; n < map.entities.length; n++) {
     var entity = map.entities[n];
     if (!entity.hasSentLatestState) {
-      entity.state.time = frame.time;
+      entity.state.time = (frame.time * 1000) | 0;
       entityStates.push(entity.state);
       entity.hasSentLatestState = true;
     }

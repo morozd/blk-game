@@ -528,7 +528,7 @@ blk.physics.Movement.prototype.executeCommand = function(time, cmd) {
     this.performActions_(timeDelta, cmd);
   }
 
-  state.time = cmd.time;
+  state.time = cmd.time / 1000;
 
   cmd.havePredicted = true;
 };
