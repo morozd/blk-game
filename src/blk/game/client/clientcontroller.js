@@ -435,7 +435,7 @@ blk.game.client.ClientController.prototype.render = function(frame) {
     // Draw the frame
     this.beginDrawing(frame);
     this.drawWorld(frame);
-    this.drawOverlays(frame);
+    this.drawOverlays(frame, this.inputData_);
     this.endDrawing(frame);
 
     graphicsContext.end();
@@ -491,8 +491,10 @@ blk.game.client.ClientController.prototype.drawWorld = function(frame) {
 /**
  * Draws any overlays and UI to the screen.
  * @param {!gf.RenderFrame} frame Current render frame.
+ * @param {!gf.input.Data} inputData Updated input data.
  */
-blk.game.client.ClientController.prototype.drawOverlays = function(frame) {
+blk.game.client.ClientController.prototype.drawOverlays =
+    function(frame, inputData) {
   var mapStats = this.map_.getStatisticsString();
   var renderStats = '';//this.viewManager.getStatisticsString();
   // var movement = this.localPlayer ? [

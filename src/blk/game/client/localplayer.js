@@ -98,6 +98,14 @@ blk.game.client.LocalPlayer.prototype.disposeInternal = function() {
 
 
 /**
+ * @return {!gf.vec.Viewport} The player viewport.
+ */
+blk.game.client.LocalPlayer.prototype.getViewport = function() {
+  return this.viewport_;
+};
+
+
+/**
  * @override
  */
 blk.game.client.LocalPlayer.prototype.attachEntity = function(entity) {

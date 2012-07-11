@@ -23,6 +23,8 @@ goog.provide('blk.modes.basic.client.BasicClientController');
 goog.require('blk.game.client.ClientController');
 goog.require('blk.ui.Menubar');
 goog.require('blk.ui.PlayerListing');
+goog.require('goog.vec.Mat4');
+goog.require('goog.vec.Vec4');
 
 
 
@@ -34,6 +36,18 @@ goog.require('blk.ui.PlayerListing');
  */
 blk.modes.basic.client.BasicClientController = function(game, session) {
   goog.base(this, game, session);
+
+  var renderState = this.game.getRenderState();
+
+  // TODO(benvanik): remove this as better ways of adding UI are done
+  /**
+   * Sprite buffer used for UI drawing.
+   * @private
+   * @type {!gf.graphics.SpriteBuffer}
+   */
+  this.spriteBuffer_ = renderState.createSpriteBuffer();
+  this.registerDisposable(this.spriteBuffer_);
+  this.spriteBuffer_.restore();
 
   /**
    * Player listing.
@@ -113,7 +127,6 @@ blk.modes.basic.client.BasicClientController.prototype.beginDrawing =
     function(frame) {
   goog.base(this, 'beginDrawing', frame);
 
-  // Reset render state
   var renderState = this.game.getRenderState();
 
   // Reset render state
@@ -139,10 +152,73 @@ blk.modes.basic.client.BasicClientController.prototype.drawWorld =
  * @override
  */
 blk.modes.basic.client.BasicClientController.prototype.drawOverlays =
-    function(frame) {
-  goog.base(this, 'drawOverlays', frame);
+    function(frame, inputData) {
+  goog.base(this, 'drawOverlays', frame, inputData);
 
   // Draw UI
-  // this.drawInputUI_(frame);
+  this.drawInputUI_(frame, inputData);
   // this.drawBlockTypes_(frame);
 };
+
+
+/**
+ * Draws the input UI.
+ * @private
+ * @param {!gf.RenderFrame} frame Current frame.
+ * @param {!gf.input.Data} inputData Updated input data.
+ */
+blk.modes.basic.client.BasicClientController.prototype.drawInputUI_ =
+    function(frame, inputData) {
+  var renderState = this.game.getRenderState();
+  var localPlayer = this.getLocalPlayer();
+  var viewport = localPlayer.getViewport();
+
+  var uiAtlas = renderState.uiAtlas;
+
+  var spriteBuffer = this.spriteBuffer_;
+  spriteBuffer.clear();
+
+  var slotCoords = blk.modes.basic.client.BasicClientController.tmpVec4_;
+
+  // If using mouse lock, draw a crosshair in the center of the screen
+  if (inputData.mouse.isLocked) {
+    var x = viewport.width / 2 / 2 - 8;
+    var y = viewport.height / 2 / 2 - 8;
+    uiAtlas.getSlotCoords(11, slotCoords);
+    spriteBuffer.add(
+        slotCoords[0], slotCoords[1],
+        slotCoords[2] - slotCoords[0], slotCoords[3] - slotCoords[1],
+        0xFFFFFFFF,
+        x, y, 16, 16);
+  }
+
+  // TODO(benvanik): draw onscreen dpad/etc for touch
+
+  var worldMatrix = blk.modes.basic.client.BasicClientController.tmpMat4_;
+  goog.vec.Mat4.setFromValues(worldMatrix,
+      2, 0, 0, 0,
+      0, 2, 0, 0,
+      0, 0, 1, 0,
+      0, 0, 0, 1);
+
+  renderState.beginSprites(uiAtlas, false);
+  spriteBuffer.draw(viewport.orthoMatrix, worldMatrix);
+};
+
+
+/**
+ * Temp mat4 for math.
+ * @private
+ * @type {!goog.vec.Mat4.Type}
+ */
+blk.modes.basic.client.BasicClientController.tmpMat4_ =
+    goog.vec.Mat4.createFloat32();
+
+
+/**
+ * Temp vec4 for math.
+ * @private
+ * @type {!goog.vec.Vec4.Float32}
+ */
+blk.modes.basic.client.BasicClientController.tmpVec4_ =
+    goog.vec.Vec4.createFloat32();
