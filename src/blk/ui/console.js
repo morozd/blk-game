@@ -16,6 +16,7 @@
 
 goog.provide('blk.ui.Console');
 
+goog.require('gf');
 goog.require('gf.log');
 goog.require('gf.net.chat.EventType');
 goog.require('goog.Disposable');
@@ -75,6 +76,7 @@ blk.ui.Console = function(game, chatService) {
    */
   this.textBuffer_ = this.renderState_.createSpriteBuffer();
   this.registerDisposable(this.textBuffer_);
+  this.textBuffer_.restore();
 
   /**
    * Whether the console has input focus.
@@ -158,7 +160,7 @@ blk.ui.Console.LINE_SPACING_ = 2;
  * @const
  * @type {number}
  */
-blk.ui.Console.ENTRY_TIMEOUT_ = 15;
+blk.ui.Console.ENTRY_TIMEOUT_ = 15 * 1000;
 
 
 /**
@@ -285,16 +287,21 @@ blk.ui.Console.prototype.update = function(frame) {
 blk.ui.Console.prototype.render = function(frame, viewport, var_args) {
   var font = this.renderState_.font;
 
+  if (arguments.length <= 2 && !this.entries_.length) {
+    return;
+  }
+
   var buffer = this.textBuffer_;
   buffer.clear();
 
   // Scrub dead entries
+  var now = gf.now();
   for (var n = 0; n < this.entries_.length; n++) {
     var entry = this.entries_[n];
     if (entry.timestamp == 0) {
-      entry.timestamp = frame.time;
+      entry.timestamp = now;
     } else {
-      var age = frame.time - entry.timestamp;
+      var age = now - entry.timestamp;
       if (age > blk.ui.Console.ENTRY_TIMEOUT_) {
         // Dead - remove
         this.entries_.splice(n, 1);

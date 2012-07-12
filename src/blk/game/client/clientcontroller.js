@@ -155,6 +155,13 @@ blk.game.client.ClientController = function(game, session) {
   // Simulated latency
   var launchOptions = this.game.launchOptions;
   this.session.socket.simulatedLatency = launchOptions.simulatedLatency;
+
+  // Say hi
+  this.console_.log('wsad to move');
+  this.console_.log('left click to place blocks, right click to remove');
+  if (!this.session.isLocal()) {
+    this.console_.log('t to chat');
+  }
 };
 goog.inherits(blk.game.client.ClientController, goog.Disposable);
 
@@ -497,13 +504,11 @@ blk.game.client.ClientController.prototype.drawWorld = function(frame) {
  */
 blk.game.client.ClientController.prototype.drawOverlays =
     function(frame, inputData) {
+  var localPlayer = this.getLocalPlayer();
+  var viewport = localPlayer.getViewport();
   var mapStats = this.map_.getStatisticsString();
-  var renderStats = '';//this.viewManager.getStatisticsString();
-  // var movement = this.localPlayer ? [
-  //   this.localPlayer.entity.state.velocity[0].toFixed(8),
-  //   this.localPlayer.entity.state.velocity[1].toFixed(8),
-  //   this.localPlayer.entity.state.velocity[2].toFixed(8)].join(',') : '';
-  //this.console_.render(frame, viewport, mapStats, renderStats);//, movement);
+  var playerInfo = localPlayer.getDebugInfo();
+  this.console_.render(frame, viewport, mapStats, playerInfo);
 };
 
 

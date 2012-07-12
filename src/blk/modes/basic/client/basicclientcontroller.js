@@ -76,7 +76,7 @@ blk.modes.basic.client.BasicClientController = function(game, session) {
   //  * @private
   //  * @type {!blk.ui.Toolbar}
   //  */
-  // this.toolbar_ = new blk.ui.Toolbar(this);
+  // this.toolbar_ = new blk.ui.Toolbar(this.game);
   // this.addWidget(this.toolbar_);
 
   /**

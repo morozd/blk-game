@@ -21,9 +21,11 @@ goog.require('blk.env.ChunkView');
 goog.require('blk.env.blocks.BlockID');
 goog.require('blk.env.client.ViewManager');
 goog.require('blk.game.client.ClientPlayer');
+goog.require('blk.net.packets.SetBlock');
 goog.require('blk.physics.ClientMovement');
 goog.require('gf.input.MouseButton');
 goog.require('gf.vec.Viewport');
+goog.require('goog.asserts');
 goog.require('goog.events.KeyCodes');
 goog.require('goog.vec.Mat4');
 goog.require('goog.vec.Quaternion');
@@ -145,6 +147,19 @@ blk.game.client.LocalPlayer.prototype.disposeInternal = function() {
  */
 blk.game.client.LocalPlayer.prototype.getViewport = function() {
   return this.viewport_;
+};
+
+
+/**
+ * @return {string} Debug information for console output.
+ */
+blk.game.client.LocalPlayer.prototype.getDebugInfo = function() {
+  var renderStats = this.viewManager_.getStatisticsString();
+  // var movement = [
+  //   this.entity.state.velocity[0].toFixed(8),
+  //   this.entity.state.velocity[1].toFixed(8),
+  //   this.entity.state.velocity[2].toFixed(8)].join(',') : '';
+  return renderStats;
 };
 
 
