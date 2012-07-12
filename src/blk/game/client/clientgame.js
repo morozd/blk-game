@@ -657,77 +657,91 @@ blk.game.client.ClientGame.ENABLE_SHARED_WORKERS_ = false;
  */
 blk.game.client.ClientGame.prototype.connectToLocalHost_ =
     function(uri, authToken, userInfo, deferred) {
-  // // Request quota
-  // // TODO(benvanik): pull from somewhere?
-  // var quotaSize = 1024 * 1024 * 1024;
-  // deferred = new goog.async.Deferred();
-  // gf.io.requestQuota(
-  //     gf.io.FileSystemType.PERSISTENT, quotaSize).addCallbacks(
-  //     function(grantedBytes) {
-  //       if (grantedBytes < quotaSize) {
-  //         deferred.errback(null);
-  //       } else {
-  //         blk.client.launchLocalServer_(
-  //             sourceMode,
-  //             launchOptions.host,
-  //             authToken,
-  //             userInfo).chainDeferred(/** @type {!goog.async.Deferred} */ (
-  //             deferred));
-  //       }
-  //     },
-  //     function(arg) {
-  //       gf.log.write('unable to get quota - no saving!');
-  //       blk.client.launchLocalServer_(
-  //           sourceMode,
-  //           launchOptions.host,
-  //           authToken,
-  //           userInfo).chainDeferred(/** @type {!goog.async.Deferred} */ (
-  //           deferred));
-  //     });
+  // Request quota
+  // TODO(benvanik): pull from somewhere?
+  var quotaSize = 1024 * 1024 * 1024;
+  gf.io.requestQuota(
+      gf.io.FileSystemType.PERSISTENT, quotaSize).addCallbacks(
+      function(grantedBytes) {
+        if (grantedBytes < quotaSize) {
+          deferred.errback(null);
+        } else {
+          blk.client.launchLocalServer_(
+              uri,
+              authToken,
+              userInfo,
+              deferred);
+        }
+      },
+      function(arg) {
+        // TODO(benvanik): ask the user if they want to continue/etc
+        gf.log.write('unable to get quota - no saving!');
+        blk.client.launchLocalServer_(
+            uri,
+            authToken,
+            userInfo,
+            deferred);
+      });
+};
 
-  // // Launch worker
-  // var deferred = new goog.async.Deferred();
-  // goog.asserts.assert(!!goog.global.Worker);
 
-  // // TODO(benvanik): name servers so there can be multiple/etc
-  // var serverId = goog.uri.utils.getDomain(uri);
-  // var name = 'server-' + serverId + (sourceMode ? '-uncompiled' : '');
+/**
+ * Launches a local server and connects to it.
+ * @private
+ * @param {!goog.Uri} uri Local host URI.
+ * @param {!gf.net.AuthToken} authToken Authentication information.
+ * @param {!gf.net.UserInfo} userInfo Client user information.
+ * @param {!goog.async.Deferred} deferred A deferred to callback with the
+ *     session once it has been established.
+ */
+blk.game.client.ClientGame.prototype.connectToLocalHost_ =
+    function(uri, authToken, userInfo, deferred) {
+  goog.asserts.assert(!!goog.global.Worker);
+  if (!goog.global.Worker) {
+    deferred.errback('Workers not supported');
+    return;
+  }
 
-  // // Launch worker
-  // // Attempt to create a shared worker if it's supported - otherwise go
-  // // dedicated so we at least work
-  // var workerUri = sourceMode ?
-  //     'worker-server-uncompiled.js' :
-  //     'worker-server.js';
-  // var worker;
-  // var port;
-  // // HACK: SharedWorker exists in WebKit, but is not working
-  // if (blk.game.client.ClientGame.ENABLE_SHARED_WORKERS_ &&
-  //     goog.userAgent.product.CHROME &&
-  //     goog.global['SharedWorker']) {
-  //   worker = new SharedWorker(workerUri, name);
-  //   port = worker.port;
-  // } else {
-  //   worker = new Worker(workerUri);
-  //   port = worker;
-  // }
+  // TODO(benvanik): name servers so there can be multiple/etc
+  var serverId = uri.getDomain();
+  var name = 'server-' + serverId + (goog.COMPILED ? '' : '-uncompiled');
 
-  // // Connect
-  // var connectDeferred = gf.net.connect(
-  //     /** @type {gf.net.Endpoint} */ (port),
-  //     blk.net.packets.PROTOCOL_VERSION,
-  //     authToken,
-  //     userInfo);
-  // connectDeferred.addCallbacks(function(session) {
-  //   // Wait until here otherwise it will steal events from the session
-  //   gf.log.installListener(port, '{server}');
+  // Launch worker
+  // Attempt to create a shared worker if it's supported - otherwise go
+  // dedicated so we at least work
+  var workerUri = goog.COMPILED ?
+      'worker-server.js' :
+      'worker-server-uncompiled.js';
+  var worker;
+  var port;
+  // HACK: SharedWorker exists in WebKit, but is not working
+  if (blk.game.client.ClientGame.ENABLE_SHARED_WORKERS_ &&
+      goog.userAgent.product.CHROME &&
+      goog.global['SharedWorker']) {
+    worker = new SharedWorker(workerUri, name);
+    port = worker.port;
+  } else {
+    worker = new Worker(workerUri);
+    port = worker;
+  }
 
-  //   // TODO(benvanik): send server init
+  // Connect
+  var connectDeferred = gf.net.connect(
+      /** @type {gf.net.Endpoint} */ (port),
+      blk.net.packets.PROTOCOL_VERSION,
+      authToken,
+      userInfo);
+  connectDeferred.addCallbacks(function(session) {
+    // Wait until here otherwise it will steal events from the session
+    // TODO(benvanik): avoid adding extra listeners to the socket port
+    gf.log.installListener(port, '{server}');
 
-  //   deferred.callback(session);
-  // }, function(arg) {
-  //   deferred.errback(arg);
-  // });
+    // TODO(benvanik): send server init
+
+    deferred.callback(session);
+  }, function(arg) {
+    deferred.errback(arg);
+  });
 };
 
 
