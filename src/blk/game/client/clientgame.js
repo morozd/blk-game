@@ -32,6 +32,8 @@ goog.require('gf.audio.MusicController');
 goog.require('gf.dom.Display');
 goog.require('gf.graphics.GraphicsContext');
 goog.require('gf.input.InputManager');
+goog.require('gf.io');
+goog.require('gf.io.FileSystemType');
 goog.require('gf.log');
 goog.require('gf.net');
 goog.require('gf.net.AuthToken');
@@ -40,6 +42,7 @@ goog.require('gf.ui.ScreenManager');
 goog.require('goog.Uri');
 goog.require('goog.asserts');
 goog.require('goog.async.Deferred');
+goog.require('goog.userAgent.product');
 
 
 

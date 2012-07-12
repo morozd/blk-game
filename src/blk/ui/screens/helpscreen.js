@@ -33,7 +33,8 @@ goog.require('blk.ui.screens.helpscreen');
  * @param {!Element} parentElement Parent DOM element to render into.
  */
 blk.ui.screens.HelpScreen = function(dom, parentElement) {
-  goog.base(this, dom, parentElement, blk.ui.screens.helpscreen.content, {
-  });
+  goog.base(this, 'help', dom, parentElement,
+      blk.ui.screens.helpscreen.content, {
+      });
 };
 goog.inherits(blk.ui.screens.HelpScreen, blk.ui.PopupScreen);

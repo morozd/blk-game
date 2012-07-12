@@ -40,8 +40,9 @@ goog.require('goog.style');
  * @param {!blk.game.client.UserSettings} settings User settings.
  */
 blk.ui.screens.SettingsScreen = function(dom, parentElement, settings) {
-  goog.base(this, dom, parentElement, blk.ui.screens.settingsscreen.content, {
-  });
+  goog.base(this, 'settings', dom, parentElement,
+      blk.ui.screens.settingsscreen.content, {
+      });
 
   /**
    * User settings.

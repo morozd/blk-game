@@ -33,7 +33,10 @@ goog.require('gf.ui.Screen');
  * @param {!gf.net.ClientSession} session Connected network session.
  */
 blk.ui.screens.GameScreen = function(game, session) {
+  // TODO(benvanik): game string
+  var hashToken = 'game-' + 'url';
   goog.base(this,
+      hashToken,
       gf.ui.Screen.Flags.COVERS_DISPLAY |
       gf.ui.Screen.Flags.OPAQUE |
       gf.ui.Screen.Flags.MODAL_INPUT);

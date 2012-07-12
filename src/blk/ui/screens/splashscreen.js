@@ -35,7 +35,8 @@ goog.require('blk.ui.screens.splashscreen');
  * @param {!Element} parentElement Parent DOM element to render into.
  */
 blk.ui.screens.SplashScreen = function(dom, parentElement) {
-  goog.base(this, dom, parentElement, blk.ui.screens.splashscreen.content, {
-  });
+  goog.base(this, '', dom, parentElement,
+      blk.ui.screens.splashscreen.content, {
+      });
 };
 goog.inherits(blk.ui.screens.SplashScreen, blk.ui.PopupScreen);

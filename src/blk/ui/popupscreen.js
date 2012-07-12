@@ -35,13 +35,15 @@ goog.require('goog.soy');
  * Soy-based popup screen.
  * @constructor
  * @extends {gf.ui.Screen}
+ * @param {string} hashToken History URL hash token.
  * @param {!goog.dom.DomHelper} dom DOM helper used to create DOM nodes.
  * @param {!Element} parentElement Parent DOM element to render into.
  * @param {!Function} template The Soy template defining the element's content.
  * @param {Object=} opt_templateData The data for the template.
  */
-blk.ui.PopupScreen = function(dom, parentElement, template, opt_templateData) {
-  goog.base(this, gf.ui.Screen.Flags.MODAL_INPUT);
+blk.ui.PopupScreen = function(
+    hashToken, dom, parentElement, template, opt_templateData) {
+  goog.base(this, hashToken, gf.ui.Screen.Flags.MODAL_INPUT);
 
   /**
    * @protected

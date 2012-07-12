@@ -40,7 +40,7 @@ goog.require('goog.soy');
  * @param {!Element} parentElement Parent DOM element to render into.
  */
 blk.ui.screens.MainMenuScreen = function(game, parentElement) {
-  goog.base(this, gf.ui.Screen.Flags.MODAL_INPUT);
+  goog.base(this, '', gf.ui.Screen.Flags.MODAL_INPUT);
 
   /**
    * @private

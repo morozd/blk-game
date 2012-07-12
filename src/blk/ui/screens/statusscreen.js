@@ -36,7 +36,7 @@ goog.require('blk.ui.screens.statusscreen');
  */
 blk.ui.screens.StatusScreen =
     function(dom, parentElement, template, opt_templateData) {
-  goog.base(this, dom, parentElement, template, opt_templateData);
+  goog.base(this, '', dom, parentElement, template, opt_templateData);
 };
 goog.inherits(blk.ui.screens.StatusScreen, blk.ui.PopupScreen);
 
