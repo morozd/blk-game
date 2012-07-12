@@ -53,7 +53,7 @@ blk.env.BlockSet.prototype.registerBlock = function(block) {
  * @param {number} id Block ID.
  * @return {!blk.env.Block} Block with the given ID.
  */
-blk.env.BlockSet.prototype.get = function(id) {
+blk.env.BlockSet.prototype.getBlockWithId = function(id) {
   var block = this.list_[id];
   goog.asserts.assert(block);
   return block;
@@ -65,6 +65,6 @@ blk.env.BlockSet.prototype.get = function(id) {
  * @param {number} id Block ID.
  * @return {boolean} True if the block type exists.
  */
-blk.env.BlockSet.prototype.has = function(id) {
+blk.env.BlockSet.prototype.hasBlockWithId = function(id) {
   return !!this.list_[id];
 };

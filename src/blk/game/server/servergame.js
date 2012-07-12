@@ -375,7 +375,7 @@ blk.game.server.ServerGame.prototype.setBlock =
   // TODO(benvanik): verify user can act on the block (distance check/etc)
 
   // Validate block type
-  if (blockData && !map.blockSet.has(blockData >> 8)) {
+  if (blockData && !map.blockSet.hasBlockWithId(blockData >> 8)) {
     gf.log.write('unknown block type');
     return false;
   }

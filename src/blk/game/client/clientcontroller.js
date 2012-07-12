@@ -572,7 +572,7 @@ blk.game.client.ClientController.prototype.setBlock =
   if (changed) {
     var soundData = blockData ? blockData : oldData;
     if (soundData >> 8) {
-      var block = map.blockSet.get(soundData >> 8);
+      var block = map.blockSet.getBlockWithId(soundData >> 8);
       var cue = block ? block.material.actionCue : null;
       if (cue) {
         var soundPosition = goog.vec.Vec3.createFloat32FromValues(x, y, z);

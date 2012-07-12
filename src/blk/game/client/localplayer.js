@@ -117,11 +117,11 @@ blk.game.client.LocalPlayer = function(controller, user) {
    * @type {!Array.<!blk.env.Block>}
    */
   this.blockTypes = [
-    map.blockSet.get(blk.env.blocks.BlockID.DIRT),
-    map.blockSet.get(blk.env.blocks.BlockID.STONE),
-    map.blockSet.get(blk.env.blocks.BlockID.BRICK),
-    map.blockSet.get(blk.env.blocks.BlockID.WOOD),
-    map.blockSet.get(blk.env.blocks.BlockID.GLASS)
+    map.blockSet.getBlockWithId(blk.env.blocks.BlockID.DIRT),
+    map.blockSet.getBlockWithId(blk.env.blocks.BlockID.STONE),
+    map.blockSet.getBlockWithId(blk.env.blocks.BlockID.BRICK),
+    map.blockSet.getBlockWithId(blk.env.blocks.BlockID.WOOD),
+    map.blockSet.getBlockWithId(blk.env.blocks.BlockID.GLASS)
   ];
 };
 goog.inherits(blk.game.client.LocalPlayer, blk.game.client.ClientPlayer);

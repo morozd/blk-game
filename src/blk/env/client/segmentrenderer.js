@@ -265,11 +265,11 @@ blk.env.client.SegmentRenderer.prototype.build = function() {
               data : blockData[bo - blk.env.Chunk.STRIDE_Y]) >> 8;
           neighbors[4] = blockData[bo + 1] >> 8;
           neighbors[5] = blockData[bo - 1] >> 8;
-          var block = blockSet.get(data >> 8);
+          var block = blockSet.getBlockWithId(data >> 8);
           for (var n = 0; n < 6; n++) {
             if (!neighbors[n] ||
                 (neighbors[n] != data >> 8 &&
-                    (blockSet.get(neighbors[n]).material.flags &
+                    (blockSet.getBlockWithId(neighbors[n]).material.flags &
                         blk.env.MaterialFlags.MERGE))) {
               var slot = block.getFaceSlot(
                   bx, by, bz,
@@ -393,11 +393,11 @@ blk.env.client.SegmentRenderer.prototype.addFaces_ = function(
       neighbors[5] = blockData[bo - 1] >> 8;
     }
 
-    var block = blockSet.get(data >> 8);
+    var block = blockSet.getBlockWithId(data >> 8);
     for (var n = 0; n < 6; n++) {
       if (!neighbors[n] ||
           (neighbors[n] != data >> 8 &&
-              (blockSet.get(neighbors[n]).material.flags &
+              (blockSet.getBlockWithId(neighbors[n]).material.flags &
                   blk.env.MaterialFlags.MERGE))) {
         var slot = block.getFaceSlot(
             bx, by, bz,
