@@ -17,10 +17,14 @@
 goog.provide('blk.game.server.ServerPlayer');
 
 goog.require('blk.env.Chunk');
+goog.require('blk.env.Entity');
 goog.require('blk.game.Player');
 goog.require('blk.net.packets.ChunkData');
+goog.require('blk.net.packets.EntityPosition');
+goog.require('blk.physics.ServerMovement');
 goog.require('gf.net.PacketWriter');
 goog.require('goog.array');
+goog.require('goog.asserts');
 goog.require('goog.vec.Vec3');
 
 
@@ -30,23 +34,24 @@ goog.require('goog.vec.Vec3');
  *
  * @constructor
  * @extends {blk.game.Player}
- * @param {!blk.game.server.ServerGame} game Game.
+ * @param {!blk.game.server.ServerController} controller Server controller.
  * @param {!gf.net.User} user Net user.
  */
-blk.game.server.ServerPlayer = function(game, user) {
+blk.game.server.ServerPlayer = function(controller, user) {
   goog.base(this, user);
 
   /**
-   * Current game.
-   * @type {!blk.game.server.ServerGame}
+   * @private
+   * @type {!blk.game.server.ServerController}
    */
-  this.game = game;
+  this.controller_ = controller;
 
   /**
    * Movement controller, if any.
+   * @private
    * @type {blk.physics.ServerMovement}
    */
-  this.movement = null;
+  this.movement_ = null;
 
   /**
    * A queue of chunks to send to the player.
@@ -71,12 +76,50 @@ goog.inherits(blk.game.server.ServerPlayer, blk.game.Player);
 
 
 /**
+ * Get movement
+blk.game.server.ServerPlayer.prototype.getMovement = function() {
+  return;
+};
+
+
+/**
+ * Attaches an entity to a player.
+ * @param {!blk.env.Entity} entity Player entity.
+ */
+blk.game.server.ServerPlayer.prototype.attachEntity = function(entity) {
+  // Bind
+  this.entity = entity;
+  entity.player = this;
+
+  // Mark as being user controlled
+  entity.flags = blk.env.Entity.Flags.USER_CONTROLLED;
+
+  // Setup movement
+  goog.asserts.assert(this.view);
+  this.movement_ = new blk.physics.ServerMovement(this.view);
+  this.movement_.attach(entity);
+};
+
+
+/**
+ * Queues a list of movement commands sent from the player.
+ * @param {!Array.<!blk.physics.MoveCommand>} commands Move commands.
+ */
+blk.game.server.ServerPlayer.prototype.queueMovementCommands =
+    function(commands) {
+  if (this.movement_) {
+    this.movement_.queueCommands(commands);
+  }
+};
+
+
+/**
  * @override
  */
 blk.game.server.ServerPlayer.prototype.update = function(frame) {
   // Process movement
-  if (this.movement) {
-    this.movement.update(frame);
+  if (this.movement_) {
+    this.movement_.update(frame);
   }
 
   // Update views
@@ -87,6 +130,35 @@ blk.game.server.ServerPlayer.prototype.update = function(frame) {
   // Handle pending chunk sends
   if (this.sendQueue_.length) {
     this.processSendQueue_(frame);
+  }
+};
+
+
+/**
+ * Sends an update packet to the given player with entity state deltas.
+ * @param {!gf.UpdateFrame} frame Current update frame.
+ * @param {!Array.<!blk.env.EntityState>} entityStates Entity state deltas.
+ */
+blk.game.server.ServerPlayer.prototype.sendUpdate = function(
+    frame, entityStates) {
+  var movement = this.movement_;
+
+  // Determine if we need to send a sequence ID
+  var sequence = -1;
+  var needsSequenceUpdate = false;
+  if (movement) {
+    needsSequenceUpdate = movement.lastSequence != movement.lastSequenceSent;
+    sequence = movement.lastSequence;
+    movement.lastSequenceSent = movement.lastSequence;
+  }
+
+  // Only send packet if we need to confirm a sequence or update entities
+  // TODO(benvanik): delay confirming sequences a bit to reduce network
+  //     traffic when nothing is moving
+  if (entityStates.length || needsSequenceUpdate) {
+    this.controller_.session.send(
+        blk.net.packets.EntityPosition.createData(sequence, entityStates),
+        this.getUser());
   }
 };
 
@@ -138,21 +210,22 @@ blk.game.server.ServerPlayer.prototype.processSendQueue_ = function(frame) {
     blk.env.Chunk.sortByDistanceFromPoint(this.sendQueue_, this.view.center);
   }
 
+  var writer = blk.game.server.ServerPlayer.packetWriter_;
+  var packet = blk.net.packets.ChunkData.writeInstance;
+  var chunkSerializer = this.controller_.getChunkSerializer();
   for (var n = 0; n < sendCount; n++) {
     var chunk = this.sendQueue_.shift();
 
     // Build the packet piece by piece
     // First write in the packet header
-    var writer = blk.game.server.ServerPlayer.packetWriter_;
-    var packet = blk.net.packets.ChunkData.writeInstance;
     packet.x = chunk.x;
     packet.y = chunk.y;
     packet.z = chunk.z;
     if (blk.net.packets.ChunkData.write(writer, packet)) {
       // Serialize chunk data
-      if (this.game.chunkSerializer.serializeToWriter(chunk, writer)) {
+      if (chunkSerializer.serializeToWriter(chunk, writer)) {
         // Send to user
-        this.game.session.send(writer.finish(), this.user);
+        this.controller_.session.send(writer.finish(), this.user);
       }
     }
 

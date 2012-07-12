@@ -18,7 +18,7 @@
  * @author benvanik@google.com (Ben Vanik)
  */
 
-goog.provide('blk.modes.basic.client.BasicClientController');
+goog.provide('blk.modes.fps.client.FpsClientController');
 
 goog.require('blk.assets.audio.Music');
 goog.require('blk.game.client.ClientController');
@@ -32,12 +32,12 @@ goog.require('goog.vec.Vec4');
 
 
 /**
- * Basic game mode.
+ * Simple FPS game mode.
  * Can be subclassed or used on its own.
  * @constructor
  * @extends {blk.game.client.ClientController}
  */
-blk.modes.basic.client.BasicClientController = function(game, session) {
+blk.modes.fps.client.FpsClientController = function(game, session) {
   goog.base(this, game, session);
 
   var renderState = this.game.getRenderState();
@@ -92,14 +92,14 @@ blk.modes.basic.client.BasicClientController = function(game, session) {
   var musicController = this.game.getMusicController();
   musicController.setTrackList(this.musicTrackList_);
 };
-goog.inherits(blk.modes.basic.client.BasicClientController,
+goog.inherits(blk.modes.fps.client.FpsClientController,
     blk.game.client.ClientController);
 
 
 /**
  * @override
  */
-blk.modes.basic.client.BasicClientController.prototype.handlePlayersChanged =
+blk.modes.fps.client.FpsClientController.prototype.handlePlayersChanged =
     function() {
   goog.base(this, 'handlePlayersChanged');
 
@@ -110,7 +110,7 @@ blk.modes.basic.client.BasicClientController.prototype.handlePlayersChanged =
 /**
  * @override
  */
-blk.modes.basic.client.BasicClientController.prototype.update =
+blk.modes.fps.client.FpsClientController.prototype.update =
     function(frame) {
   goog.base(this, 'update', frame);
 };
@@ -119,7 +119,7 @@ blk.modes.basic.client.BasicClientController.prototype.update =
 /**
  * @override
  */
-blk.modes.basic.client.BasicClientController.prototype.processPhysics =
+blk.modes.fps.client.FpsClientController.prototype.processPhysics =
     function(frame) {
   goog.base(this, 'processPhysics', frame);
 };
@@ -128,7 +128,7 @@ blk.modes.basic.client.BasicClientController.prototype.processPhysics =
 /**
  * @override
  */
-blk.modes.basic.client.BasicClientController.prototype.processInput =
+blk.modes.fps.client.FpsClientController.prototype.processInput =
     function(frame, inputData) {
   if (goog.base(this, 'processInput', frame, inputData)) {
     return true;
@@ -210,7 +210,7 @@ blk.modes.basic.client.BasicClientController.prototype.processInput =
 /**
  * @override
  */
-blk.modes.basic.client.BasicClientController.prototype.beginDrawing =
+blk.modes.fps.client.FpsClientController.prototype.beginDrawing =
     function(frame) {
   goog.base(this, 'beginDrawing', frame);
 
@@ -225,7 +225,7 @@ blk.modes.basic.client.BasicClientController.prototype.beginDrawing =
 /**
  * @override
  */
-blk.modes.basic.client.BasicClientController.prototype.drawWorld =
+blk.modes.fps.client.FpsClientController.prototype.drawWorld =
     function(frame) {
   goog.base(this, 'drawWorld', frame);
 
@@ -238,7 +238,7 @@ blk.modes.basic.client.BasicClientController.prototype.drawWorld =
 /**
  * @override
  */
-blk.modes.basic.client.BasicClientController.prototype.drawOverlays =
+blk.modes.fps.client.FpsClientController.prototype.drawOverlays =
     function(frame, inputData) {
   goog.base(this, 'drawOverlays', frame, inputData);
 
@@ -254,7 +254,7 @@ blk.modes.basic.client.BasicClientController.prototype.drawOverlays =
  * @param {!gf.RenderFrame} frame Current frame.
  * @param {!gf.input.Data} inputData Updated input data.
  */
-blk.modes.basic.client.BasicClientController.prototype.drawInputUI_ =
+blk.modes.fps.client.FpsClientController.prototype.drawInputUI_ =
     function(frame, inputData) {
   var renderState = this.game.getRenderState();
   var localPlayer = this.getLocalPlayer();
@@ -265,7 +265,7 @@ blk.modes.basic.client.BasicClientController.prototype.drawInputUI_ =
   var spriteBuffer = this.spriteBuffer_;
   spriteBuffer.clear();
 
-  var slotCoords = blk.modes.basic.client.BasicClientController.tmpVec4_;
+  var slotCoords = blk.modes.fps.client.FpsClientController.tmpVec4_;
 
   // If using mouse lock, draw a crosshair in the center of the screen
   if (inputData.mouse.isLocked) {
@@ -281,7 +281,7 @@ blk.modes.basic.client.BasicClientController.prototype.drawInputUI_ =
 
   // TODO(benvanik): draw onscreen dpad/etc for touch
 
-  var worldMatrix = blk.modes.basic.client.BasicClientController.tmpMat4_;
+  var worldMatrix = blk.modes.fps.client.FpsClientController.tmpMat4_;
   goog.vec.Mat4.setFromValues(worldMatrix,
       2, 0, 0, 0,
       0, 2, 0, 0,
@@ -298,7 +298,7 @@ blk.modes.basic.client.BasicClientController.prototype.drawInputUI_ =
  * @private
  * @param {!gf.RenderFrame} frame Current frame.
  */
-blk.modes.basic.client.BasicClientController.prototype.drawBlockTypes_ =
+blk.modes.fps.client.FpsClientController.prototype.drawBlockTypes_ =
     function(frame) {
   var renderState = this.game.getRenderState();
   var localPlayer = this.getLocalPlayer();
@@ -313,7 +313,7 @@ blk.modes.basic.client.BasicClientController.prototype.drawBlockTypes_ =
   var x = 0;
   var width = blockTypes.length * (16 + 1);
   var height = 16;
-  var texCoords = blk.modes.basic.client.BasicClientController.tmpVec4_;
+  var texCoords = blk.modes.fps.client.FpsClientController.tmpVec4_;
   for (var n = 0; n < blockTypes.length; n++) {
     var block = blockTypes[n];
     blockAtlas.getSlotCoords(block.atlasSlot, texCoords);
@@ -325,7 +325,7 @@ blk.modes.basic.client.BasicClientController.prototype.drawBlockTypes_ =
     x += 16 + 1;
   }
 
-  var worldMatrix = blk.modes.basic.client.BasicClientController.tmpMat4_;
+  var worldMatrix = blk.modes.fps.client.FpsClientController.tmpMat4_;
   goog.vec.Mat4.setFromValues(worldMatrix,
       2, 0, 0, 0,
       0, 2, 0, 0,
@@ -343,7 +343,7 @@ blk.modes.basic.client.BasicClientController.prototype.drawBlockTypes_ =
  * @param {!gf.input.MouseData} mouseData Mouse input data.
  * @return {number|undefined} Block index selected or undefined if non clicked.
  */
-blk.modes.basic.client.BasicClientController.prototype.hitTestBlockTypes_ =
+blk.modes.fps.client.FpsClientController.prototype.hitTestBlockTypes_ =
     function(mouseData) {
   var localPlayer = this.getLocalPlayer();
   var viewport = localPlayer.getViewport();
@@ -369,7 +369,7 @@ blk.modes.basic.client.BasicClientController.prototype.hitTestBlockTypes_ =
  * @private
  * @type {!goog.vec.Mat4.Type}
  */
-blk.modes.basic.client.BasicClientController.tmpMat4_ =
+blk.modes.fps.client.FpsClientController.tmpMat4_ =
     goog.vec.Mat4.createFloat32();
 
 
@@ -378,5 +378,5 @@ blk.modes.basic.client.BasicClientController.tmpMat4_ =
  * @private
  * @type {!goog.vec.Vec4.Float32}
  */
-blk.modes.basic.client.BasicClientController.tmpVec4_ =
+blk.modes.fps.client.FpsClientController.tmpVec4_ =
     goog.vec.Vec4.createFloat32();

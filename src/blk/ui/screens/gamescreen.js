@@ -20,7 +20,7 @@
 
 goog.provide('blk.ui.screens.GameScreen');
 
-goog.require('blk.modes.basic.client.BasicClientController');
+goog.require('blk.modes.fps.client.FpsClientController');
 goog.require('gf.ui.Screen');
 
 
@@ -42,7 +42,7 @@ blk.ui.screens.GameScreen = function(game, session) {
       gf.ui.Screen.Flags.MODAL_INPUT);
 
   // TODO(benvanik): pull from options? etc
-  var controllerCtor = blk.modes.basic.client.BasicClientController;
+  var controllerCtor = blk.modes.fps.client.FpsClientController;
 
   /**
    * @private
@@ -99,6 +99,14 @@ blk.ui.screens.GameScreen.prototype.exitDocument = function() {
   this.game_.stopTicking();
 
   goog.base(this, 'exitDocument');
+};
+
+
+/**
+ * Refreshes settings from the user settings object.
+ */
+blk.ui.screens.GameScreen.prototype.refreshSettings = function() {
+  this.controller_.refreshSettings();
 };
 
 

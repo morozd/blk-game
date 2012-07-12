@@ -260,12 +260,11 @@ blk.game.client.ClientGame.prototype.refreshSettings_ = function() {
   // Toggle global mutes
   this.musicController_.setMuted(this.settings.musicMuted);
 
-  // TODO(benvanik): set multiplayer info if connected
-  // var user = this.session.getLocalUser();
-  // goog.asserts.assert(user);
-  // var userInfo = user.info.clone();
-  // userInfo.displayName = this.settings.userName;
-  // this.session.updateUserInfo(userInfo);
+  // Notify the game screen
+  var gameScreen = this.getGameScreen_();
+  if (gameScreen) {
+    gameScreen.refreshSettings();
+  }
 };
 
 
@@ -669,7 +668,7 @@ blk.game.client.ClientGame.prototype.connectToLocalHost_ =
         if (grantedBytes < quotaSize) {
           deferred.errback(null);
         } else {
-          blk.client.launchLocalServer_(
+          this.launchLocalServer_(
               uri,
               authToken,
               userInfo,
@@ -679,7 +678,7 @@ blk.game.client.ClientGame.prototype.connectToLocalHost_ =
       function(arg) {
         // TODO(benvanik): ask the user if they want to continue/etc
         gf.log.write('unable to get quota - no saving!');
-        blk.client.launchLocalServer_(
+        this.launchLocalServer_(
             uri,
             authToken,
             userInfo,
@@ -697,7 +696,7 @@ blk.game.client.ClientGame.prototype.connectToLocalHost_ =
  * @param {!goog.async.Deferred} deferred A deferred to callback with the
  *     session once it has been established.
  */
-blk.game.client.ClientGame.prototype.connectToLocalHost_ =
+blk.game.client.ClientGame.prototype.launchLocalServer_ =
     function(uri, authToken, userInfo, deferred) {
   goog.asserts.assert(!!goog.global.Worker);
   if (!goog.global.Worker) {
@@ -707,12 +706,12 @@ blk.game.client.ClientGame.prototype.connectToLocalHost_ =
 
   // TODO(benvanik): name servers so there can be multiple/etc
   var serverId = uri.getDomain();
-  var name = 'server-' + serverId + (goog.COMPILED ? '' : '-uncompiled');
+  var name = 'server-' + serverId + (COMPILED ? '' : '-uncompiled');
 
   // Launch worker
   // Attempt to create a shared worker if it's supported - otherwise go
   // dedicated so we at least work
-  var workerUri = goog.COMPILED ?
+  var workerUri = COMPILED ?
       'worker-server.js' :
       'worker-server-uncompiled.js';
   var worker;
@@ -800,4 +799,27 @@ blk.game.client.ClientGame.prototype.enterGame_ = function() {
 blk.game.client.ClientGame.prototype.exitGame_ = function() {
   goog.asserts.assert(this.isInGame());
   this.inGame_ = false;
+};
+
+
+/**
+ * Gets the game screen, if the game is running.
+ * @private
+ * @return {blk.ui.screens.GameScreen} The game screen, if it is active.
+ */
+blk.game.client.ClientGame.prototype.getGameScreen_ = function() {
+  // Less than ideal to have to do this, but not having to retain it is nice
+  // TODO(benvanik): cache, mumble, something
+  if (!this.inGame_) {
+    return null;
+  }
+
+  var gameScreen = null;
+  this.screenManager_.forEachScreen(function(screen) {
+    if (screen instanceof blk.ui.screens.GameScreen) {
+      gameScreen = screen;
+      return false;
+    }
+  });
+  return gameScreen;
 };

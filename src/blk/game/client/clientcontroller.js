@@ -351,6 +351,21 @@ blk.game.client.ClientController.prototype.handleError =
 
 
 /**
+ * Refreshes settings from the user settings object.
+ */
+blk.game.client.ClientController.prototype.refreshSettings = function() {
+  var settings = this.game.settings;
+
+  // Update username
+  var user = this.session.getLocalUser();
+  goog.asserts.assert(user);
+  var userInfo = user.info.clone();
+  userInfo.displayName = settings.userName;
+  this.session.updateUserInfo(userInfo);
+};
+
+
+/**
  * Maximum amount of time, in ms, the network poll is allowed to take.
  * @private
  * @const
@@ -588,6 +603,7 @@ blk.game.client.ClientController.prototype.setBlock =
 /**
  * Client network handling.
  *
+ * @private
  * @constructor
  * @extends {gf.net.NetworkService}
  * @param {!blk.game.client.ClientController} controller Client controller.

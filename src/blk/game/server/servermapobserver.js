@@ -27,28 +27,23 @@ goog.require('blk.env.MapObserver');
  *
  * @constructor
  * @implements {blk.env.MapObserver}
- * @param {!blk.game.server.ServerGame} game Server game.
- * @param {!blk.game.Player} player Player.
+ * @param {!blk.game.server.ServerPlayer} player Player.
  * @param {!blk.env.ChunkView} view Active view.
  */
-blk.game.server.ServerMapObserver = function(game, player, view) {
-  /**
-   * Server game.
-   * @type {!blk.game.server.ServerGame}
-   */
-  this.game = game;
-
+blk.game.server.ServerMapObserver = function(player, view) {
   /**
    * Player the target chunk view is associated with.
-   * @type {!blk.game.Player}
+   * @private
+   * @type {!blk.game.server.ServerPlayer}
    */
-  this.player = player;
+  this.player_ = player;
 
   /**
    * Chunk view this instance is observing.
+   * @private
    * @type {!blk.env.ChunkView}
    */
-  this.view = view;
+  this.view_ = view;
 };
 
 
@@ -56,7 +51,7 @@ blk.game.server.ServerMapObserver = function(game, player, view) {
  * @override
  */
 blk.game.server.ServerMapObserver.prototype.chunkLoaded = function(chunk) {
-  this.player.queueChunkSend(chunk);
+  this.player_.queueChunkSend(chunk);
 };
 
 
@@ -66,7 +61,7 @@ blk.game.server.ServerMapObserver.prototype.chunkLoaded = function(chunk) {
 blk.game.server.ServerMapObserver.prototype.chunkEnteredView = function(chunk) {
   // Only send if already present, otherwise chunkLoaded will send it later
   if (chunk.state == blk.env.Chunk.State.LOADED) {
-    this.player.queueChunkSend(chunk);
+    this.player_.queueChunkSend(chunk);
   }
 };
 

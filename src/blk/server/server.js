@@ -129,11 +129,16 @@ blk.server.launchServer_ = function(launchOptions, session, mapStore,
     goog.global['blk_server'] = game;
   }
 
-  // Start ticking
-  game.startTicking();
+  // Load the game
+  game.load().addCallbacks(
+      function() {
+        // Start ticking
+        game.startTicking();
 
-  // TODO(benvanik): wait until loaded, etc
-  deferred.callback(game);
+        deferred.callback(game);
+      }, function(arg) {
+        deferred.errback(arg);
+      });
 };
 
 
