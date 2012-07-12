@@ -381,6 +381,12 @@ blk.game.client.ClientController.prototype.update = function(frame) {
   // Update game state
   this.map_.update(frame);
 
+  // Update each player
+  for (var n = 0; n < this.players_.length; n++) {
+    var player = this.players_[n];
+    player.update(frame);
+  }
+
   // Update UI bits
   this.console_.update(frame);
 };
