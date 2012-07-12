@@ -104,6 +104,23 @@ blk.game.client.LocalPlayer = function(controller, user) {
    * @type {number}
    */
   this.repeatTime_ = 0;
+
+  // TODO(benvanik): predicted variable, real inventory system
+  /**
+   * @type {number}
+   */
+  this.blockIndex = 0;
+
+  /**
+   * @type {!Array.<!blk.env.Block>}
+   */
+  this.blockTypes = [
+    map.blockSet.get(blk.env.blocks.BlockID.DIRT),
+    map.blockSet.get(blk.env.blocks.BlockID.STONE),
+    map.blockSet.get(blk.env.blocks.BlockID.BRICK),
+    map.blockSet.get(blk.env.blocks.BlockID.WOOD),
+    map.blockSet.get(blk.env.blocks.BlockID.GLASS)
+  ];
 };
 goog.inherits(blk.game.client.LocalPlayer, blk.game.client.ClientPlayer);
 
@@ -349,8 +366,7 @@ blk.game.client.LocalPlayer.prototype.processInputActions_ =
         var nx = wx + dx;
         var ny = wy + dy;
         var nz = wz + dz;
-        var block = map.blockSet.get(blk.env.blocks.BlockID.DIRT);
-        // this.blockTypes_[this.blockIndex_];
+        var block = this.blockTypes[this.blockIndex];
 
         // Client-side action
         this.controller_.setBlock(nx, ny, nz, block.id << 8);
@@ -378,7 +394,7 @@ blk.game.client.LocalPlayer.prototype.processInputActions_ =
   //   var wx = intersection.blockX;
   //   var wy = intersection.blockY;
   //   var wz = intersection.blockZ;
-  //   var block = this.blockTypes_[this.blockIndex_];
+  //   var block = this.blockTypes[this.blockIndex];
   //   map.drawBlocks(
   //       ray[0], ray[1], ray[2],
   //       wx, wy, wz,

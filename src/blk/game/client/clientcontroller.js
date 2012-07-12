@@ -467,7 +467,7 @@ blk.game.client.ClientController.prototype.processPhysics = function(frame) {
  */
 blk.game.client.ClientController.prototype.processInput =
     function(frame, inputData) {
-  return this.localPlayer_.processInput(frame, this.inputData_);
+  return false;
 };
 
 
