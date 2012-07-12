@@ -78,23 +78,26 @@ blk.game.server.ServerController = function(game, session, mapStore) {
 
   /**
    * Server net service.
+   * @private
    * @type {!blk.game.server.ServerController.NetService_}
    */
-  this.netService = new blk.game.server.ServerController.NetService_(this);
-  this.session.registerService(this.netService);
+  this.netService_ = new blk.game.server.ServerController.NetService_(this);
+  this.session.registerService(this.netService_);
 
   /**
    * Chat server.
+   * @private
    * @type {!gf.net.chat.ServerChatService}
    */
-  this.chat = new gf.net.chat.ServerChatService(session);
-  this.session.registerService(this.chat);
+  this.chatService_ = new gf.net.chat.ServerChatService(session);
+  this.session.registerService(this.chatService_);
 
   // TODO(benvanik): pull from somewhere - args?
   var mapParams = new blk.env.MapParameters();
 
   /**
    * Map.
+   * @private
    * @type {!blk.env.server.ServerMap}
    */
   this.map_ = new blk.env.server.ServerMap(mapParams, mapStore);
@@ -225,7 +228,7 @@ blk.game.server.ServerController.prototype.handleUserConnect = function(user) {
   this.players_.push(player);
 
   // Add to chat channels
-  this.chat.join(user, 'main');
+  this.chatService_.join(user, 'main');
 
   // Pick a spawn position
   var spawnPosition = goog.vec.Vec3.createFloat32FromValues(0, 80, 0);

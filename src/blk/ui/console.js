@@ -50,7 +50,8 @@ blk.ui.Console = function(game, chatService) {
   this.chatService_ = chatService;
 
   /**
-   * Input manager
+   * Input manager.
+   * @private
    * @type {!gf.input.InputManager}
    */
   this.inputManager_ = game.getInputManager();

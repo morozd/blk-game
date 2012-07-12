@@ -211,7 +211,8 @@ blk.ui.screens.SettingsScreen.prototype.setupCheckbox_ = function(
  * @param {string} className Checkbox root CSS class name.
  * @return {boolean|undefined} Checkbox value.
  */
-blk.ui.screens.SettingsScreen.prototype.getCheckboxValue_ = function(className) {
+blk.ui.screens.SettingsScreen.prototype.getCheckboxValue_ = function(
+    className) {
   var root = this.dom.getElementByClass(className);
   if (!root) {
     return undefined;

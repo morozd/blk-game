@@ -87,6 +87,7 @@ blk.game.client.ClientController = function(game, session) {
 
   /**
    * Chat client.
+   * @private
    * @type {!gf.net.chat.ClientChatService}
    */
   this.chatService_ = new gf.net.chat.ClientChatService(this.session);
@@ -116,6 +117,7 @@ blk.game.client.ClientController = function(game, session) {
 
   /**
    * Console.
+   * @private
    * @type {!blk.ui.Console}
    */
   this.console_ = new blk.ui.Console(this.game, this.chatService_);

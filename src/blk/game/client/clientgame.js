@@ -91,6 +91,7 @@ blk.game.client.ClientGame = function(dom, launchOptions, settings) {
 
   /**
    * Input manager.
+   * @private
    * @type {!gf.input.InputManager}
    */
   this.inputManager_ = new gf.input.InputManager(this,
@@ -111,6 +112,7 @@ blk.game.client.ClientGame = function(dom, launchOptions, settings) {
 
   /**
    * BLK render state.
+   * @private
    * @type {!blk.graphics.RenderState}
    */
   this.renderState_ = new blk.graphics.RenderState(
@@ -138,6 +140,7 @@ blk.game.client.ClientGame = function(dom, launchOptions, settings) {
 
   /**
    * Sound bank for base game sounds (UI/etc).
+   * @private
    * @type {!gf.audio.SoundBank}
    */
   this.baseSounds_ = blk.assets.audio.BaseSounds.create(
@@ -285,6 +288,7 @@ blk.game.client.ClientGame.prototype.start = function() {
  * outcome of the setup either {@see #setupSucceeded_} or {@see setupFailed_}
  * will be called.
  * @private
+ * @return {!goog.async.Deferred} A deferred fulfilled when setup is complete.
  */
 blk.game.client.ClientGame.prototype.beginSetup_ = function() {
   var deferred = new goog.async.Deferred();

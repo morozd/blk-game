@@ -36,6 +36,8 @@ goog.require('goog.vec.Vec4');
  * Can be subclassed or used on its own.
  * @constructor
  * @extends {blk.game.client.ClientController}
+ * @param {!blk.game.client.ClientGame} game Client game.
+ * @param {!gf.net.ClientSession} session Network session.
  */
 blk.modes.fps.client.FpsClientController = function(game, session) {
   goog.base(this, game, session);

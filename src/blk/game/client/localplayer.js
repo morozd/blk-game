@@ -88,6 +88,7 @@ blk.game.client.LocalPlayer = function(controller, user) {
   // TODO(benvanik): make a player property
   /**
    * God mode toggle.
+   * @private
    * @type {boolean}
    */
   this.godMode_ = true;
@@ -202,6 +203,7 @@ blk.game.client.LocalPlayer.prototype.update = function(frame) {
  * Occurs without interpolation applied.
  * @param {!gf.RenderFrame} frame Current frame.
  * @param {!gf.input.Data} inputData Current input data.
+ * @return {boolean} True if physics is valid, false if physics has failed.
  */
 blk.game.client.LocalPlayer.prototype.processPhysics =
     function(frame, inputData) {
