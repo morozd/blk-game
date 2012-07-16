@@ -63,6 +63,11 @@ M5: Performance Tuning
 
 * networking
     * override format with serializer, use UNCOMPRESSED when running localhost
+    * add the ability to define multiple sockets per User/ClientSession
+        * used for bulk data (custom textures/chunks/etc)
+    * reader/writer normalizedQuaternion - infer w from xx+yy+zz+ww=1
+        * http://www.gamedev.net/topic/461253-compressed-quaternions/
+        * http://physicsforgames.blogspot.com/2010/03/quaternion-tricks.html
 
 * io
     * defer writes a bit (no write each modify)
