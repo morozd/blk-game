@@ -34,6 +34,8 @@ goog.require('blk.net.packets.EntityPosition');
 goog.require('blk.net.packets.MapInfo');
 goog.require('blk.net.packets.ReadyPlayer');
 goog.require('blk.net.packets.SetBlock');
+goog.require('blk.sim.commands');
+goog.require('blk.sim.entities');
 goog.require('blk.ui.Console');
 goog.require('blk.ui.screens.StatusScreen');
 goog.require('gf.input.Data');
@@ -107,8 +109,10 @@ blk.game.client.ClientController = function(game, session) {
    * @private
    * @type {!gf.sim.ClientSimulator}
    */
-  this.simulator_ = new gf.sim.ClientSimulator(this.runtime, this.session);
+  this.simulator_ = new gf.sim.ClientSimulator(game, this.session);
   this.registerDisposable(this.simulator_);
+  blk.sim.commands.registerCommands(this.simulator_);
+  blk.sim.entities.registerEntities(this.simulator_);
 
   /**
    * Input data storage.
@@ -472,7 +476,7 @@ blk.game.client.ClientController.prototype.render = function(frame) {
   // (I think ;)
   var originalFrameTime = frame.time;
   frame.time -= blk.game.client.ClientController.INTERPOLATION_DELAY_;
-  this.interpolateEntities(frame.time);
+  this.simulator_.interpolateEntities(frame.time);
 
   // Render the game
   var graphicsContext = this.game.getGraphicsContext();

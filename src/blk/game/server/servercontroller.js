@@ -37,6 +37,8 @@ goog.require('blk.net.packets.ReadyPlayer');
 goog.require('blk.net.packets.RequestChunkData');
 goog.require('blk.net.packets.SetBlock');
 goog.require('blk.sim.MapEntity');
+goog.require('blk.sim.commands');
+goog.require('blk.sim.entities');
 goog.require('gf');
 goog.require('gf.log');
 goog.require('gf.net.NetworkService');
@@ -111,9 +113,11 @@ blk.game.server.ServerController = function(game, session, mapStore) {
    * @private
    * @type {!gf.sim.ServerSimulator}
    */
-  this.simulator_ = new gf.sim.ServerSimulator(this.runtime, this.session,
+  this.simulator_ = new gf.sim.ServerSimulator(game, this.session,
       blk.game.server.SimulationObserver);
   this.registerDisposable(this.simulator_);
+  blk.sim.commands.registerCommands(this.simulator_);
+  blk.sim.entities.registerEntities(this.simulator_);
 
   /**
    * Player listing.

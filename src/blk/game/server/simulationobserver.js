@@ -20,7 +20,7 @@
 
 goog.provide('blk.game.server.SimulationObserver');
 
-goog.require('gf.sim.SimulationObserver');
+goog.require('gf.sim.Observer');
 
 
 
@@ -29,13 +29,14 @@ goog.require('gf.sim.SimulationObserver');
  *
  * @constructor
  * @extends {gf.sim.Observer}
+ * @param {!gf.sim.ServerSimulator} simulator Server simulator.
  * @param {!gf.net.ServerSession} session Network session.
  * @param {!gf.net.User} user User this observer is representing.
  */
-blk.game.server.SimulationObserver = function(session, user) {
-  goog.base(this, session, user);
+blk.game.server.SimulationObserver = function(simulator, session, user) {
+  goog.base(this, simulator, session, user);
 };
-goog.inherits(blk.game.server.SimulationObserver, gf.sim.SimulationObserver);
+goog.inherits(blk.game.server.SimulationObserver, gf.sim.Observer);
 
 
 /**

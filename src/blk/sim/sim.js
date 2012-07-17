@@ -20,6 +20,12 @@
 
 goog.provide('blk.sim');
 
+// Extra requires to shut up type warnings
+/** @suppress {extraRequire} */
+goog.require('gf.sim.ClientSimulator');
+/** @suppress {extraRequire} */
+goog.require('gf.sim.ServerSimulator');
+
 
 /**
  * BLK module ID.
