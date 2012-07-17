@@ -687,7 +687,7 @@ blk.game.client.ClientGame.prototype.connectToLocalHost_ =
             authToken,
             userInfo,
             deferred);
-      });
+      }, this);
 };
 
 
