@@ -67,7 +67,6 @@ M5: Performance Tuning
         * used for bulk data (custom textures/chunks/etc)
     * reader/writer normalizedQuaternion - infer w from xx+yy+zz+ww=1
         * http://www.gamedev.net/topic/461253-compressed-quaternions/
-        * http://physicsforgames.blogspot.com/2010/03/quaternion-tricks.html
 
 * io
     * defer writes a bit (no write each modify)
@@ -151,6 +150,9 @@ Experiments
 
 * investigate dtrace probes for server:
     http://mcavage.github.com/node-restify/#DTrace
+
+* math hacks/fixes
+    * http://physicsforgames.blogspot.com/2010/03/quaternion-tricks.html
 
 
 
