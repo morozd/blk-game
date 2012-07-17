@@ -26,6 +26,7 @@ goog.require('blk.env.MapParameters');
 goog.require('blk.env.server.ServerMap');
 goog.require('blk.game.server.ServerMapObserver');
 goog.require('blk.game.server.ServerPlayer');
+goog.require('blk.game.server.SimulationObserver');
 goog.require('blk.io.ChunkSerializer');
 goog.require('blk.io.CompressionFormat');
 goog.require('blk.net.packets.EntityCreate');
@@ -35,12 +36,14 @@ goog.require('blk.net.packets.Move');
 goog.require('blk.net.packets.ReadyPlayer');
 goog.require('blk.net.packets.RequestChunkData');
 goog.require('blk.net.packets.SetBlock');
+goog.require('blk.sim.MapEntity');
 goog.require('gf');
 goog.require('gf.log');
 goog.require('gf.net.NetworkService');
 goog.require('gf.net.PacketWriter');
 goog.require('gf.net.SessionState');
 goog.require('gf.net.chat.ServerChatService');
+goog.require('gf.sim.ServerSimulator');
 goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.async.Deferred');
@@ -104,6 +107,15 @@ blk.game.server.ServerController = function(game, session, mapStore) {
   this.registerDisposable(this.map_);
 
   /**
+   * Server-side simulation.
+   * @private
+   * @type {!gf.sim.ServerSimulator}
+   */
+  this.simulator_ = new gf.sim.ServerSimulator(this.runtime, this.session,
+      blk.game.server.SimulationObserver);
+  this.registerDisposable(this.simulator_);
+
+  /**
    * Player listing.
    * @private
    * @type {!Array.<!blk.game.server.ServerPlayer>}
@@ -123,7 +135,7 @@ blk.game.server.ServerController = function(game, session, mapStore) {
    */
   this.chunkSerializer_ = new blk.io.ChunkSerializer(compressionFormat);
 
-  // TODO(benvanik): something better
+  // SIMDEPRECATED
   /**
    * @private
    * @type {number}
@@ -204,11 +216,31 @@ blk.game.server.ServerController.prototype.handlePlayersChanged =
  */
 blk.game.server.ServerController.prototype.load = function() {
   var deferred = new goog.async.Deferred();
+
   // TODO(benvanik): wait on initial map load?
+
+  // Create initial simulation state
+  this.setupSimulation();
+
   // Start accepting connections
   this.session.ready();
   deferred.callback(null);
   return deferred;
+};
+
+
+// TODO(benvanik): make all of this subclass only?
+/**
+ * Sets up the simulation on initial load.
+ * @protected
+ */
+blk.game.server.ServerController.prototype.setupSimulation = function() {
+  // Map
+  var map = /** @type {!blk.sim.ServerMapEntity} */ (
+      this.simulator_.createEntity(
+          blk.sim.MapEntity.ID,
+          0));
+  this.simulator_.addEntity(map);
 };
 
 
@@ -373,12 +405,17 @@ blk.game.server.ServerController.prototype.update = function(frame) {
   var map = this.map_;
   map.update(frame);
 
+  // Update simulation
+  this.simulator_.update(frame);
+
+  // SIMDEPRECATED
   // Update each player
   for (var n = 0; n < this.players_.length; n++) {
     var player = this.players_[n];
     player.update(frame);
   }
 
+  // SIMDEPRECATED
   // Broadcast any pending updates to users
   // TODO(benvanik): only send updates relevant to each user vs. broadcast all
   // NOTE: always sending, even if not updates, so sequence numbers get ACKed

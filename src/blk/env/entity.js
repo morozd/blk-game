@@ -23,6 +23,7 @@ goog.require('goog.math');
 
 
 
+// SIMDEPRECATED
 /**
  * An entity in the game world.
  * Actors are updated each simulation tick and can be rendered. Certain entities

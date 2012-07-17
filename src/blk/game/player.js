@@ -20,6 +20,7 @@ goog.require('goog.Disposable');
 
 
 
+// SIMDEPRECATED
 /**
  * A block world player.
  *

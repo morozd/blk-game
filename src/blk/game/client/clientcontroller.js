@@ -42,6 +42,7 @@ goog.require('gf.net.DisconnectReason');
 goog.require('gf.net.NetworkService');
 goog.require('gf.net.SessionState');
 goog.require('gf.net.chat.ClientChatService');
+goog.require('gf.sim.ClientSimulator');
 goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.asserts');
@@ -100,6 +101,14 @@ blk.game.client.ClientController = function(game, session) {
    */
   this.map_ = new blk.env.client.ClientMap();
   this.registerDisposable(this.map_);
+
+  /**
+   * Client-side simulation.
+   * @private
+   * @type {!gf.sim.ClientSimulator}
+   */
+  this.simulator_ = new gf.sim.ClientSimulator(this.runtime, this.session);
+  this.registerDisposable(this.simulator_);
 
   /**
    * Input data storage.
@@ -398,6 +407,10 @@ blk.game.client.ClientController.prototype.update = function(frame) {
   // Update game state
   this.map_.update(frame);
 
+  // Update simulation
+  this.simulator_.update(frame);
+
+  // SIMDEPRECATED
   // Update each player
   for (var n = 0; n < this.players_.length; n++) {
     var player = this.players_[n];
@@ -439,6 +452,7 @@ blk.game.client.ClientController.prototype.render = function(frame) {
   this.inputData_.poll();
 
   // Process physics (and user input)
+  // SIMDEPRECATED
   // NOTE: this is done without the interpolation delay so real times get used
   if (!this.localPlayer_.processPhysics(frame, this.inputData_)) {
     // Physics inconsistency - no way to proceed
@@ -458,6 +472,7 @@ blk.game.client.ClientController.prototype.render = function(frame) {
   // (I think ;)
   var originalFrameTime = frame.time;
   frame.time -= blk.game.client.ClientController.INTERPOLATION_DELAY_;
+  this.interpolateEntities(frame.time);
 
   // Render the game
   var graphicsContext = this.game.getGraphicsContext();

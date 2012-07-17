@@ -36,8 +36,6 @@ goog.require('goog.asserts');
  * Map entity.
  * A global singleton entity that defines map parameters.
  *
- *
- *
  * @constructor
  */
 blk.sim.MapEntity = function() {

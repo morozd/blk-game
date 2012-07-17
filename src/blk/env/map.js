@@ -75,6 +75,7 @@ blk.env.Map = function() {
   this.chunkCache_ = new blk.env.ChunkCache();
   this.registerDisposable(this.chunkCache_);
 
+  // SIMDEPRECATED
   /**
    * All active entities in the map.
    * HACK: THIS IS DEPRECATED AND WILL BE MOVING TO CHUNKS
@@ -82,6 +83,7 @@ blk.env.Map = function() {
    */
   this.entities = [];
 
+  // SIMDEPRECATED
   /**
    * Map of entities by entity ID.
    * HACK: THIS IS DEPRECATED AND WILL BE MOVING TO CHUNKS
@@ -142,6 +144,7 @@ blk.env.Map.prototype.update = function(frame) {
   // Handle environment first, in case it changes things
   this.environment.update(frame);
 
+  // SIMDEPRECATED
   // Update all entities
   // HACK: deprecated, will be moving
   for (var n = 0; n < this.entities.length; n++) {
@@ -289,6 +292,7 @@ blk.env.Map.prototype.setBlock = function(x, y, z, value) {
 };
 
 
+// SIMDEPRECATED
 /**
  * Adds an entity to the map.
  * HACK: deprecated
@@ -302,6 +306,7 @@ blk.env.Map.prototype.addEntity = function(entity) {
 };
 
 
+// SIMDEPRECATED
 /**
  * Removes an entity from the map.
  * HACK: deprecated
@@ -317,6 +322,7 @@ blk.env.Map.prototype.removeEntity = function(entity) {
 };
 
 
+// SIMDEPRECATED
 /**
  * Gets an entity by ID.
  * HACK: deprecated

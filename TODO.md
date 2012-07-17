@@ -189,3 +189,75 @@ gf.config.net.ClientConfigService(session, config)
     poll() -> [update config, dispatch query results]
 gf.config.net.ServerConfigService(session, config)
     [config.addListener(this)] -> post
+
+
+Simulator Transition
+====================
+
+MapEntity:
+- state:
+    - seed #
+    - block set
+    - environment options
+- server:
+    - blk.env.ServerMap
+- client:
+    - blk.env.ClientMap
+
+PositionedEntity:
+- state:
+    - position, orientation (PRED | INTERP | FREQ)
+- shared:
+    - bounding box
+    - getChunk() ?
+
+ActorEntity[PositionedEntity]:
+- state:
+    - model
+    - animation state?
+- client:
+    - blk.graphics.Model
+    - animation info
+
+ToolEntity[ActorEntity]:
+- state:
+    -
+-
+
+ControllableEntity[ActorEntity]:
+- state:
+    -
+-
+
+ControllerEntity:
+- state:
+    -
+-
+
+PlayerEntity[ControllerEntity]:
+- state:
+    - color
+- shared:
+    - blk.env.ChunkView
+
+
+blk.sim.MapEntity
+blk.sim.MusicEntity
+blk.sim.PositionedEntity
+  blk.sim.SoundEffectEntity
+  blk.sim.ActorEntity
+    blk.sim.ToolEntity
+      blk.sim.tools.PickaxeEntity
+      blk.sim.tools.RocketLauncherEntity
+    blk.sim.ProjectileEntity
+      blk.sim.tools.RocketEntity
+    blk.sim.ControllableEntity
+      blk.sim.controllables.HumanEntity
+blk.sim.ControllerEntity
+  blk.sim.controllers.PlayerEntity
+
+
+how does controller entity set pos/orientation on parent so pred/interp
+entity parenting
+
+// SIMDEPRECATED

@@ -22,6 +22,7 @@ goog.require('goog.vec.Vec4');
 
 
 
+// SIMDEPRECATED
 /**
  * The world state of an entity.
  * This structure is used for prediction, input control, and rendering.
