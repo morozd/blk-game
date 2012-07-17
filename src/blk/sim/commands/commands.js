@@ -21,7 +21,7 @@
 goog.provide('blk.sim.commands');
 
 goog.require('blk.sim.commands.PlayerMoveCommand');
-goog.require('gf.sim.CommandType');
+goog.require('gf.sim.CommandFactory');
 
 
 /**
@@ -29,7 +29,7 @@ goog.require('gf.sim.CommandType');
  * @param {!gf.sim.Simulator} simulator Simulator.
  */
 blk.sim.commands.registerCommands = function(simulator) {
-  simulator.registerCommandType(new gf.sim.CommandType(
+  simulator.registerCommandFactory(new gf.sim.CommandFactory(
       blk.sim.commands.PlayerMoveCommand.ID,
       blk.sim.commands.PlayerMoveCommand));
 };

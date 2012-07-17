@@ -99,13 +99,13 @@ blk.sim.MapEntity.State.declareVariables = function(variableList) {
  * @constructor
  * @extends {gf.sim.ClientEntity}
  * @param {!gf.sim.ClientSimulator} simulator Owning client simulator.
- * @param {!gf.sim.EntityType} entityType Entity type.
+ * @param {!gf.sim.EntityFactory} entityFactory Entity factory.
  * @param {number} entityId Entity ID.
  * @param {number} entityFlags Bitmask of {@see gf.sim.EntityFlag} values.
  */
 blk.sim.ClientMapEntity = function(
-    simulator, entityType, entityId, entityFlags) {
-  goog.base(this, simulator, entityType, entityId, entityFlags);
+    simulator, entityFactory, entityId, entityFlags) {
+  goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
 goog.inherits(blk.sim.ClientMapEntity, gf.sim.ClientEntity);
 goog.mixin(blk.sim.ClientMapEntity.prototype, blk.sim.MapEntity.prototype);
@@ -118,13 +118,13 @@ goog.mixin(blk.sim.ClientMapEntity.prototype, blk.sim.MapEntity.prototype);
  * @constructor
  * @extends {gf.sim.ServerEntity}
  * @param {!gf.sim.ServerSimulator} simulator Owning server simulator.
- * @param {!gf.sim.EntityType} entityType Entity type.
+ * @param {!gf.sim.EntityFactory} entityFactory Entity factory.
  * @param {number} entityId Entity ID.
  * @param {number} entityFlags Bitmask of {@see gf.sim.EntityFlag} values.
  */
 blk.sim.ServerMapEntity = function(
-    simulator, entityType, entityId, entityFlags) {
-  goog.base(this, simulator, entityType, entityId, entityFlags);
+    simulator, entityFactory, entityId, entityFlags) {
+  goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
 goog.inherits(blk.sim.ServerMapEntity, gf.sim.ServerEntity);
 goog.mixin(blk.sim.ServerMapEntity.prototype, blk.sim.MapEntity.prototype);

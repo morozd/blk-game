@@ -24,7 +24,7 @@ goog.require('blk.sim.ClientMapEntity');
 goog.require('blk.sim.MapEntity');
 goog.require('blk.sim.ServerMapEntity');
 goog.require('gf');
-goog.require('gf.sim.EntityType');
+goog.require('gf.sim.EntityFactory');
 
 
 /**
@@ -32,7 +32,7 @@ goog.require('gf.sim.EntityType');
  * @param {!gf.sim.Simulator} simulator Simulator.
  */
 blk.sim.entities.registerEntities = function(simulator) {
-  simulator.registerEntityType(new gf.sim.EntityType(
+  simulator.registerEntityFactory(new gf.sim.EntityFactory(
       blk.sim.MapEntity.ID,
       gf.SERVER ?
           blk.sim.ServerMapEntity : blk.sim.ClientMapEntity,

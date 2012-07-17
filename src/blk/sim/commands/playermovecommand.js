@@ -74,10 +74,10 @@ blk.sim.commands.PlayerMoveAction = {
  *
  * @constructor
  * @extends {gf.sim.PredictedCommand}
- * @param {!gf.sim.CommandType} commandType Command type.
+ * @param {!gf.sim.CommandFactory} commandFactory Command factory.
  */
-blk.sim.commands.PlayerMoveCommand = function(commandType) {
-  goog.base(this, commandType);
+blk.sim.commands.PlayerMoveCommand = function(commandFactory) {
+  goog.base(this, commandFactory);
 
   /**
    * Viewport rotation quaternion at the time the command was generated.

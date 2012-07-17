@@ -20,6 +20,8 @@ goog.require('blk.env.Chunk');
 goog.require('blk.env.UpdatePriority');
 goog.require('gf.vec.BoundingBox');
 goog.require('gf.vec.Containment');
+/** @suppress {extraRequire} */
+goog.require('gf.vec.Viewport');
 goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.asserts');
