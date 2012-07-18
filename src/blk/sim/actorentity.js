@@ -22,9 +22,9 @@ goog.provide('blk.sim.ActorEntity');
 goog.provide('blk.sim.ClientActorEntity');
 goog.provide('blk.sim.ServerActorEntity');
 
-goog.require('blk.sim.ClientPositionedEntity');
-goog.require('blk.sim.PositionedEntity');
-goog.require('blk.sim.ServerPositionedEntity');
+goog.require('blk.sim.ClientModelEntity');
+goog.require('blk.sim.ModelEntity');
+goog.require('blk.sim.ServerModelEntity');
 goog.require('gf.log');
 goog.require('gf.sim.Variable');
 goog.require('gf.sim.VariableFlag');
@@ -48,7 +48,7 @@ blk.sim.ActorEntity = function() {
 /**
  * Actor entity state.
  * @constructor
- * @extends {blk.sim.PositionedEntity.State}
+ * @extends {blk.sim.ModelEntity.State}
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
  * @param {!gf.sim.VariableTable} variableTable A subclass's variable table.
  */
@@ -56,10 +56,7 @@ blk.sim.ActorEntity.State = function(entity, variableTable) {
   goog.base(this, entity, variableTable);
 
   // TODO(benvanik): add vars:
-  // - model
-  // - animation params (current pose/etc)
   // - controller entity ID
-  // - color modulation?
 
   /**
    * @private
@@ -74,7 +71,7 @@ blk.sim.ActorEntity.State = function(entity, variableTable) {
   this.positionOrdinal_ = variableTable.getOrdinal(
       blk.sim.ActorEntity.State.positionTag_);
 };
-goog.inherits(blk.sim.ActorEntity.State, blk.sim.PositionedEntity.State);
+goog.inherits(blk.sim.ActorEntity.State, blk.sim.ModelEntity.State);
 
 
 /**
@@ -110,7 +107,7 @@ blk.sim.ActorEntity.State.prototype.setPosition = function(value) {
  * @override
  */
 blk.sim.ActorEntity.State.declareVariables = function(variableList) {
-  blk.sim.PositionedEntity.State.declareVariables(variableList);
+  blk.sim.ModelEntity.State.declareVariables(variableList);
   variableList.push(new gf.sim.Variable.Vec3(
       blk.sim.ActorEntity.State.positionTag_,
       gf.sim.VariableFlag.UPDATED_FREQUENTLY | gf.sim.VariableFlag.INTERPOLATED,
@@ -124,7 +121,7 @@ blk.sim.ActorEntity.State.declareVariables = function(variableList) {
  * Abstract client-side actor entity.
  *
  * @constructor
- * @extends {blk.sim.ClientPositionedEntity}
+ * @extends {blk.sim.ClientModelEntity}
  * @param {!gf.sim.ClientSimulator} simulator Owning client simulator.
  * @param {!gf.sim.EntityFactory} entityFactory Entity factory.
  * @param {number} entityId Entity ID.
@@ -136,10 +133,8 @@ blk.sim.ClientActorEntity = function(
 
   // TODO(benvanik): add locals:
   // - viewport
-  // - render model
-  // - render state
 };
-goog.inherits(blk.sim.ClientActorEntity, blk.sim.ClientPositionedEntity);
+goog.inherits(blk.sim.ClientActorEntity, blk.sim.ClientModelEntity);
 
 
 
@@ -147,7 +142,7 @@ goog.inherits(blk.sim.ClientActorEntity, blk.sim.ClientPositionedEntity);
  * Abstract server-side actor entity.
  *
  * @constructor
- * @extends {blk.sim.ServerPositionedEntity}
+ * @extends {blk.sim.ServerModelEntity}
  * @param {!gf.sim.ServerSimulator} simulator Owning server simulator.
  * @param {!gf.sim.EntityFactory} entityFactory Entity factory.
  * @param {number} entityId Entity ID.
@@ -157,4 +152,4 @@ blk.sim.ServerActorEntity = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
-goog.inherits(blk.sim.ServerActorEntity, blk.sim.ServerPositionedEntity);
+goog.inherits(blk.sim.ServerActorEntity, blk.sim.ServerModelEntity);

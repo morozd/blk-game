@@ -211,23 +211,31 @@ PositionedEntity:
     - bounding box
     - getChunk() ?
 
-ActorEntity[PositionedEntity]:
+ModelEntity[PositionedEntity]:
 - state:
     - model
     - animation state?
-    - controller
+    - color
 - shared:
-    - viewport
+    -
 - client:
     - blk.graphics.Model
     - animation info
 
-ToolEntity[ActorEntity]:
+ActorEntity[ModelEntity]:
+- state:
+    - controller
+- shared:
+    - viewport
+- client:
+    -
+
+ToolEntity[ModelEntity]:
 - state:
     -
 -
 
-ProjectileEntity[ActorEntity]:
+ProjectileEntity[ModelEntity]:
 - state:
     -
 -
@@ -248,7 +256,8 @@ blk.sim.MapEntity
 blk.sim.MusicEntity
 blk.sim.PositionedEntity
   blk.sim.SoundEffectEntity
-  blk.sim.ActorEntity
+  blk.sim.ModelEntity
+    blk.sim.ActorEntity
     blk.sim.ToolEntity
       blk.sim.tools.PickaxeEntity
       blk.sim.tools.RocketLauncherEntity

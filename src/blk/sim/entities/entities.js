@@ -27,8 +27,14 @@ goog.require('blk.sim.controllers.ClientPlayerEntity');
 goog.require('blk.sim.controllers.PlayerEntity');
 goog.require('blk.sim.controllers.ServerPlayerEntity');
 goog.require('blk.sim.tools.ClientPickaxeEntity');
+goog.require('blk.sim.tools.ClientRocketEntity');
+goog.require('blk.sim.tools.ClientRocketLauncherEntity');
 goog.require('blk.sim.tools.PickaxeEntity');
+goog.require('blk.sim.tools.RocketEntity');
+goog.require('blk.sim.tools.RocketLauncherEntity');
 goog.require('blk.sim.tools.ServerPickaxeEntity');
+goog.require('blk.sim.tools.ServerRocketEntity');
+goog.require('blk.sim.tools.ServerRocketLauncherEntity');
 goog.require('gf');
 goog.require('gf.sim.EntityFactory');
 
@@ -59,4 +65,19 @@ blk.sim.entities.registerEntities = function(simulator) {
       gf.SERVER ?
           blk.sim.tools.ServerPickaxeEntity : blk.sim.tools.ClientPickaxeEntity,
       blk.sim.tools.PickaxeEntity.State));
+
+  // ROCKETLAUNCHER_TOOL
+  simulator.registerEntityFactory(new gf.sim.EntityFactory(
+      blk.sim.tools.RocketLauncherEntity.ID,
+      gf.SERVER ?
+          blk.sim.tools.ServerRocketLauncherEntity :
+          blk.sim.tools.ClientRocketLauncherEntity,
+      blk.sim.tools.RocketLauncherEntity.State));
+
+  // ROCKET_PROJECTILE
+  simulator.registerEntityFactory(new gf.sim.EntityFactory(
+      blk.sim.tools.RocketEntity.ID,
+      gf.SERVER ?
+          blk.sim.tools.ServerRocketEntity : blk.sim.tools.ClientRocketEntity,
+      blk.sim.tools.RocketEntity.State));
 };

@@ -18,14 +18,18 @@
  * @author benvanik@google.com (Ben Vanik)
  */
 
-goog.provide('blk.sim.ClientProjectileEntity');
-goog.provide('blk.sim.ProjectileEntity');
-goog.provide('blk.sim.ServerProjectileEntity');
+goog.provide('blk.sim.tools.ClientRocketLauncherEntity');
+goog.provide('blk.sim.tools.RocketLauncherEntity');
+goog.provide('blk.sim.tools.ServerRocketLauncherEntity');
 
-goog.require('blk.sim.ClientModelEntity');
-goog.require('blk.sim.ModelEntity');
-goog.require('blk.sim.ServerModelEntity');
+goog.require('blk.sim');
+goog.require('blk.sim.ClientToolEntity');
+goog.require('blk.sim.ServerToolEntity');
+goog.require('blk.sim.ToolEntity');
+goog.require('blk.sim.entities.EntityType');
 goog.require('gf.log');
+goog.require('gf.sim');
+goog.require('gf.sim.EntityState');
 goog.require('gf.sim.Variable');
 goog.require('gf.sim.VariableFlag');
 goog.require('goog.asserts');
@@ -34,25 +38,35 @@ goog.require('goog.vec.Vec3');
 
 
 /**
- * Abstract projectile entity.
- * An entity produced from some tool.
+ * Rocket launcher tool entity.
+ * A ranged projectile-shooting tool for 'sploding the world.
  *
  * @constructor
  */
-blk.sim.ProjectileEntity = function() {
+blk.sim.tools.RocketLauncherEntity = function() {
   goog.asserts.fail('Cannot create shared proto class');
 };
 
 
+/**
+ * Entity ID.
+ * @const
+ * @type {number}
+ */
+blk.sim.tools.RocketLauncherEntity.ID = gf.sim.createTypeId(
+    blk.sim.BLK_MODULE_ID, blk.sim.entities.EntityType.ROCKETLAUNCHER_TOOL);
+
+
 
 /**
- * Projectile entity state.
+ * RocketLauncher entity state.
  * @constructor
- * @extends {blk.sim.ModelEntity.State}
+ * @extends {blk.sim.ToolEntity.State}
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
- * @param {!gf.sim.VariableTable} variableTable A subclass's variable table.
  */
-blk.sim.ProjectileEntity.State = function(entity, variableTable) {
+blk.sim.tools.RocketLauncherEntity.State = function(entity) {
+  var variableTable = gf.sim.EntityState.getVariableTable(
+      blk.sim.tools.RocketLauncherEntity.State.declareVariables);
   goog.base(this, entity, variableTable);
 
   /**
@@ -66,23 +80,25 @@ blk.sim.ProjectileEntity.State = function(entity, variableTable) {
    * @type {number}
    */
   this.positionOrdinal_ = variableTable.getOrdinal(
-      blk.sim.ProjectileEntity.State.positionTag_);
+      blk.sim.tools.RocketLauncherEntity.State.positionTag_);
 };
-goog.inherits(blk.sim.ProjectileEntity.State, blk.sim.ModelEntity.State);
+goog.inherits(blk.sim.tools.RocketLauncherEntity.State,
+    blk.sim.ToolEntity.State);
 
 
 /**
  * @private
  * @type {number}
  */
-blk.sim.ProjectileEntity.State.positionTag_ = gf.sim.Variable.getUniqueTag();
+blk.sim.tools.RocketLauncherEntity.State.positionTag_ =
+    gf.sim.Variable.getUniqueTag();
 
 
 /**
  * Gets the position.
  * @return {!goog.vec.Vec3.Float32} Current value.
  */
-blk.sim.ProjectileEntity.State.prototype.getPosition = function() {
+blk.sim.tools.RocketLauncherEntity.State.prototype.getPosition = function() {
   return this.position_;
 };
 
@@ -91,7 +107,8 @@ blk.sim.ProjectileEntity.State.prototype.getPosition = function() {
  * Sets the position.
  * @param {goog.vec.Vec3.Float32} value New value.
  */
-blk.sim.ProjectileEntity.State.prototype.setPosition = function(value) {
+blk.sim.tools.RocketLauncherEntity.State.prototype.setPosition = function(
+    value) {
   gf.log.write('setPosition:', value[0], value[1], value[2]);
   if (!goog.vec.Vec3.equals(this.position_, value)) {
     goog.vec.Vec3.setFromArray(this.position_, value);
@@ -103,47 +120,50 @@ blk.sim.ProjectileEntity.State.prototype.setPosition = function(value) {
 /**
  * @override
  */
-blk.sim.ProjectileEntity.State.declareVariables = function(variableList) {
-  blk.sim.ModelEntity.State.declareVariables(variableList);
+blk.sim.tools.RocketLauncherEntity.State.declareVariables = function(
+    variableList) {
+  blk.sim.ToolEntity.State.declareVariables(variableList);
   variableList.push(new gf.sim.Variable.Vec3(
-      blk.sim.ProjectileEntity.State.positionTag_,
+      blk.sim.tools.RocketLauncherEntity.State.positionTag_,
       gf.sim.VariableFlag.UPDATED_FREQUENTLY | gf.sim.VariableFlag.INTERPOLATED,
-      blk.sim.ProjectileEntity.State.prototype.getPosition,
-      blk.sim.ProjectileEntity.State.prototype.setPosition));
+      blk.sim.tools.RocketLauncherEntity.State.prototype.getPosition,
+      blk.sim.tools.RocketLauncherEntity.State.prototype.setPosition));
 };
 
 
 
 /**
- * Abstract client-side projectile entity.
+ * Client-side rocket launcher tool entity.
  *
  * @constructor
- * @extends {blk.sim.ClientModelEntity}
+ * @extends {blk.sim.ClientToolEntity}
  * @param {!gf.sim.ClientSimulator} simulator Owning client simulator.
  * @param {!gf.sim.EntityFactory} entityFactory Entity factory.
  * @param {number} entityId Entity ID.
  * @param {number} entityFlags Bitmask of {@see gf.sim.EntityFlag} values.
  */
-blk.sim.ClientProjectileEntity = function(
+blk.sim.tools.ClientRocketLauncherEntity = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
-goog.inherits(blk.sim.ClientProjectileEntity, blk.sim.ClientModelEntity);
+goog.inherits(blk.sim.tools.ClientRocketLauncherEntity,
+    blk.sim.ClientToolEntity);
 
 
 
 /**
- * Abstract server-side projectile entity.
+ * Server-side rocket launcher tool entity.
  *
  * @constructor
- * @extends {blk.sim.ServerModelEntity}
+ * @extends {blk.sim.ServerToolEntity}
  * @param {!gf.sim.ServerSimulator} simulator Owning server simulator.
  * @param {!gf.sim.EntityFactory} entityFactory Entity factory.
  * @param {number} entityId Entity ID.
  * @param {number} entityFlags Bitmask of {@see gf.sim.EntityFlag} values.
  */
-blk.sim.ServerProjectileEntity = function(
+blk.sim.tools.ServerRocketLauncherEntity = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
-goog.inherits(blk.sim.ServerProjectileEntity, blk.sim.ServerModelEntity);
+goog.inherits(blk.sim.tools.ServerRocketLauncherEntity,
+    blk.sim.ServerToolEntity);

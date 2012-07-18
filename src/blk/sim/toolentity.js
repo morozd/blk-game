@@ -22,9 +22,9 @@ goog.provide('blk.sim.ClientToolEntity');
 goog.provide('blk.sim.ServerToolEntity');
 goog.provide('blk.sim.ToolEntity');
 
-goog.require('blk.sim.ActorEntity');
-goog.require('blk.sim.ClientActorEntity');
-goog.require('blk.sim.ServerActorEntity');
+goog.require('blk.sim.ClientModelEntity');
+goog.require('blk.sim.ModelEntity');
+goog.require('blk.sim.ServerModelEntity');
 goog.require('gf.log');
 goog.require('gf.sim.Variable');
 goog.require('gf.sim.VariableFlag');
@@ -37,6 +37,15 @@ goog.require('goog.vec.Vec3');
  * Abstract tool entity.
  * An entity that can be used to perform some action (generate commands/etc).
  *
+ * Tools can be held (parented on some actor), contained within something
+ * (parented to an inventory or box), or standalone in the world (no parent).
+ * Held:
+ * - Position/etc indicates relative position to parent attachment point
+ * Contained:
+ * - Position ignored
+ * Standalone:
+ * - Position is world position
+ *
  * @constructor
  */
 blk.sim.ToolEntity = function() {
@@ -48,7 +57,7 @@ blk.sim.ToolEntity = function() {
 /**
  * Tool entity state.
  * @constructor
- * @extends {blk.sim.ActorEntity.State}
+ * @extends {blk.sim.ModelEntity.State}
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
  * @param {!gf.sim.VariableTable} variableTable A subclass's variable table.
  */
@@ -68,7 +77,7 @@ blk.sim.ToolEntity.State = function(entity, variableTable) {
   this.positionOrdinal_ = variableTable.getOrdinal(
       blk.sim.ToolEntity.State.positionTag_);
 };
-goog.inherits(blk.sim.ToolEntity.State, blk.sim.ActorEntity.State);
+goog.inherits(blk.sim.ToolEntity.State, blk.sim.ModelEntity.State);
 
 
 /**
@@ -104,7 +113,7 @@ blk.sim.ToolEntity.State.prototype.setPosition = function(value) {
  * @override
  */
 blk.sim.ToolEntity.State.declareVariables = function(variableList) {
-  blk.sim.ActorEntity.State.declareVariables(variableList);
+  blk.sim.ModelEntity.State.declareVariables(variableList);
   variableList.push(new gf.sim.Variable.Vec3(
       blk.sim.ToolEntity.State.positionTag_,
       gf.sim.VariableFlag.UPDATED_FREQUENTLY | gf.sim.VariableFlag.INTERPOLATED,
@@ -118,7 +127,7 @@ blk.sim.ToolEntity.State.declareVariables = function(variableList) {
  * Abstract client-side tool entity.
  *
  * @constructor
- * @extends {blk.sim.ClientActorEntity}
+ * @extends {blk.sim.ClientModelEntity}
  * @param {!gf.sim.ClientSimulator} simulator Owning client simulator.
  * @param {!gf.sim.EntityFactory} entityFactory Entity factory.
  * @param {number} entityId Entity ID.
@@ -128,7 +137,7 @@ blk.sim.ClientToolEntity = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
-goog.inherits(blk.sim.ClientToolEntity, blk.sim.ClientActorEntity);
+goog.inherits(blk.sim.ClientToolEntity, blk.sim.ClientModelEntity);
 
 
 
@@ -136,7 +145,7 @@ goog.inherits(blk.sim.ClientToolEntity, blk.sim.ClientActorEntity);
  * Abstract server-side tool entity.
  *
  * @constructor
- * @extends {blk.sim.ServerActorEntity}
+ * @extends {blk.sim.ServerModelEntity}
  * @param {!gf.sim.ServerSimulator} simulator Owning server simulator.
  * @param {!gf.sim.EntityFactory} entityFactory Entity factory.
  * @param {number} entityId Entity ID.
@@ -146,4 +155,4 @@ blk.sim.ServerToolEntity = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
-goog.inherits(blk.sim.ServerToolEntity, blk.sim.ServerActorEntity);
+goog.inherits(blk.sim.ServerToolEntity, blk.sim.ServerModelEntity);
