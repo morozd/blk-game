@@ -31,6 +31,7 @@ goog.require('gf.sim.VariableFlag');
 goog.require('goog.asserts');
 goog.require('goog.vec.Quaternion');
 goog.require('goog.vec.Vec3');
+goog.require('goog.vec.Vec4');
 
 
 
@@ -179,8 +180,6 @@ blk.sim.ClientPositionedEntity = function(
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
 goog.inherits(blk.sim.ClientPositionedEntity, gf.sim.ClientEntity);
-goog.mixin(blk.sim.ClientPositionedEntity.prototype,
-    blk.sim.PositionedEntity.prototype);
 
 
 
@@ -199,5 +198,3 @@ blk.sim.ServerPositionedEntity = function(
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
 goog.inherits(blk.sim.ServerPositionedEntity, gf.sim.ServerEntity);
-goog.mixin(blk.sim.ServerPositionedEntity.prototype,
-    blk.sim.PositionedEntity.prototype);

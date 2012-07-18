@@ -161,7 +161,8 @@ blk.sim.ClientMapEntity = function(
   this.scheduleUpdate(gf.sim.SchedulingPriority.NORMAL);
 };
 goog.inherits(blk.sim.ClientMapEntity, gf.sim.ClientEntity);
-goog.mixin(blk.sim.ClientMapEntity.prototype, blk.sim.MapEntity.prototype);
+blk.sim.ClientMapEntity.prototype.sharedMethod =
+    blk.sim.MapEntity.prototype.sharedMethod;
 
 
 /**
@@ -193,7 +194,8 @@ blk.sim.ServerMapEntity = function(
   this.scheduleUpdate(gf.sim.SchedulingPriority.NORMAL);
 };
 goog.inherits(blk.sim.ServerMapEntity, gf.sim.ServerEntity);
-goog.mixin(blk.sim.ServerMapEntity.prototype, blk.sim.MapEntity.prototype);
+blk.sim.ServerMapEntity.prototype.sharedMethod =
+    blk.sim.MapEntity.prototype.sharedMethod;
 
 
 /**

@@ -144,11 +144,12 @@ blk.sim.controllers.PlayerEntity.State.declareVariables = function(
 blk.sim.controllers.ClientPlayerEntity = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
+
+  // TODO(benvanik): add locals:
+  // - chunk view
 };
 goog.inherits(blk.sim.controllers.ClientPlayerEntity,
     blk.sim.ClientControllerEntity);
-goog.mixin(blk.sim.controllers.ClientPlayerEntity.prototype,
-    blk.sim.controllers.PlayerEntity.prototype);
 
 
 
@@ -165,8 +166,9 @@ goog.mixin(blk.sim.controllers.ClientPlayerEntity.prototype,
 blk.sim.controllers.ServerPlayerEntity = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
+
+  // TODO(benvanik): add locals:
+  // - chunk view
 };
 goog.inherits(blk.sim.controllers.ServerPlayerEntity,
     blk.sim.ServerControllerEntity);
-goog.mixin(blk.sim.controllers.ServerPlayerEntity.prototype,
-    blk.sim.controllers.PlayerEntity.prototype);

@@ -129,8 +129,6 @@ blk.sim.ClientControllerEntity = function(
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
 goog.inherits(blk.sim.ClientControllerEntity, gf.sim.ClientEntity);
-goog.mixin(blk.sim.ClientControllerEntity.prototype,
-    blk.sim.ControllerEntity.prototype);
 
 
 
@@ -149,5 +147,3 @@ blk.sim.ServerControllerEntity = function(
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
 goog.inherits(blk.sim.ServerControllerEntity, gf.sim.ServerEntity);
-goog.mixin(blk.sim.ServerControllerEntity.prototype,
-    blk.sim.ControllerEntity.prototype);

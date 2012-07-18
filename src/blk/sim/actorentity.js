@@ -55,6 +55,12 @@ blk.sim.ActorEntity = function() {
 blk.sim.ActorEntity.State = function(entity, variableTable) {
   goog.base(this, entity, variableTable);
 
+  // TODO(benvanik): add vars:
+  // - model
+  // - animation params (current pose/etc)
+  // - controller entity ID
+  // - color modulation?
+
   /**
    * @private
    * @type {!goog.vec.Vec3.Float32}
@@ -127,10 +133,13 @@ blk.sim.ActorEntity.State.declareVariables = function(variableList) {
 blk.sim.ClientActorEntity = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
+
+  // TODO(benvanik): add locals:
+  // - viewport
+  // - render model
+  // - render state
 };
 goog.inherits(blk.sim.ClientActorEntity, blk.sim.ClientPositionedEntity);
-goog.mixin(blk.sim.ClientActorEntity.prototype,
-    blk.sim.ActorEntity.prototype);
 
 
 
@@ -149,5 +158,3 @@ blk.sim.ServerActorEntity = function(
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
 goog.inherits(blk.sim.ServerActorEntity, blk.sim.ServerPositionedEntity);
-goog.mixin(blk.sim.ServerActorEntity.prototype,
-    blk.sim.ActorEntity.prototype);

@@ -147,8 +147,6 @@ blk.sim.tools.ClientPickaxeEntity = function(
 };
 goog.inherits(blk.sim.tools.ClientPickaxeEntity,
     blk.sim.ClientToolEntity);
-goog.mixin(blk.sim.tools.ClientPickaxeEntity.prototype,
-    blk.sim.tools.PickaxeEntity.prototype);
 
 
 
@@ -168,5 +166,3 @@ blk.sim.tools.ServerPickaxeEntity = function(
 };
 goog.inherits(blk.sim.tools.ServerPickaxeEntity,
     blk.sim.ServerToolEntity);
-goog.mixin(blk.sim.tools.ServerPickaxeEntity.prototype,
-    blk.sim.tools.PickaxeEntity.prototype);

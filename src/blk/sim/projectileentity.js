@@ -129,8 +129,6 @@ blk.sim.ClientProjectileEntity = function(
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
 goog.inherits(blk.sim.ClientProjectileEntity, blk.sim.ClientActorEntity);
-goog.mixin(blk.sim.ClientProjectileEntity.prototype,
-    blk.sim.ProjectileEntity.prototype);
 
 
 
@@ -149,5 +147,3 @@ blk.sim.ServerProjectileEntity = function(
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
 goog.inherits(blk.sim.ServerProjectileEntity, blk.sim.ServerActorEntity);
-goog.mixin(blk.sim.ServerProjectileEntity.prototype,
-    blk.sim.ProjectileEntity.prototype);

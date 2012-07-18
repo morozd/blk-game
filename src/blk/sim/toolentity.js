@@ -129,8 +129,6 @@ blk.sim.ClientToolEntity = function(
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
 goog.inherits(blk.sim.ClientToolEntity, blk.sim.ClientActorEntity);
-goog.mixin(blk.sim.ClientToolEntity.prototype,
-    blk.sim.ToolEntity.prototype);
 
 
 
@@ -149,5 +147,3 @@ blk.sim.ServerToolEntity = function(
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
 goog.inherits(blk.sim.ServerToolEntity, blk.sim.ServerActorEntity);
-goog.mixin(blk.sim.ServerToolEntity.prototype,
-    blk.sim.ToolEntity.prototype);
