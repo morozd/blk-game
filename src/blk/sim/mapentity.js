@@ -73,8 +73,9 @@ blk.sim.MapEntity.prototype.sharedMethod = function(a) {
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
  */
 blk.sim.MapEntity.State = function(entity) {
-  var vtable = gf.sim.EntityState.getVariableTable(blk.sim.MapEntity.State);
-  goog.base(this, entity, vtable);
+  var variableTable = gf.sim.EntityState.getVariableTable(
+      blk.sim.MapEntity.State.declareVariables);
+  goog.base(this, entity, variableTable);
 
   // TODO(benvanik): add vars:
   // - day cycle duration
@@ -94,7 +95,8 @@ blk.sim.MapEntity.State = function(entity) {
    * @private
    * @type {number}
    */
-  this.testVarOrdinal_ = vtable.getOrdinal(blk.sim.MapEntity.State.testVarTag_);
+  this.testVarOrdinal_ = variableTable.getOrdinal(
+      blk.sim.MapEntity.State.testVarTag_);
 };
 goog.inherits(blk.sim.MapEntity.State, gf.sim.EntityState);
 
@@ -132,7 +134,7 @@ blk.sim.MapEntity.State.prototype.setTestVar = function(value) {
  * @override
  */
 blk.sim.MapEntity.State.declareVariables = function(variableList) {
-  // TODO(benvanik): add vars
+  gf.sim.EntityState.declareVariables(variableList);
   variableList.push(new gf.sim.Variable.Float(
       blk.sim.MapEntity.State.testVarTag_,
       0,

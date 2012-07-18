@@ -215,6 +215,9 @@ ActorEntity[PositionedEntity]:
 - state:
     - model
     - animation state?
+    - controller
+- shared:
+    - viewport
 - client:
     - blk.graphics.Model
     - animation info
@@ -224,7 +227,7 @@ ToolEntity[ActorEntity]:
     -
 -
 
-ControllableEntity[ActorEntity]:
+ProjectileEntity[ActorEntity]:
 - state:
     -
 -
@@ -251,8 +254,6 @@ blk.sim.PositionedEntity
       blk.sim.tools.RocketLauncherEntity
     blk.sim.ProjectileEntity
       blk.sim.tools.RocketEntity
-    blk.sim.ControllableEntity
-      blk.sim.controllables.HumanEntity
 blk.sim.ControllerEntity
   blk.sim.controllers.PlayerEntity
 

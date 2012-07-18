@@ -28,5 +28,9 @@ goog.provide('blk.sim.entities.EntityType');
  */
 blk.sim.entities.EntityType = {
   /** {@see blk.sim.MapEntity} */
-  MAP: 0
+  MAP: 0,
+  /** {@see blk.sim.controllers.PlayerEntity} */
+  PLAYER_CONTROLLER: 1,
+  /** {@see blk.sim.tools.PickaxeEntity} */
+  PICKAXE_TOOL: 2
 };
