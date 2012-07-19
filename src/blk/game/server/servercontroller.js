@@ -36,9 +36,9 @@ goog.require('blk.net.packets.Move');
 goog.require('blk.net.packets.ReadyPlayer');
 goog.require('blk.net.packets.RequestChunkData');
 goog.require('blk.net.packets.SetBlock');
-goog.require('blk.sim.MapEntity');
 goog.require('blk.sim.commands');
 goog.require('blk.sim.entities');
+goog.require('blk.sim.entities.MapEntity');
 goog.require('gf');
 goog.require('gf.log');
 goog.require('gf.net.NetworkService');
@@ -240,9 +240,9 @@ blk.game.server.ServerController.prototype.load = function() {
  */
 blk.game.server.ServerController.prototype.setupSimulation = function() {
   // Map
-  var map = /** @type {!blk.sim.ServerMapEntity} */ (
+  var map = /** @type {!blk.sim.entities.MapEntity} */ (
       this.simulator_.createEntity(
-          blk.sim.MapEntity.ID,
+          blk.sim.entities.MapEntity.ID,
           0));
   this.simulator_.addEntity(map);
 };

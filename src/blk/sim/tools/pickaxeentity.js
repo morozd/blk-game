@@ -18,13 +18,13 @@
  * @author benvanik@google.com (Ben Vanik)
  */
 
-goog.provide('blk.sim.entities.PickaxeEntity');
 goog.provide('blk.sim.tools.PickaxeEntity');
 
 goog.require('blk.sim');
 goog.require('blk.sim.entities.EntityType');
 goog.require('blk.sim.entities.ToolEntity');
 goog.require('gf.sim');
+goog.require('gf.sim.EntityState');
 
 
 
@@ -39,11 +39,11 @@ goog.require('gf.sim');
  * @param {number} entityId Entity ID.
  * @param {number} entityFlags Bitmask of {@see gf.sim.EntityFlag} values.
  */
-blk.sim.entities.PickaxeEntity = function(
+blk.sim.tools.PickaxeEntity = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
-goog.inherits(blk.sim.entities.PickaxeEntity, blk.sim.entities.ToolEntity);
+goog.inherits(blk.sim.tools.PickaxeEntity, blk.sim.entities.ToolEntity);
 
 
 /**
@@ -61,19 +61,22 @@ blk.sim.tools.PickaxeEntity.ID = gf.sim.createTypeId(
  * @constructor
  * @extends {blk.sim.entities.ToolEntity.State}
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
- * @param {!gf.sim.VariableTable} variableTable A subclass's variable table.
+* @param {!gf.sim.VariableTable=} opt_variableTable A subclass's variable
+ *     table, if subclassed.
  */
-blk.sim.entities.PickaxeEntity.State = function(entity, variableTable) {
+blk.sim.tools.PickaxeEntity.State = function(entity, opt_variableTable) {
+  var variableTable = opt_variableTable || gf.sim.EntityState.getVariableTable(
+      blk.sim.tools.PickaxeEntity.State.declareVariables);
   goog.base(this, entity, variableTable);
 };
-goog.inherits(blk.sim.entities.PickaxeEntity.State,
+goog.inherits(blk.sim.tools.PickaxeEntity.State,
     blk.sim.entities.ToolEntity.State);
 
 
 /**
  * @override
  */
-blk.sim.entities.PickaxeEntity.State.declareVariables = function(
+blk.sim.tools.PickaxeEntity.State.declareVariables = function(
     variableList) {
   blk.sim.entities.ToolEntity.State.declareVariables(variableList);
 };

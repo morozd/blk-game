@@ -178,7 +178,7 @@ blk.sim.entities.ModelEntity.State.prototype.setModelColor = function(value) {
 
 /**
  * Gets the attachment point.
- * @return {string} Current value.
+ * @return {number} Current value.
  */
 blk.sim.entities.ModelEntity.State.prototype.getAttachPoint = function() {
   return this.attachPoint_;
@@ -187,7 +187,7 @@ blk.sim.entities.ModelEntity.State.prototype.getAttachPoint = function() {
 
 /**
  * Sets the attachment point.
- * @param {string} value New value.
+ * @param {number} value New value.
  */
 blk.sim.entities.ModelEntity.State.prototype.setAttachPoint = function(value) {
   if (this.attachPoint_ != value) {

@@ -21,6 +21,7 @@
 goog.provide('blk.sim.controllers.PlayerEntity');
 
 goog.require('blk.sim.entities.ControllerEntity');
+goog.require('gf.sim.EntityState');
 
 
 
@@ -49,9 +50,12 @@ goog.inherits(blk.sim.controllers.PlayerEntity,
  * @constructor
  * @extends {blk.sim.entities.ControllerEntity.State}
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
- * @param {!gf.sim.VariableTable} variableTable A subclass's variable table.
+ * @param {!gf.sim.VariableTable=} opt_variableTable A subclass's variable
+ *     table, if subclassed.
  */
-blk.sim.controllers.PlayerEntity.State = function(entity, variableTable) {
+blk.sim.controllers.PlayerEntity.State = function(entity, opt_variableTable) {
+  var variableTable = opt_variableTable || gf.sim.EntityState.getVariableTable(
+      blk.sim.controllers.PlayerEntity.State.declareVariables);
   goog.base(this, entity, variableTable);
 };
 goog.inherits(blk.sim.controllers.PlayerEntity.State,

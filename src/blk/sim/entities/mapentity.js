@@ -29,6 +29,7 @@ goog.require('gf.sim.EntityState');
 goog.require('gf.sim.SchedulingPriority');
 goog.require('gf.sim.Variable');
 goog.require('gf.sim.entities.SceneEntity');
+goog.require('gf.sim.search.ListDatabase');
 
 
 
@@ -45,7 +46,9 @@ goog.require('gf.sim.entities.SceneEntity');
  */
 blk.sim.entities.MapEntity = function(
     simulator, entityFactory, entityId, entityFlags) {
-  goog.base(this, simulator, entityFactory, entityId, entityFlags);
+  // TODO(benvanik): custom search database
+  var db = new gf.sim.search.ListDatabase();
+  goog.base(this, simulator, entityFactory, entityId, entityFlags, db);
 
   this.scheduleUpdate(gf.sim.SchedulingPriority.NORMAL);
 };
@@ -65,12 +68,13 @@ blk.sim.entities.MapEntity.ID = gf.sim.createTypeId(
  * @override
  */
 blk.sim.entities.MapEntity.prototype.update = function(time, timeDelta) {
-  var state = /** @type {!blk.sim.entities.MapEntity.State} */ (this.state);
+  var state = /** @type {!blk.sim.entities.MapEntity.State} */ (
+      this.getState());
 
   if (gf.CLIENT) {
     gf.log.write('client var = ' + state.getTestVar());
   } else {
-    state.setTestVar(this.sharedMethod(time | 0));
+    state.setTestVar(time | 0);
   }
 
   this.scheduleUpdate(gf.sim.SchedulingPriority.NORMAL, time + 1);
@@ -83,9 +87,12 @@ blk.sim.entities.MapEntity.prototype.update = function(time, timeDelta) {
  * @constructor
  * @extends {gf.sim.entities.SceneEntity.State}
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
- * @param {!gf.sim.VariableTable} variableTable A subclass's variable table.
+ * @param {!gf.sim.VariableTable=} opt_variableTable A subclass's variable
+ *     table, if subclassed.
  */
-blk.sim.entities.MapEntity.State = function(entity, variableTable) {
+blk.sim.entities.MapEntity.State = function(entity, opt_variableTable) {
+  var variableTable = opt_variableTable || gf.sim.EntityState.getVariableTable(
+      blk.sim.entities.MapEntity.State.declareVariables);
   goog.base(this, entity, variableTable);
 
   // TODO(benvanik): add vars:
@@ -109,7 +116,8 @@ blk.sim.entities.MapEntity.State = function(entity, variableTable) {
   this.testVarOrdinal_ = variableTable.getOrdinal(
       blk.sim.entities.MapEntity.State.tags_.testVar);
 };
-goog.inherits(blk.sim.entities.MapEntity.State, gf.sim.EntityState);
+goog.inherits(blk.sim.entities.MapEntity.State,
+    gf.sim.entities.SceneEntity.State);
 
 
 /**
