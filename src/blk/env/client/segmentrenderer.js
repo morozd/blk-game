@@ -42,6 +42,12 @@ blk.env.client.SegmentRenderer = function(viewManager, renderState, chunk, by) {
   goog.base(this, renderState);
 
   /**
+   * Unique ID that can be used for caching.
+   * @type {number}
+   */
+  this.id = blk.env.client.SegmentRenderer.nextId_++;
+
+  /**
    * Parent view renderer.
    * @type {!blk.env.client.ViewManager}
    */
@@ -166,6 +172,14 @@ goog.inherits(blk.env.client.SegmentRenderer, blk.env.client.BaseRenderer);
 blk.env.client.SegmentRenderer.prototype.disposeInternal = function() {
   goog.base(this, 'disposeInternal');
 };
+
+
+/**
+ * Next segment ID.
+ * @private
+ * @type {number}
+ */
+blk.env.client.SegmentRenderer.nextId_ = 0;
 
 
 /**

@@ -194,10 +194,9 @@ blk.env.client.ViewManager.prototype.setDebugVisuals = function(value) {
     return;
   }
   this.debugVisuals = value;
-  for (var n = 0; n < this.segmentCache_.list.length; n++) {
-    var segment = this.segmentCache_.list[n];
+  this.segmentCache_.forEach(function(segment) {
     segment.setDebugVisuals(value);
-  }
+  });
   var entities = this.map.entities;
   for (var n = 0; n < entities.length; n++) {
     var entity = entities[n];
@@ -435,12 +434,10 @@ blk.env.client.ViewManager.prototype.waitForBuildIdle = function() {
  */
 blk.env.client.ViewManager.prototype.rebuildAll = function() {
   this.segmentCache_.resetSize();
-  var segments = this.segmentCache_.list;
-  for (var n = 0; n < segments.length; n++) {
-    var segment = segments[n];
+  this.segmentCache_.forEach(function(segment) {
     segment.discard();
     segment.restore();
-  }
+  });
 };
 
 

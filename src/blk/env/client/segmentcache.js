@@ -17,7 +17,6 @@
 goog.provide('blk.env.client.SegmentCache');
 
 goog.require('goog.Disposable');
-goog.require('goog.array');
 
 
 
@@ -31,10 +30,17 @@ blk.env.client.SegmentCache = function() {
   goog.base(this);
 
   /**
-   * A list of all chunk segment renderers in the cache.
-   * @type {!Array.<!blk.env.client.SegmentRenderer>}
+   * A set of all chunk segment renderers in the cache, mapped by ID.
+   * @type {!Object.<!blk.env.client.SegmentRenderer>}
    */
-  this.list = [];
+  this.entries_ = {};
+
+  /**
+   * Number of entries in the cache.
+   * @private
+   * @type {number}
+   */
+  this.count_ = 0;
 
   /**
    * Estimated total size of the cache GL buffers, in bytes.
@@ -51,7 +57,7 @@ goog.inherits(blk.env.client.SegmentCache, goog.Disposable);
  * @return {number} Chunk renderer count.
  */
 blk.env.client.SegmentCache.prototype.getCount = function() {
-  return this.list.length;
+  return this.count_;
 };
 
 
@@ -86,7 +92,8 @@ blk.env.client.SegmentCache.prototype.adjustSize = function(delta) {
  * @param {!blk.env.client.SegmentRenderer} segmentRenderer Chunk renderer.
  */
 blk.env.client.SegmentCache.prototype.add = function(segmentRenderer) {
-  this.list.push(segmentRenderer);
+  this.count_++;
+  this.entries_[segmentRenderer.id] = segmentRenderer;
   this.totalSize_ += segmentRenderer.estimatedSize;
 };
 
@@ -96,6 +103,20 @@ blk.env.client.SegmentCache.prototype.add = function(segmentRenderer) {
  * @param {!blk.env.client.SegmentRenderer} segmentRenderer Chunk renderer.
  */
 blk.env.client.SegmentCache.prototype.remove = function(segmentRenderer) {
-  goog.array.remove(this.list, segmentRenderer);
+  this.count_--;
+  delete this.entries_[segmentRenderer.id];
   this.totalSize_ -= segmentRenderer.estimatedSize;
+};
+
+
+/**
+ * Enumerates all segments in the cache.
+ * @param {!function(!blk.env.client.SegmentRenderer)} callback Function to call
+ *     for each segment renderer.
+ * @param {Object=} opt_scope Scope to call the callback in.
+ */
+blk.env.client.SegmentCache.prototype.forEach = function(callback, opt_scope) {
+  for (var id in this.entries_) {
+    callback.call(opt_scope || goog.global, this.entries_[id]);
+  }
 };

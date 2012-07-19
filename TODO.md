@@ -59,7 +59,6 @@ M5: Performance Tuning
     * forEachInViewport / viewport.containsBoundingBox is slowest method!
     * rotateCube_
     * BuildQueue sort optimization
-    * SegmentCache list remove is expensive
 
 * networking
     * override format with serializer, use UNCOMPRESSED when running localhost
