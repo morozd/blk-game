@@ -27,14 +27,10 @@ goog.provide('blk.sim.entities.EntityType');
  * @enum {number}
  */
 blk.sim.entities.EntityType = {
-  /** {@see blk.sim.MapEntity} */
+  /** {@see blk.sim.entities.MapEntity} */
   MAP: 0,
   /** {@see blk.sim.controllers.PlayerEntity} */
   PLAYER_CONTROLLER: 1,
   /** {@see blk.sim.tools.PickaxeEntity} */
-  PICKAXE_TOOL: 2,
-  /** {@see blk.sim.tools.RocketLauncherEntity} */
-  ROCKETLAUNCHER_TOOL: 3,
-  /** {@see blk.sim.tools.RocketEntity} */
-  ROCKET_PROJECTILE: 4
+  PICKAXE_TOOL: 2
 };

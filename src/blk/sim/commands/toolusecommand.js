@@ -25,8 +25,6 @@ goog.require('blk.sim');
 goog.require('blk.sim.commands.CommandType');
 goog.require('gf.sim');
 goog.require('gf.sim.PredictedCommand');
-goog.require('goog.vec.Quaternion');
-
 
 
 /**
@@ -68,7 +66,8 @@ blk.sim.commands.ToolUseCommand = function(commandFactory) {
    */
   this.actions = 0;
 };
-goog.inherits(blk.sim.commands.ToolUseCommand, gf.sim.PredictedCommand);
+goog.inherits(blk.sim.commands.ToolUseCommand,
+    gf.sim.PredictedCommand);
 
 
 /**

@@ -18,50 +18,48 @@
  * @author benvanik@google.com (Ben Vanik)
  */
 
-goog.provide('blk.sim.controllers.PlayerEntity');
+goog.provide('blk.sim.entities.ProjectileEntity');
 
-goog.require('blk.sim.entities.ControllerEntity');
+goog.require('blk.sim.entities.ModelEntity');
 
 
 
 /**
- * Abstract actor controller entity.
- * Can be parented to an actor and assigned as a controller.
+ * Abstract renderable projectile entity.
  *
  * @constructor
- * @extends {blk.sim.entities.ControllerEntity}
+ * @extends {blk.sim.entities.ModelEntity}
  * @param {!gf.sim.Simulator} simulator Owning simulator.
  * @param {!gf.sim.EntityFactory} entityFactory Entity factory.
  * @param {number} entityId Entity ID.
  * @param {number} entityFlags Bitmask of {@see gf.sim.EntityFlag} values.
  */
-blk.sim.controllers.PlayerEntity = function(
+blk.sim.entities.ProjectileEntity = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
-goog.inherits(blk.sim.controllers.PlayerEntity,
-    blk.sim.entities.ControllerEntity);
+goog.inherits(blk.sim.entities.ProjectileEntity, blk.sim.entities.ModelEntity);
 
 
 
 /**
- * Controller entity state.
+ * Projectile entity state.
  * @constructor
- * @extends {blk.sim.entities.ControllerEntity.State}
+ * @extends {blk.sim.entities.ModelEntity.State}
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
  * @param {!gf.sim.VariableTable} variableTable A subclass's variable table.
  */
-blk.sim.controllers.PlayerEntity.State = function(entity, variableTable) {
+blk.sim.entities.ProjectileEntity.State = function(entity, variableTable) {
   goog.base(this, entity, variableTable);
 };
-goog.inherits(blk.sim.controllers.PlayerEntity.State,
-    blk.sim.entities.ControllerEntity.State);
+goog.inherits(blk.sim.entities.ProjectileEntity.State,
+    blk.sim.entities.ModelEntity.State);
 
 
 /**
  * @override
  */
-blk.sim.controllers.PlayerEntity.State.declareVariables = function(
+blk.sim.entities.ProjectileEntity.State.declareVariables = function(
     variableList) {
-  blk.sim.entities.ControllerEntity.State.declareVariables(variableList);
+  blk.sim.entities.ModelEntity.State.declareVariables(variableList);
 };

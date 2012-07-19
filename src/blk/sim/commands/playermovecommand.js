@@ -18,7 +18,6 @@
  * @author benvanik@google.com (Ben Vanik)
  */
 
-goog.provide('blk.sim.commands.PlayerMoveAction');
 goog.provide('blk.sim.commands.PlayerMoveCommand');
 goog.provide('blk.sim.commands.PlayerMoveTranslation');
 
@@ -73,7 +72,8 @@ blk.sim.commands.PlayerMoveCommand = function(commandFactory) {
    */
   this.translation = 0;
 };
-goog.inherits(blk.sim.commands.PlayerMoveCommand, gf.sim.PredictedCommand);
+goog.inherits(blk.sim.commands.PlayerMoveCommand,
+    gf.sim.PredictedCommand);
 
 
 /**

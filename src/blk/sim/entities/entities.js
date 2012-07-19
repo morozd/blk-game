@@ -20,22 +20,9 @@
 
 goog.provide('blk.sim.entities');
 
-goog.require('blk.sim.ClientMapEntity');
-goog.require('blk.sim.MapEntity');
-goog.require('blk.sim.ServerMapEntity');
-goog.require('blk.sim.controllers.ClientPlayerEntity');
 goog.require('blk.sim.controllers.PlayerEntity');
-goog.require('blk.sim.controllers.ServerPlayerEntity');
-goog.require('blk.sim.tools.ClientPickaxeEntity');
-goog.require('blk.sim.tools.ClientRocketEntity');
-goog.require('blk.sim.tools.ClientRocketLauncherEntity');
+goog.require('blk.sim.entities.MapEntity');
 goog.require('blk.sim.tools.PickaxeEntity');
-goog.require('blk.sim.tools.RocketEntity');
-goog.require('blk.sim.tools.RocketLauncherEntity');
-goog.require('blk.sim.tools.ServerPickaxeEntity');
-goog.require('blk.sim.tools.ServerRocketEntity');
-goog.require('blk.sim.tools.ServerRocketLauncherEntity');
-goog.require('gf');
 goog.require('gf.sim.EntityFactory');
 
 
@@ -46,38 +33,19 @@ goog.require('gf.sim.EntityFactory');
 blk.sim.entities.registerEntities = function(simulator) {
   // MAP
   simulator.registerEntityFactory(new gf.sim.EntityFactory(
-      blk.sim.MapEntity.ID,
-      gf.SERVER ?
-          blk.sim.ServerMapEntity : blk.sim.ClientMapEntity,
-      blk.sim.MapEntity.State));
+      blk.sim.entities.MapEntity.ID,
+      blk.sim.entities.MapEntity,
+      blk.sim.entities.MapEntity.State));
 
   // PLAYER_CONTROLLER
   simulator.registerEntityFactory(new gf.sim.EntityFactory(
       blk.sim.controllers.PlayerEntity.ID,
-      gf.SERVER ?
-          blk.sim.controllers.ServerPlayerEntity :
-          blk.sim.controllers.ClientPlayerEntity,
+      blk.sim.controllers.PlayerEntity,
       blk.sim.controllers.PlayerEntity.State));
 
   // PICKAXE_TOOL
   simulator.registerEntityFactory(new gf.sim.EntityFactory(
       blk.sim.tools.PickaxeEntity.ID,
-      gf.SERVER ?
-          blk.sim.tools.ServerPickaxeEntity : blk.sim.tools.ClientPickaxeEntity,
+      blk.sim.tools.PickaxeEntity,
       blk.sim.tools.PickaxeEntity.State));
-
-  // ROCKETLAUNCHER_TOOL
-  simulator.registerEntityFactory(new gf.sim.EntityFactory(
-      blk.sim.tools.RocketLauncherEntity.ID,
-      gf.SERVER ?
-          blk.sim.tools.ServerRocketLauncherEntity :
-          blk.sim.tools.ClientRocketLauncherEntity,
-      blk.sim.tools.RocketLauncherEntity.State));
-
-  // ROCKET_PROJECTILE
-  simulator.registerEntityFactory(new gf.sim.EntityFactory(
-      blk.sim.tools.RocketEntity.ID,
-      gf.SERVER ?
-          blk.sim.tools.ServerRocketEntity : blk.sim.tools.ClientRocketEntity,
-      blk.sim.tools.RocketEntity.State));
 };
