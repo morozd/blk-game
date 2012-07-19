@@ -25,11 +25,9 @@ goog.provide('blk.sim.ServerModelEntity');
 goog.require('blk.sim.ClientPositionedEntity');
 goog.require('blk.sim.PositionedEntity');
 goog.require('blk.sim.ServerPositionedEntity');
-goog.require('gf.log');
 goog.require('gf.sim.Variable');
 goog.require('gf.sim.VariableFlag');
 goog.require('goog.asserts');
-goog.require('goog.vec.Vec3');
 
 
 
@@ -56,22 +54,38 @@ blk.sim.ModelEntity.State = function(entity, variableTable) {
   goog.base(this, entity, variableTable);
 
   // TODO(benvanik): add vars:
-  // - model
+  // - model tag info (variants/etc)
+  // - model skin info
   // - animation params (current pose/etc)
-  // - color modulation?
 
+  // TODO(benvanik): move to string table
   /**
+   * Model name.
    * @private
-   * @type {!goog.vec.Vec3.Float32}
+   * @type {string}
    */
-  this.position_ = goog.vec.Vec3.createFloat32();
+  this.modelName_ = '';
 
   /**
    * @private
    * @type {number}
    */
-  this.positionOrdinal_ = variableTable.getOrdinal(
-      blk.sim.ModelEntity.State.positionTag_);
+  this.modelNameOrdinal_ = variableTable.getOrdinal(
+      blk.sim.ModelEntity.State.modelNameTag_);
+
+  /**
+   * Model color modulation as 0xAABBGGRR.
+   * @private
+   * @type {number}
+   */
+  this.modelColor_ = 0xFFFFFFFF;
+
+  /**
+   * @private
+   * @type {number}
+   */
+  this.modelColorOrdinal_ = variableTable.getOrdinal(
+      blk.sim.ModelEntity.State.modelColorTag_);
 };
 goog.inherits(blk.sim.ModelEntity.State, blk.sim.PositionedEntity.State);
 
@@ -80,27 +94,54 @@ goog.inherits(blk.sim.ModelEntity.State, blk.sim.PositionedEntity.State);
  * @private
  * @type {number}
  */
-blk.sim.ModelEntity.State.positionTag_ = gf.sim.Variable.getUniqueTag();
+blk.sim.ModelEntity.State.modelNameTag_ = gf.sim.Variable.getUniqueTag();
 
 
 /**
- * Gets the position.
- * @return {!goog.vec.Vec3.Float32} Current value.
+ * @private
+ * @type {number}
  */
-blk.sim.ModelEntity.State.prototype.getPosition = function() {
-  return this.position_;
+blk.sim.ModelEntity.State.modelColorTag_ = gf.sim.Variable.getUniqueTag();
+
+
+/**
+ * Gets the model name.
+ * @return {string} Current value.
+ */
+blk.sim.ModelEntity.State.prototype.getModelName = function() {
+  return this.modelName_;
 };
 
 
 /**
- * Sets the position.
- * @param {goog.vec.Vec3.Float32} value New value.
+ * Sets the model name.
+ * @param {string} value New value.
  */
-blk.sim.ModelEntity.State.prototype.setPosition = function(value) {
-  gf.log.write('setPosition:', value[0], value[1], value[2]);
-  if (!goog.vec.Vec3.equals(this.position_, value)) {
-    goog.vec.Vec3.setFromArray(this.position_, value);
-    this.setVariableDirty(this.positionOrdinal_);
+blk.sim.ModelEntity.State.prototype.setModelName = function(value) {
+  if (this.modelName_ != value) {
+    this.modelName_ = value;
+    this.setVariableDirty(this.modelNameOrdinal_);
+  }
+};
+
+
+/**
+ * Gets the model color as 0xAABBGGRR.
+ * @return {number} Current value.
+ */
+blk.sim.ModelEntity.State.prototype.getModelColor = function() {
+  return this.modelColor_;
+};
+
+
+/**
+ * Sets the model color as 0xAABBGGRR.
+ * @param {number} value New value.
+ */
+blk.sim.ModelEntity.State.prototype.setModelColor = function(value) {
+  if (this.modelColor_ != value) {
+    this.modelColor_ = value;
+    this.setVariableDirty(this.modelColorOrdinal_);
   }
 };
 
@@ -110,11 +151,16 @@ blk.sim.ModelEntity.State.prototype.setPosition = function(value) {
  */
 blk.sim.ModelEntity.State.declareVariables = function(variableList) {
   blk.sim.PositionedEntity.State.declareVariables(variableList);
-  variableList.push(new gf.sim.Variable.Vec3(
-      blk.sim.ModelEntity.State.positionTag_,
+  variableList.push(new gf.sim.Variable.String(
+      blk.sim.ModelEntity.State.modelNameTag_,
+      0,
+      blk.sim.ModelEntity.State.prototype.getModelName,
+      blk.sim.ModelEntity.State.prototype.setModelName));
+  variableList.push(new gf.sim.Variable.Color(
+      blk.sim.ModelEntity.State.modelColorTag_,
       gf.sim.VariableFlag.UPDATED_FREQUENTLY | gf.sim.VariableFlag.INTERPOLATED,
-      blk.sim.ModelEntity.State.prototype.getPosition,
-      blk.sim.ModelEntity.State.prototype.setPosition));
+      blk.sim.ModelEntity.State.prototype.getModelColor,
+      blk.sim.ModelEntity.State.prototype.setModelColor));
 };
 
 

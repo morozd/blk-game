@@ -46,26 +46,6 @@ blk.sim.commands.PlayerMoveTranslation = {
 };
 
 
-/**
- * Bitmask values used to indicate actions performed by the player.
- * Expected to be <= 8 bits.
- * @enum {number}
- */
-blk.sim.commands.PlayerMoveAction = {
-  /**
-   * Use the currently selected inventory item.
-   */
-  USE: 1 << 0,
-
-  /**
-   * Use the currently selected inventory item in its alternate mode.
-   */
-  USE_ALT: 1 << 1
-
-  // TODO(benvanik): change inventory/etc?
-};
-
-
 
 /**
  * Simulation command for player movement.
@@ -92,14 +72,6 @@ blk.sim.commands.PlayerMoveCommand = function(commandFactory) {
    * @type {number}
    */
   this.translation = 0;
-
-  /**
-   * Bitmask indicating actions.
-   * Zero or more bits set from {@see blk.sim.commands.PlayerMoveAction}.
-   * Expected to be <= 8 bits.
-   * @type {number}
-   */
-  this.actions = 0;
 };
 goog.inherits(blk.sim.commands.PlayerMoveCommand, gf.sim.PredictedCommand);
 
@@ -112,7 +84,6 @@ blk.sim.commands.PlayerMoveCommand.prototype.read = function(reader) {
 
   reader.readVec4(this.viewRotation);
   this.translation = reader.readUint8();
-  this.actions = reader.readUint8();
 };
 
 
@@ -124,7 +95,6 @@ blk.sim.commands.PlayerMoveCommand.prototype.write = function(writer) {
 
   writer.writeVec4(this.viewRotation);
   writer.writeUint8(this.translation);
-  writer.writeUint8(this.actions);
 };
 
 

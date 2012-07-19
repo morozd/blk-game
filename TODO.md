@@ -210,6 +210,7 @@ PositionedEntity:
 - shared:
     - bounding box
     - getChunk() ?
+    - getTransform(mat, opt_relativeToParent)
 
 ModelEntity[PositionedEntity]:
 - state:
@@ -255,7 +256,6 @@ PlayerEntity[ControllerEntity]:
 blk.sim.MapEntity
 blk.sim.MusicEntity
 blk.sim.PositionedEntity
-  blk.sim.SoundEffectEntity
   blk.sim.ModelEntity
     blk.sim.ActorEntity
     blk.sim.ToolEntity

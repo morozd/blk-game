@@ -29,6 +29,7 @@ goog.require('gf.sim.ServerEntity');
 goog.require('gf.sim.Variable');
 goog.require('gf.sim.VariableFlag');
 goog.require('goog.asserts');
+goog.require('goog.vec.Mat4');
 goog.require('goog.vec.Quaternion');
 goog.require('goog.vec.Vec3');
 goog.require('goog.vec.Vec4');
@@ -44,6 +45,43 @@ goog.require('goog.vec.Vec4');
  */
 blk.sim.PositionedEntity = function() {
   goog.asserts.fail('Cannot create shared proto class');
+};
+
+
+/**
+ * @private
+ * @type {!goog.vec.Mat4.Float32}
+ */
+blk.sim.PositionedEntity.prototype.transform_;
+
+
+/**
+ * @return {!gf.sim.Entity} Entity.
+ */
+blk.sim.PositionedEntity.prototype.getParent;
+
+
+/**
+ * Calculates a transformation matrix from this entity up to the root (or a
+ * given parent entity).
+ * @param {!goog.vec.Mat4.Float32} result Matrix to populate with the transform.
+ * @param {gf.sim.Entity=} opt_relativeToParent Parent entity to get the
+ *     transform to. If omitted then the transform is relative to the root.
+ * @return {!goog.vec.Mat4.Float32} The result matrix, for chaining.
+ */
+blk.sim.PositionedEntity.prototype.getTransform = function(
+    result, opt_relativeToParent) {
+  goog.vec.Mat4.setFromArray(result, this.transform_);
+  var untilParent = opt_relativeToParent || null;
+  var current = this.getParent();
+  while (current != untilParent) {
+    if (current instanceof blk.sim.ClientPositionedEntity ||
+        current instanceof blk.sim.ServerPositionedEntity) {
+      goog.vec.Mat4.multMat(current.transform_, result, result);
+    }
+    current = this.getParent();
+  }
+  return result;
 };
 
 
@@ -180,6 +218,8 @@ blk.sim.ClientPositionedEntity = function(
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
 goog.inherits(blk.sim.ClientPositionedEntity, gf.sim.ClientEntity);
+blk.sim.ClientPositionedEntity.prototype.getTransform =
+    blk.sim.PositionedEntity.prototype.getTransform;
 
 
 
@@ -198,3 +238,5 @@ blk.sim.ServerPositionedEntity = function(
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
 goog.inherits(blk.sim.ServerPositionedEntity, gf.sim.ServerEntity);
+blk.sim.ServerPositionedEntity.prototype.getTransform =
+    blk.sim.PositionedEntity.prototype.getTransform;
