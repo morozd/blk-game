@@ -107,16 +107,18 @@ blk.sim.entities.MapEntity.State = function(entity, variableTable) {
    * @type {number}
    */
   this.testVarOrdinal_ = variableTable.getOrdinal(
-      blk.sim.entities.MapEntity.State.testVarTag_);
+      blk.sim.entities.MapEntity.State.tags_.testVar);
 };
 goog.inherits(blk.sim.entities.MapEntity.State, gf.sim.EntityState);
 
 
 /**
  * @private
- * @type {number}
+ * @type {!Object.<number>}
  */
-blk.sim.entities.MapEntity.State.testVarTag_ = gf.sim.Variable.getUniqueTag();
+blk.sim.entities.MapEntity.State.tags_ = {
+  testVar: gf.sim.Variable.getUniqueTag()
+};
 
 
 /**
@@ -147,7 +149,7 @@ blk.sim.entities.MapEntity.State.prototype.setTestVar = function(value) {
 blk.sim.entities.MapEntity.State.declareVariables = function(variableList) {
   gf.sim.entities.SceneEntity.State.declareVariables(variableList);
   variableList.push(new gf.sim.Variable.Float(
-      blk.sim.entities.MapEntity.State.testVarTag_,
+      blk.sim.entities.MapEntity.State.tags_.testVar,
       0,
       blk.sim.entities.MapEntity.State.prototype.getTestVar,
       blk.sim.entities.MapEntity.State.prototype.setTestVar));
