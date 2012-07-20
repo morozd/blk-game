@@ -44,6 +44,7 @@ goog.require('gf.net.INetworkService');
 goog.require('gf.net.SessionState');
 goog.require('gf.net.chat.ClientChatService');
 goog.require('gf.sim.ClientSimulator');
+goog.require('gf.vec.Viewport');
 goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.asserts');
@@ -478,7 +479,9 @@ blk.game.client.ClientController.prototype.render = function(frame) {
   // Grab latest input data as early in the frame as possible
   this.inputData_.poll();
 
-  // Process physics (and user input)
+  // Process physics
+  this.processPhysics(frame);
+
   // SIMDEPRECATED
   // NOTE: this is done without the interpolation delay so real times get used
   if (!this.localPlayer_.processPhysics(frame, this.inputData_)) {
@@ -486,9 +489,8 @@ blk.game.client.ClientController.prototype.render = function(frame) {
     this.handleError('Network physics backup');
     return;
   }
-  this.processPhysics(frame);
 
-  // Handle user input (for UI/actions/etc)
+  // Handle user input
   // Let the console eat the data first, if it wants to
   if (!this.console_.processInput(frame, this.inputData_)) {
     this.processInput(frame, this.inputData_);
@@ -522,15 +524,6 @@ blk.game.client.ClientController.prototype.render = function(frame) {
 
 
 /**
- * Processes physics and movement.
- * @protected
- * @param {!gf.RenderFrame} frame Current render frame.
- */
-blk.game.client.ClientController.prototype.processPhysics = function(frame) {
-};
-
-
-/**
  * Processes new input data.
  * @protected
  * @param {!gf.RenderFrame} frame Current render frame.
@@ -540,6 +533,15 @@ blk.game.client.ClientController.prototype.processPhysics = function(frame) {
 blk.game.client.ClientController.prototype.processInput =
     function(frame, inputData) {
   return false;
+};
+
+
+/**
+ * Processes physics and movement.
+ * @protected
+ * @param {!gf.RenderFrame} frame Current render frame.
+ */
+blk.game.client.ClientController.prototype.processPhysics = function(frame) {
 };
 
 

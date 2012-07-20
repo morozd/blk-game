@@ -441,8 +441,7 @@ blk.game.server.ServerController.prototype.update = function(frame) {
   }
 
   // Update game state
-  var map = this.map_;
-  map.update(frame);
+  this.map_.update(frame);
 
   // Update simulation
   this.simulator_.update(frame);
@@ -459,8 +458,8 @@ blk.game.server.ServerController.prototype.update = function(frame) {
   // TODO(benvanik): only send updates relevant to each user vs. broadcast all
   // NOTE: always sending, even if not updates, so sequence numbers get ACKed
   var entityStates = [];
-  for (var n = 0; n < map.entities.length; n++) {
-    var entity = map.entities[n];
+  for (var n = 0; n < this.map_.entities.length; n++) {
+    var entity = this.map_.entities[n];
     if (!entity.hasSentLatestState) {
       entity.state.time = (frame.time * 1000) | 0;
       entityStates.push(entity.state);

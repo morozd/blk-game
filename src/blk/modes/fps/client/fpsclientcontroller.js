@@ -22,11 +22,14 @@ goog.provide('blk.modes.fps.client.FpsClientController');
 
 goog.require('blk.assets.audio.Music');
 goog.require('blk.game.client.ClientController');
+goog.require('blk.sim.Player');
 goog.require('blk.sim.World');
 goog.require('blk.ui.Menubar');
 goog.require('blk.ui.PlayerListing');
 goog.require('gf.input.MouseButton');
+goog.require('gf.log');
 goog.require('gf.sim.IEntityWatcher');
+goog.require('gf.vec.Viewport');
 goog.require('goog.events.KeyCodes');
 goog.require('goog.vec.Mat4');
 goog.require('goog.vec.Vec4');
@@ -105,6 +108,13 @@ blk.modes.fps.client.FpsClientController = function(game, session) {
    */
   this.world_ = null;
 
+  /**
+   * Players current viewport.
+   * @private
+   * @type {!gf.vec.Viewport}
+   */
+  this.playerViewport_ = new gf.vec.Viewport();
+
   // Register to be notified about entity events
   var simulator = this.getSimulator();
   simulator.addWatcher(this);
@@ -163,19 +173,21 @@ blk.modes.fps.client.FpsClientController.prototype.update =
 /**
  * @override
  */
-blk.modes.fps.client.FpsClientController.prototype.processPhysics =
-    function(frame) {
-  goog.base(this, 'processPhysics', frame);
-};
-
-
-/**
- * @override
- */
 blk.modes.fps.client.FpsClientController.prototype.processInput =
     function(frame, inputData) {
   if (goog.base(this, 'processInput', frame, inputData)) {
     return true;
+  }
+
+  // TODO(benvanik): cleanup
+  var player = this.getLocalPlayer();
+  if (player && player.entity2) {
+    var controller = player.entity2.getController();
+    if (!controller.processInput(frame, inputData)) {
+      // Failed for some reason - likely prediction errors
+      this.handleError('Input backup');
+      return true;
+    }
   }
 
   var keyboardData = inputData.keyboard;
@@ -254,6 +266,14 @@ blk.modes.fps.client.FpsClientController.prototype.processInput =
 /**
  * @override
  */
+blk.modes.fps.client.FpsClientController.prototype.processPhysics =
+    function(frame) {
+};
+
+
+/**
+ * @override
+ */
 blk.modes.fps.client.FpsClientController.prototype.beginDrawing =
     function(frame) {
   goog.base(this, 'beginDrawing', frame);
@@ -273,11 +293,22 @@ blk.modes.fps.client.FpsClientController.prototype.drawWorld =
     function(frame) {
   goog.base(this, 'drawWorld', frame);
 
+  var renderState = this.game.getRenderState();
+  var renderList = renderState.getRenderList();
+
+  // Initialize viewport
+  var viewport = this.playerViewport_;
+  var display = this.game.getDisplay();
+  viewport.far = 100;//this.view.getDrawDistance();
+  viewport.reset(display.getSize());
+  var player = this.getLocalPlayer();
+  if (player && player.entity2) {
+    // TODO(benvanik): cleanup eww
+    player.entity2.getActor().calculateViewport(viewport);
+  }
+
   // Render the simulation
   if (this.world_) {
-    // TODO(benvanik): draw map
-    var viewport;
-    var renderList;
     this.world_.render(frame, viewport, renderList);
   }
 

@@ -23,6 +23,7 @@ goog.provide('blk.sim.controllers.PlayerController');
 goog.require('blk.sim');
 goog.require('blk.sim.Controller');
 goog.require('blk.sim.EntityType');
+goog.require('gf');
 goog.require('gf.sim');
 goog.require('gf.sim.EntityState');
 
@@ -54,6 +55,23 @@ goog.inherits(blk.sim.controllers.PlayerController,
  */
 blk.sim.controllers.PlayerController.ID = gf.sim.createTypeId(
     blk.sim.BLK_MODULE_ID, blk.sim.EntityType.PLAYER_CONTROLLER);
+
+
+if (gf.CLIENT) {
+  /**
+   * @override
+   */
+  blk.sim.controllers.PlayerController.prototype.processInput = function(
+      frame, inputData) {
+    var state = /** @type {!blk.sim.controllers.PlayerController.State} */ (
+        this.getState());
+    var target = this.getTarget();
+
+    // TODO(benvanik): input
+
+    return true;
+  };
+}
 
 
 

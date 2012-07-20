@@ -93,6 +93,24 @@ blk.sim.Player.prototype.getUser = function() {
 };
 
 
+/**
+ * @return {!blk.sim.Actor} Player actor.
+ */
+blk.sim.Player.prototype.getActor = function() {
+  goog.asserts.assert(this.actor_);
+  return this.actor_;
+};
+
+
+/**
+ * @return {!blk.sim.controllers.PlayerController} Player controller.
+ */
+blk.sim.Player.prototype.getController = function() {
+  goog.asserts.assert(this.controller_);
+  return this.controller_;
+};
+
+
 if (gf.SERVER) {
   /**
    * Sets up the player entity for the given user.

@@ -158,6 +158,7 @@ blk.game.server.ServerPlayer.prototype.update = function(frame) {
   // Update views
   if (this.view) {
     this.view.update(frame, this.entity.state.position);
+    //this.view.update(frame, this.entity2.);
   }
 
   // Handle pending chunk sends

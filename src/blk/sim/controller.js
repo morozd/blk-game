@@ -20,6 +20,7 @@
 
 goog.provide('blk.sim.Controller');
 
+goog.require('gf');
 goog.require('gf.sim.Entity');
 goog.require('gf.sim.EntityState');
 
@@ -41,6 +42,26 @@ blk.sim.Controller = function(
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
 goog.inherits(blk.sim.Controller, gf.sim.Entity);
+
+
+/**
+ * Gets the target actor of the controller, if any.
+ * @return {blk.sim.Actor} Target actor.
+ */
+blk.sim.Controller.prototype.getTarget = function() {
+  return /** @type {blk.sim.Actor} */ (this.getParent());
+};
+
+
+if (gf.CLIENT) {
+  /**
+   * Processes the input control for a single frame.
+   * @param {!gf.RenderFrame} frame Current frame.
+   * @param {!gf.input.Data} inputData Current input data.
+   * @return {boolean} True if input is valid, false if input has failed.
+   */
+  blk.sim.Controller.prototype.processInput = goog.abstractMethod;
+};
 
 
 

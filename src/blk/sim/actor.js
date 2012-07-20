@@ -25,6 +25,8 @@ goog.require('blk.sim.EntityType');
 goog.require('blk.sim.Model');
 goog.require('gf.sim');
 goog.require('gf.sim.EntityState');
+goog.require('goog.vec.Mat4');
+goog.require('goog.vec.Quaternion');
 
 
 
@@ -56,6 +58,28 @@ goog.inherits(blk.sim.Actor, blk.sim.Model);
  */
 blk.sim.Actor.ID = gf.sim.createTypeId(
     blk.sim.BLK_MODULE_ID, blk.sim.EntityType.ACTOR);
+
+
+/**
+ * Calculates a viewport from the actors perspective.
+ * @param {!gf.vec.Viewport} viewport Viewport to fill with the results.
+ */
+blk.sim.Actor.prototype.calculateViewport = function(viewport) {
+  var state = /** @type {!blk.sim.Actor.State} */ (this.getState());
+
+  // Set matrix based on state
+  var vm = viewport.viewMatrix;
+  var position = state.getPosition();
+  var rotation = state.getRotation();
+  // TODO(benvanik): does scale matter?
+  goog.vec.Quaternion.toRotationMatrix4(rotation, vm);
+  goog.vec.Mat4.transpose(vm, vm);
+  goog.vec.Mat4.translate(vm,
+      -position[0], -position[1], -position[2]);
+
+  // Update viewport matrices/etc now that the controller logic has been applied
+  viewport.calculate();
+};
 
 
 

@@ -23,6 +23,7 @@ goog.require('blk.assets.programs.LineProgram');
 goog.require('blk.assets.programs.SpriteProgram');
 goog.require('blk.assets.textures.ui');
 goog.require('blk.graphics.BlockBuilder');
+goog.require('blk.graphics.RenderList');
 goog.require('gf.graphics.BlendState');
 goog.require('gf.graphics.DepthState');
 goog.require('gf.graphics.ProgramCache');
@@ -142,8 +143,24 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
    */
   this.blockBuilder = new blk.graphics.BlockBuilder(this);
   this.registerDisposable(this.blockBuilder);
+
+  /**
+   * Shared render list.
+   * @private
+   * @type {!blk.graphics.RenderList}
+   */
+  this.renderList_ = new blk.graphics.RenderList();
+  this.registerDisposable(this.renderList_);
 };
 goog.inherits(blk.graphics.RenderState, gf.graphics.Resource);
+
+
+/**
+ * @return {!blk.graphics.RenderList} Shared render list.
+ */
+blk.graphics.RenderState.prototype.getRenderList = function() {
+  return this.renderList_;
+};
 
 
 /**
