@@ -31,18 +31,14 @@ goog.require('blk.io.ChunkSerializer');
 goog.require('blk.io.CompressionFormat');
 goog.require('blk.net.packets.EntityCreate');
 goog.require('blk.net.packets.EntityDelete');
-goog.require('blk.net.packets.MapCreate');
 goog.require('blk.net.packets.Move');
 goog.require('blk.net.packets.ReadyPlayer');
-goog.require('blk.net.packets.RequestChunkData');
 goog.require('blk.net.packets.SetBlock');
-goog.require('blk.sim.World');
 goog.require('blk.sim.commands');
 goog.require('blk.sim.entities');
 goog.require('gf');
 goog.require('gf.log');
 goog.require('gf.net.NetworkService');
-goog.require('gf.net.PacketWriter');
 goog.require('gf.net.SessionState');
 goog.require('gf.net.chat.ServerChatService');
 goog.require('gf.sim.ServerSimulator');
@@ -118,13 +114,6 @@ blk.game.server.ServerController = function(game, session, mapStore) {
   this.registerDisposable(this.simulator_);
   blk.sim.commands.registerCommands(this.simulator_);
   blk.sim.entities.registerEntities(this.simulator_);
-
-  /**
-   * Map entity.
-   * @private
-   * @type {blk.sim.World}
-   */
-  this.world_ = null;
 
   /**
    * Player listing.
@@ -249,18 +238,12 @@ blk.game.server.ServerController.prototype.load = function() {
 };
 
 
-// TODO(benvanik): make all of this subclass only?
 /**
  * Sets up the simulation on initial load.
  * @protected
  */
-blk.game.server.ServerController.prototype.setupSimulation = function() {
-  // Map
-  this.world_ = /** @type {!blk.sim.World} */ (
-      this.simulator_.createEntity(
-          blk.sim.World.ID,
-          0));
-};
+blk.game.server.ServerController.prototype.setupSimulation =
+    goog.abstractMethod;
 
 
 /**
@@ -273,7 +256,7 @@ blk.game.server.ServerController.prototype.userConnected = function(user) {
 
   gf.log.write('client connected', user.sessionId, user.info, user.agent);
 
-  // Create player
+  // Create player object to track entities/etc
   var player = new blk.game.server.ServerPlayer(this, user);
   user.data = player;
   this.players_.push(player);
@@ -282,8 +265,9 @@ blk.game.server.ServerController.prototype.userConnected = function(user) {
   this.chatService_.join(user, 'main');
 
   // Create player entity
-  var playerEntity = this.createPlayer(user);
+  player.entity2 = this.createPlayer(user);
 
+  // SIMDEPRECATED -----
   // Pick a spawn position
   var spawnPosition = goog.vec.Vec3.createFloat32FromValues(0, 80, 0);
 
@@ -332,6 +316,8 @@ blk.game.server.ServerController.prototype.userConnected = function(user) {
 
   // TODO(benvanik): send all map chunks
 
+  // SIMDEPRECATED -----
+
   // Signal player ready
   this.session.send(blk.net.packets.ReadyPlayer.createData(), user);
 
@@ -363,6 +349,8 @@ blk.game.server.ServerController.prototype.userDisconnected = function(user) {
     return;
   }
 
+  // SIMDEPRECATED -----
+
   // Delete entity
   var entity = player.entity;
   if (entity) {
@@ -377,8 +365,10 @@ blk.game.server.ServerController.prototype.userDisconnected = function(user) {
     player.view = null;
   }
 
+  // SIMDEPRECATED -----
+
   // Delete player entity
-  //this.deletePlayer(playerEntity);
+  this.deletePlayer(player.entity2);
 
   // Remove from roster
   goog.array.remove(this.players_, player);
@@ -450,7 +440,7 @@ blk.game.server.ServerController.prototype.update = function(frame) {
   this.simulator_.update(frame);
 
   // SIMDEPRECATED
-  // Update each player
+  // Update each player, sending any additional data (map pieces/etc)
   for (var n = 0; n < this.players_.length; n++) {
     var player = this.players_[n];
     player.update(frame);
@@ -484,6 +474,7 @@ blk.game.server.ServerController.prototype.render = function(frame) {
 };
 
 
+// SIMDEPRECATED
 /**
  * Sets a block and broadcasts the update.
  * @param {!gf.net.User} user User who performed the change.
@@ -551,12 +542,6 @@ goog.inherits(blk.game.server.ServerController.NetService_,
 blk.game.server.ServerController.NetService_.prototype.setupSwitch =
     function(packetSwitch) {
   packetSwitch.register(
-      blk.net.packets.MapCreate.ID,
-      this.handleMapCreate_, this);
-  packetSwitch.register(
-      blk.net.packets.RequestChunkData.ID,
-      this.handleRequestChunkData_, this);
-  packetSwitch.register(
       blk.net.packets.SetBlock.ID,
       this.handleSetBlock_, this);
   packetSwitch.register(
@@ -592,76 +577,7 @@ blk.game.server.ServerController.NetService_.prototype.userUpdated =
 };
 
 
-/**
- * Handles map create packets.
- * @private
- * @param {!gf.net.Packet} packet Packet.
- * @param {number} packetType Packet type ID.
- * @param {!gf.net.PacketReader} reader Packet reader.
- * @return {boolean} True if the packet was handled successfully.
- */
-blk.game.server.ServerController.NetService_.prototype.handleMapCreate_ =
-    function(packet, packetType, reader) {
-  var mapCreate = blk.net.packets.MapCreate.read(reader);
-  if (!mapCreate) {
-    return false;
-  }
-
-  if (gf.NODE) {
-    // TODO(benvanik): if real server, only allow admins - for now, die
-    gf.log.write('ignoring map create');
-    return false;
-  }
-
-  gf.log.write('user ' + packet.user + ' invoking map create...');
-
-  //this.controller_.setupMap(false);
-
-  return true;
-};
-
-
-/**
- * Handles chunk data request packets.
- * @private
- * @param {!gf.net.Packet} packet Packet.
- * @param {number} packetType Packet type ID.
- * @param {!gf.net.PacketReader} reader Packet reader.
- * @return {boolean} True if the packet was handled successfully.
- */
-blk.game.server.ServerController.NetService_.prototype.handleRequestChunkData_ =
-    function(packet, packetType, reader) {
-  var requestChunkData = blk.net.packets.RequestChunkData.read(reader);
-  if (!requestChunkData) {
-    return false;
-  }
-
-  var user = packet.user;
-  if (!user) {
-    return false;
-  }
-  var player = /** @type {blk.game.server.ServerPlayer} */ (user.data);
-  if (!player) {
-    return false;
-  }
-
-  var view = player.view;
-  if (!view) {
-    return false;
-  }
-
-  for (var n = 0; n < requestChunkData.entries.length; n++) {
-    var entry = requestChunkData.entries[n];
-    var chunk = view.getChunk(entry.x, entry.y, entry.z);
-    if (chunk) {
-      player.queueChunkSend(chunk);
-    }
-  }
-
-  return true;
-};
-
-
+// SIMDEPRECATED
 /**
  * Handles set block packets.
  * @private
@@ -688,6 +604,7 @@ blk.game.server.ServerController.NetService_.prototype.handleSetBlock_ =
 };
 
 
+// SIMDEPRECATED
 /**
  * Handles move packets.
  * @private

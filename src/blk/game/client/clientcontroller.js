@@ -31,7 +31,6 @@ goog.require('blk.net.packets.ChunkData');
 goog.require('blk.net.packets.EntityCreate');
 goog.require('blk.net.packets.EntityDelete');
 goog.require('blk.net.packets.EntityPosition');
-goog.require('blk.net.packets.MapInfo');
 goog.require('blk.net.packets.ReadyPlayer');
 goog.require('blk.net.packets.SetBlock');
 goog.require('blk.sim.commands');
@@ -408,6 +407,8 @@ blk.game.client.ClientController.prototype.update = function(frame) {
     return;
   }
 
+  // SIMDEPRECATED?
+  // TODO(benvanik): move this logic into World?
   // Update game state
   this.map_.update(frame);
 
@@ -415,11 +416,7 @@ blk.game.client.ClientController.prototype.update = function(frame) {
   this.simulator_.update(frame);
 
   // SIMDEPRECATED
-  // Update each player
-  for (var n = 0; n < this.players_.length; n++) {
-    var player = this.players_[n];
-    player.update(frame);
-  }
+  this.localPlayer_.update(frame);
 
   // Update UI bits
   this.console_.update(frame);
@@ -583,6 +580,7 @@ blk.game.client.ClientController.prototype.playPointSound =
 };
 
 
+// SIMDEPRECATED
 /**
  * Sets a block and plays sound if required.
  * Note that the block specified may have originated from the network and as
@@ -655,19 +653,18 @@ goog.inherits(blk.game.client.ClientController.NetService_,
 blk.game.client.ClientController.NetService_.prototype.setupSwitch =
     function(packetSwitch) {
   packetSwitch.register(
-      blk.net.packets.MapInfo.ID,
-      this.handleMapInfo_, this);
-  packetSwitch.register(
       blk.net.packets.ChunkData.ID,
       this.handleChunkData_, this);
   packetSwitch.register(
       blk.net.packets.ReadyPlayer.ID,
       this.handleReadyPlayer_, this);
 
+  // SIMDEPRECATED
   packetSwitch.register(
       blk.net.packets.SetBlock.ID,
       this.handleSetBlock_, this);
 
+  // SIMDEPRECATED
   packetSwitch.register(
       blk.net.packets.EntityCreate.ID,
       this.handleEntityCreate_, this);
@@ -748,35 +745,13 @@ blk.game.client.ClientController.NetService_.prototype.userDisconnected =
  */
 blk.game.client.ClientController.NetService_.prototype.userUpdated =
     function(user) {
+  // SIMDEPRECATED
   var player = this.controller_.getPlayerBySessionId(user.sessionId);
   if (player && player.entity) {
     player.entity.title = user.info.displayName;
   }
 
   this.controller_.handlePlayersChanged();
-};
-
-
-/**
- * Handles map info packets.
- * @private
- * @param {!gf.net.Packet} packet Packet.
- * @param {number} packetType Packet type ID.
- * @param {!gf.net.PacketReader} reader Packet reader.
- * @return {boolean} True if the packet was handled successfully.
- */
-blk.game.client.ClientController.NetService_.prototype.handleMapInfo_ =
-    function(packet, packetType, reader) {
-  var mapInfo = blk.net.packets.MapInfo.read(reader);
-  if (!mapInfo) {
-    return false;
-  }
-
-  //var map = this.game.state.map;
-
-  gf.log.write('map info');
-
-  return true;
 };
 
 
@@ -832,6 +807,7 @@ blk.game.client.ClientController.NetService_.prototype.handleReadyPlayer_ =
 };
 
 
+// SIMDEPRECATED
 /**
  * Handles set block packets.
  * @private
@@ -860,6 +836,7 @@ blk.game.client.ClientController.NetService_.prototype.handleSetBlock_ =
 };
 
 
+// SIMDEPRECATED
 /**
  * Handles entity create packets.
  * @private
@@ -898,6 +875,7 @@ blk.game.client.ClientController.NetService_.prototype.handleEntityCreate_ =
 };
 
 
+// SIMDEPRECATED
 /**
  * Handles entity delete packets.
  * @private
@@ -925,6 +903,7 @@ blk.game.client.ClientController.NetService_.prototype.handleEntityDelete_ =
 };
 
 
+// SIMDEPRECATED
 /**
  * Handles entity position packets.
  * @private

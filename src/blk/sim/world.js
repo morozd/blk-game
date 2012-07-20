@@ -50,6 +50,13 @@ blk.sim.World = function(
   var db = new gf.sim.search.ListDatabase();
   goog.base(this, simulator, entityFactory, entityId, entityFlags, db);
 
+  /**
+   * Map this world is drawing.
+   * @private
+   * @type {blk.env.Map}
+   */
+  this.map_ = null;
+
   this.scheduleUpdate(gf.sim.SchedulingPriority.NORMAL);
 };
 goog.inherits(blk.sim.World, gf.sim.SceneEntity);
@@ -62,6 +69,30 @@ goog.inherits(blk.sim.World, gf.sim.SceneEntity);
  */
 blk.sim.World.ID = gf.sim.createTypeId(
     blk.sim.BLK_MODULE_ID, blk.sim.EntityType.WORLD);
+
+
+/**
+ * Gets the map.
+ * @return {!blk.env.Map} The map.
+ */
+blk.sim.World.prototype.getMap = function() {
+  goog.asserts.assert(this.map_);
+  return this.map_;
+};
+
+
+/**
+ * Sets the map.
+ * This can only be called once and must be called immediately after creating
+ * the entity.
+ * @param {!blk.env.Map} map Map to use.
+ */
+blk.sim.World.prototype.setMap = function(map) {
+  goog.asserts.assert(!this.map_);
+  this.map_ = map;
+
+  // TODO(benvanik): could issue some commands here relating to map setup
+};
 
 
 /**
@@ -89,8 +120,7 @@ if (gf.CLIENT) {
    * @param {!gf.vec.Viewport} viewport Current viewport.
    * @param {!blk.graphics.RenderList} renderList Render command list.
    */
-  blk.sim.World.prototype.render = function(
-      frame, viewport, renderList) {
+  blk.sim.World.prototype.render = function(frame, viewport, renderList) {
     var db = this.getSpatialDatabase();
 
     // Walk all entities in the viewport and queue for rendering

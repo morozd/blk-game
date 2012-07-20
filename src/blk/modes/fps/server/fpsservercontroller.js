@@ -22,6 +22,7 @@ goog.provide('blk.modes.fps.server.FpsServerController');
 
 goog.require('blk.game.server.ServerController');
 goog.require('blk.sim.Player');
+goog.require('blk.sim.World');
 
 
 
@@ -35,9 +36,35 @@ goog.require('blk.sim.Player');
  */
 blk.modes.fps.server.FpsServerController = function(game, session, mapStore) {
   goog.base(this, game, session, mapStore);
+
+  /**
+   * World entity, containing the map and renderable entities (players/etc).
+   * @private
+   * @type {blk.sim.World}
+   */
+  this.world_ = null;
 };
 goog.inherits(blk.modes.fps.server.FpsServerController,
     blk.game.server.ServerController);
+
+
+/**
+ * @override
+ */
+blk.modes.fps.server.FpsServerController.prototype.setupSimulation =
+    function() {
+  var simulator = this.getSimulator();
+
+  // Create the world
+  this.world_ = /** @type {!blk.sim.World} */ (
+      this.simulator_.createEntity(
+          blk.sim.World.ID,
+          0));
+
+  // Setup world
+  // This binds the map and the world together
+  this.world_.setMap(this.getMap());
+};
 
 
 /**
@@ -52,6 +79,9 @@ blk.modes.fps.server.FpsServerController.prototype.createPlayer =
       simulator.createEntity(
           blk.sim.Player.ID,
           0));
+
+  // Add to world
+  player.setParent(this.world_);
 
   // Spawn the player
   //player.spawn();

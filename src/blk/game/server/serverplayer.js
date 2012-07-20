@@ -54,6 +54,14 @@ blk.game.server.ServerPlayer = function(controller, user) {
   this.user = user;
 
   /**
+   * Primary player entity.
+   * @protected
+   * @type {blk.sim.Player}
+   */
+  this.entity2 = null;
+
+  // SIMDEPRECATED
+  /**
    * Entity assigned to this player, if any.
    * @type {blk.env.Entity}
    */
@@ -65,6 +73,7 @@ blk.game.server.ServerPlayer = function(controller, user) {
    */
   this.view = null;
 
+  // SIMDEPRECATED
   /**
    * Movement controller, if any.
    * @private
@@ -102,13 +111,7 @@ blk.game.server.ServerPlayer.prototype.getUser = function() {
 };
 
 
-/**
- * Get movement
-blk.game.server.ServerPlayer.prototype.getMovement = function() {
-  return;
-};
-
-
+// SIMDEPRECATED
 /**
  * Attaches an entity to a player.
  * @param {!blk.env.Entity} entity Player entity.
@@ -128,6 +131,7 @@ blk.game.server.ServerPlayer.prototype.attachEntity = function(entity) {
 };
 
 
+// SIMDEPRECATED
 /**
  * Queues a list of movement commands sent from the player.
  * @param {!Array.<!blk.physics.MoveCommand>} commands Move commands.
@@ -145,11 +149,13 @@ blk.game.server.ServerPlayer.prototype.queueMovementCommands =
  * @param {!gf.UpdateFrame} frame Current frame.
  */
 blk.game.server.ServerPlayer.prototype.update = function(frame) {
+  // SIMDEPRECATED
   // Process movement
   if (this.movement_) {
     this.movement_.update(frame);
   }
 
+  // SIMDEPRECATED - move to player entity?
   // Update views
   if (this.view) {
     this.view.update(frame, this.entity.state.position);
@@ -162,6 +168,7 @@ blk.game.server.ServerPlayer.prototype.update = function(frame) {
 };
 
 
+// SIMDEPRECATED
 /**
  * Sends an update packet to the given player with entity state deltas.
  * @param {!gf.UpdateFrame} frame Current update frame.

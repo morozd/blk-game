@@ -16,41 +16,7 @@
 
 namespace blk.net.packets;
 
-const PROTOCOL_VERSION = 5;
-
-
-/**
- * Request a new map created with the given parameters.
- * Only supported on localhost servers. The server will wait for a create
- * request before proceeding with generation.
- */
-message MapCreate = 65 {
-};
-
-
-/**
- * Map information. Usually sent on connect before any chunk data.
- */
-message MapInfo = 70 {
-};
-
-
-/**
- * A chunk request entry.
- */
-message ChunkRequestEntry {
-  int32 x;
-  int32 y;
-  int32 z;
-};
-
-
-/**
- * Requests the given chunk data be sent.
- */
-message RequestChunkData = 71 {
-  array.<ChunkRequestEntry> entries;
-};
+const PROTOCOL_VERSION = 6;
 
 
 /**
@@ -74,6 +40,7 @@ message ReadyPlayer = 74 {
 };
 
 
+// SIMDEPRECATED
 /**
  * Sets a block to the given data as a request if from the client or update if
  * from the server.
@@ -86,6 +53,7 @@ message SetBlock = 75 {
 };
 
 
+// SIMDEPRECATED
 message EntityCreate = 80 {
   uint32 id;
   uint32 flags;
@@ -98,11 +66,13 @@ message EntityCreate = 80 {
 };
 
 
+// SIMDEPRECATED
 message EntityDelete = 81 {
   uint32 id;
 };
 
 
+// SIMDEPRECATED
 message EntityState(blk.env.EntityState) {
   uint32 entityId;
   uint32 time;
@@ -113,12 +83,14 @@ message EntityState(blk.env.EntityState) {
 };
 
 
+// SIMDEPRECATED
 message EntityPosition = 82 {
   uint32 sequence;
   array.<EntityState> states;
 };
 
 
+// SIMDEPRECATED
 message MoveCommand(blk.physics.MoveCommand) {
   uint32 sequence;
   uint32 time;
@@ -129,6 +101,7 @@ message MoveCommand(blk.physics.MoveCommand) {
 };
 
 
+// SIMDEPRECATED
 message Move = 90 {
   array.<MoveCommand> commands;
 };
