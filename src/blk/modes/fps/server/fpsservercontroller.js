@@ -73,6 +73,7 @@ blk.modes.fps.server.FpsServerController.prototype.setupSimulation =
 blk.modes.fps.server.FpsServerController.prototype.createPlayer =
     function(user) {
   var simulator = this.getSimulator();
+  goog.asserts.assert(this.world_);
 
   // Create player
   var player = /** @type {!blk.sim.Player} */ (
@@ -80,12 +81,11 @@ blk.modes.fps.server.FpsServerController.prototype.createPlayer =
           blk.sim.Player.ID,
           0));
 
-  // Add to world
-  player.setup(user);
-  player.setParent(this.world_);
+  // Setup and add to world
+  player.setup(user, this.world_);
 
   // Spawn the player
-  //player.spawn();
+  player.spawn();
 
   return player;
 };

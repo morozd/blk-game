@@ -21,7 +21,6 @@
 goog.provide('blk.sim.Model');
 
 goog.require('gf');
-goog.require('gf.log');
 goog.require('gf.sim.SpatialEntity');
 goog.require('gf.sim.Variable');
 goog.require('gf.sim.VariableFlag');
@@ -75,7 +74,6 @@ if (gf.CLIENT) {
   blk.sim.Model.prototype.render = function(
       frame, viewport, distanceToViewport, renderList) {
     // TODO(benvanik): queue for rendering
-    gf.log.debug('would render ' + this.getId());
 
     // TODO(benvanik): render attachments
   };

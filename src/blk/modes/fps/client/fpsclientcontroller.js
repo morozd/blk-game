@@ -22,9 +22,11 @@ goog.provide('blk.modes.fps.client.FpsClientController');
 
 goog.require('blk.assets.audio.Music');
 goog.require('blk.game.client.ClientController');
+goog.require('blk.sim.World');
 goog.require('blk.ui.Menubar');
 goog.require('blk.ui.PlayerListing');
 goog.require('gf.input.MouseButton');
+goog.require('gf.sim.IEntityWatcher');
 goog.require('goog.events.KeyCodes');
 goog.require('goog.vec.Mat4');
 goog.require('goog.vec.Vec4');
@@ -36,6 +38,7 @@ goog.require('goog.vec.Vec4');
  * Can be subclassed or used on its own.
  * @constructor
  * @extends {blk.game.client.ClientController}
+ * @implements {gf.sim.IEntityWatcher}
  * @param {!blk.game.client.ClientGame} game Client game.
  * @param {!gf.net.ClientSession} session Network session.
  */
@@ -93,9 +96,38 @@ blk.modes.fps.client.FpsClientController = function(game, session) {
   // Setup music
   var musicController = this.game.getMusicController();
   musicController.setTrackList(this.musicTrackList_);
+
+  /**
+   * World entity, containing the map and renderable entities (players/etc).
+   * Initialized when the entity is replicated.
+   * @private
+   * @type {blk.sim.World}
+   */
+  this.world_ = null;
+
+  var simulator = this.getSimulator();
+  simulator.addWatcher(this);
 };
 goog.inherits(blk.modes.fps.client.FpsClientController,
     blk.game.client.ClientController);
+
+
+/**
+ * @override
+ */
+blk.modes.fps.client.FpsClientController.prototype.entityAdded =
+    function(entity) {
+  if (entity instanceof blk.sim.World) {
+    this.world_ = entity;
+  }
+};
+
+
+/**
+ * @override
+ */
+blk.modes.fps.client.FpsClientController.prototype.entityRemoved =
+    goog.nullFunction;
 
 
 /**
@@ -231,6 +263,15 @@ blk.modes.fps.client.FpsClientController.prototype.drawWorld =
     function(frame) {
   goog.base(this, 'drawWorld', frame);
 
+  // Render the simulation
+  if (this.world_) {
+    // TODO(benvanik): draw map
+    var viewport;
+    var renderList;
+    this.world_.render(frame, viewport, renderList);
+  }
+
+  // SIMDEPRECATED
   // Render the map and entities
   var player = this.getLocalPlayer();
   player.renderViewport(frame);

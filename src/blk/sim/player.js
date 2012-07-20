@@ -27,9 +27,12 @@ goog.require('blk.sim.controllers.PlayerController');
 goog.require('gf');
 goog.require('gf.sim');
 goog.require('gf.sim.Entity');
+goog.require('gf.sim.EntityDirtyFlag');
 goog.require('gf.sim.EntityFlag');
 goog.require('gf.sim.EntityState');
+goog.require('gf.sim.Variable');
 goog.require('goog.asserts');
+goog.require('goog.vec.Vec3');
 
 
 
@@ -81,40 +84,68 @@ blk.sim.Player.ID = gf.sim.createTypeId(
     blk.sim.BLK_MODULE_ID, blk.sim.EntityType.PLAYER);
 
 
-/**
- * Sets up the player entity for the given user.
- * Can only be called once and must be called immediately after creation.
- * @this {blk.sim.Player}
- * @param {!gf.net.User} user User the player represents.
- */
-blk.sim.Player.prototype.setup = gf.SERVER ? function(user) {
-  var simulator = this.getSimulator();
-  var state = /** @type {!blk.sim.Player.State} */ (this.getState());
+if (gf.SERVER) {
+  /**
+   * Sets up the player entity for the given user.
+   * Can only be called once and must be called immediately after creation.
+   * @param {!gf.net.User} user User the player represents.
+   * @param {!blk.sim.World} world World the player exists in.
+   */
+  blk.sim.Player.prototype.setup = function(user, world) {
+    var simulator = this.getSimulator();
+    var state = /** @type {!blk.sim.Player.State} */ (this.getState());
 
-  goog.asserts.assert(!this.user_);
-  this.user_ = user;
-  state.setUserId(user.sessionId);
+    goog.asserts.assert(!this.user_);
+    this.user_ = user;
+    state.setUserId(user.sessionId);
 
-  // Create actor
-  this.actor_ = /** @type {!blk.sim.Actor} */ (
-      simulator.createEntity(
-          blk.sim.Actor.ID,
-          gf.sim.EntityFlag.UPDATED_FREQUENTLY |
-          gf.sim.EntityFlag.PREDICTED |
-          gf.sim.EntityFlag.INTERPOLATED |
-          gf.sim.EntityFlag.LATENCY_COMPENSATED));
-  state.setActorId(this.actor_.getId());
+    // Create actor
+    this.actor_ = /** @type {!blk.sim.Actor} */ (
+        simulator.createEntity(
+            blk.sim.Actor.ID,
+            gf.sim.EntityFlag.UPDATED_FREQUENTLY |
+            gf.sim.EntityFlag.PREDICTED |
+            gf.sim.EntityFlag.INTERPOLATED |
+            gf.sim.EntityFlag.LATENCY_COMPENSATED));
+    state.setActorId(this.actor_.getId());
 
-  // Create player controller
-  this.controller_ = /** @type {!blk.sim.controllers.PlayerController} */ (
-      simulator.createEntity(
-          blk.sim.controllers.PlayerController.ID,
-          gf.sim.EntityFlag.UPDATED_FREQUENTLY));
-  this.controller_.setParent(this.actor_);
-  state.setControllerId(this.controller_.getId());
+    // Create player controller
+    this.controller_ = /** @type {!blk.sim.controllers.PlayerController} */ (
+        simulator.createEntity(
+            blk.sim.controllers.PlayerController.ID,
+            gf.sim.EntityFlag.UPDATED_FREQUENTLY));
+    this.controller_.setParent(this.actor_);
+    state.setControllerId(this.controller_.getId());
 
-  // TODO(benvanik): create inventory system
-} : goog.nullFunction;
+    // TODO(benvanik): create inventory system
+
+    // Parent to the world
+    this.setParent(world);
+  };
+
+
+  /**
+   * Spawns the player in the world.
+   */
+  blk.sim.Player.prototype.spawn = function() {
+    // Add the actor to the world
+    this.actor_.setParent(this.getParent());
+
+    // Pick a spawn point
+    // TODO(benvanik): be smart, take as input, etc
+    var spawnPosition = goog.vec.Vec3.createFloat32FromValues(0, 80, 0);
+    this.actor_.getState().setPosition(spawnPosition);
+  };
+
+
+  /**
+   * De-spawns the player in the world.
+   */
+  blk.sim.Player.prototype.despawn = function() {
+    // Remove the actor from the world
+    this.actor_.setParent(null);
+  };
+}
 
 
 if (gf.CLIENT) {

@@ -183,6 +183,15 @@ goog.inherits(blk.game.client.ClientController, goog.Disposable);
 
 
 /**
+ * Gets the client simulator.
+ * @return {!gf.sim.ClientSimulator} Client-side simulation.
+ */
+blk.game.client.ClientController.prototype.getSimulator = function() {
+  return this.simulator_;
+};
+
+
+/**
  * @return {!blk.env.client.ClientMap} Game map.
  */
 blk.game.client.ClientController.prototype.getMap = function() {
