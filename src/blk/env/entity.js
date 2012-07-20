@@ -83,7 +83,7 @@ blk.env.Entity = function(entityId) {
 
   /**
    * Associated player, if any.
-   * @type {blk.game.Player}
+   * @type {Object}
    */
   this.player = null;
 

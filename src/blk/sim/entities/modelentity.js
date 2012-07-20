@@ -20,6 +20,8 @@
 
 goog.provide('blk.sim.entities.ModelEntity');
 
+goog.require('gf');
+goog.require('gf.log');
 goog.require('gf.sim.Variable');
 goog.require('gf.sim.VariableFlag');
 goog.require('gf.sim.entities.SpatialEntity');
@@ -58,6 +60,26 @@ blk.sim.entities.ModelEntity.prototype.getAttachments = function() {
   // TODO(benvanik): get attachments
   return [];
 };
+
+
+if (gf.CLIENT) {
+  /**
+   * Processes the model for rendering.
+   * @this {blk.sim.entities.ModelEntity}
+   * @param {!gf.RenderFrame} frame Current render frame.
+   * @param {!gf.vec.Viewport} viewport Current viewport.
+   * @param {number} distanceToViewport Distance from the entity to the viewport
+   *     eye point.
+   * @param {!blk.graphics.RenderList} renderList Render command list.
+   */
+  blk.sim.entities.ModelEntity.prototype.render = function(
+      frame, viewport, distanceToViewport, renderList) {
+    // TODO(benvanik): queue for rendering
+    gf.log.debug('would render ' + this.getId());
+
+    // TODO(benvanik): render attachments
+  };
+}
 
 
 

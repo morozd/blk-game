@@ -120,6 +120,13 @@ blk.game.server.ServerController = function(game, session, mapStore) {
   blk.sim.entities.registerEntities(this.simulator_);
 
   /**
+   * Map entity.
+   * @private
+   * @type {blk.sim.entities.MapEntity}
+   */
+  this.mapEntity_ = null;
+
+  /**
    * Player listing.
    * @private
    * @type {!Array.<!blk.game.server.ServerPlayer>}
@@ -147,6 +154,15 @@ blk.game.server.ServerController = function(game, session, mapStore) {
   this.nextEntityId_ = 0;
 };
 goog.inherits(blk.game.server.ServerController, goog.Disposable);
+
+
+/**
+ * Gets the server simulator.
+ * @return {!gf.sim.ServerSimulator} Server-side simulation.
+ */
+blk.game.server.ServerController.prototype.getSimulator = function() {
+  return this.simulator_;
+};
 
 
 /**
@@ -240,11 +256,11 @@ blk.game.server.ServerController.prototype.load = function() {
  */
 blk.game.server.ServerController.prototype.setupSimulation = function() {
   // Map
-  var map = /** @type {!blk.sim.entities.MapEntity} */ (
+  this.mapEntity_ = /** @type {!blk.sim.entities.MapEntity} */ (
       this.simulator_.createEntity(
           blk.sim.entities.MapEntity.ID,
           0));
-  this.simulator_.addEntity(map);
+  this.simulator_.addEntity(this.mapEntity_);
 };
 
 
@@ -253,7 +269,7 @@ blk.game.server.ServerController.prototype.setupSimulation = function() {
  * @protected
  * @param {!gf.net.User} user User that connected.
  */
-blk.game.server.ServerController.prototype.handleUserConnect = function(user) {
+blk.game.server.ServerController.prototype.userConnected = function(user) {
   var map = this.map_;
 
   gf.log.write('client connected', user.sessionId, user.info, user.agent);
@@ -265,6 +281,9 @@ blk.game.server.ServerController.prototype.handleUserConnect = function(user) {
 
   // Add to chat channels
   this.chatService_.join(user, 'main');
+
+  // Create player entity
+  var playerEntity = this.createPlayer(user);
 
   // Pick a spawn position
   var spawnPosition = goog.vec.Vec3.createFloat32FromValues(0, 80, 0);
@@ -322,17 +341,25 @@ blk.game.server.ServerController.prototype.handleUserConnect = function(user) {
 
 
 /**
+ * Creates a player entity for the given user and adds it to the simulation.
+ * @protected
+ * @param {!gf.net.User} user User the player represents.
+ * @return {!blk.sim.PlayerEntity} Player entity.
+ */
+blk.game.server.ServerController.prototype.createPlayer = goog.abstractMethod;
+
+
+/**
  * Handles a dead user.
  * @protected
  * @param {!gf.net.User} user User that disconnected.
  */
-blk.game.server.ServerController.prototype.handleUserDisconnect =
-    function(user) {
+blk.game.server.ServerController.prototype.userDisconnected = function(user) {
   var map = this.map_;
 
   gf.log.write('client disconnected', user.sessionId);
 
-  var player = /** @type {blk.game.Player} */ (user.data);
+  var player = /** @type {blk.game.server.ServerPlayer} */ (user.data);
   if (!player) {
     return;
   }
@@ -351,10 +378,21 @@ blk.game.server.ServerController.prototype.handleUserDisconnect =
     player.view = null;
   }
 
+  // Delete player entity
+  //this.deletePlayer(playerEntity);
+
   // Remove from roster
   goog.array.remove(this.players_, player);
   goog.dispose(player);
 };
+
+
+/**
+ * Deletes a player entity and removes it from the simulation.
+ * @protected
+ * @param {!blk.sim.PlayerEntity} player Player entity.
+ */
+blk.game.server.ServerController.prototype.deletePlayer = goog.abstractMethod;
 
 
 /**
@@ -458,7 +496,7 @@ blk.game.server.ServerController.prototype.render = function(frame) {
  */
 blk.game.server.ServerController.prototype.setBlock =
     function(user, x, y, z, blockData) {
-  var player = /** @type {blk.game.Player} */ (user.data);
+  var player = /** @type {blk.game.server.ServerPlayer} */ (user.data);
   if (!player || !player.view) {
     return false;
   }
@@ -533,7 +571,7 @@ blk.game.server.ServerController.NetService_.prototype.setupSwitch =
  */
 blk.game.server.ServerController.NetService_.prototype.userConnected =
     function(user) {
-  this.controller_.handleUserConnect(user);
+  this.controller_.userConnected(user);
 };
 
 
@@ -542,7 +580,7 @@ blk.game.server.ServerController.NetService_.prototype.userConnected =
  */
 blk.game.server.ServerController.NetService_.prototype.userDisconnected =
     function(user) {
-  this.controller_.handleUserDisconnect(user);
+  this.controller_.userDisconnected(user);
 };
 
 
@@ -603,7 +641,7 @@ blk.game.server.ServerController.NetService_.prototype.handleRequestChunkData_ =
   if (!user) {
     return false;
   }
-  var player = /** @type {blk.game.Player} */ (user.data);
+  var player = /** @type {blk.game.server.ServerPlayer} */ (user.data);
   if (!player) {
     return false;
   }

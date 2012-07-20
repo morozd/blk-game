@@ -21,6 +21,7 @@
 goog.provide('blk.modes.fps.server.FpsServerController');
 
 goog.require('blk.game.server.ServerController');
+goog.require('blk.sim.PlayerEntity');
 
 
 
@@ -37,3 +38,37 @@ blk.modes.fps.server.FpsServerController = function(game, session, mapStore) {
 };
 goog.inherits(blk.modes.fps.server.FpsServerController,
     blk.game.server.ServerController);
+
+
+/**
+ * @override
+ */
+blk.modes.fps.server.FpsServerController.prototype.createPlayer =
+    function(user) {
+  var simulator = this.getSimulator();
+
+  // Create player
+  var player = /** @type {!blk.sim.PlayerEntity} */ (
+      simulator.createEntity(
+          blk.sim.PlayerEntity.ID,
+          0));
+  simulator.addEntity(player);
+
+  // Spawn the player
+  //player.spawn();
+
+  return player;
+};
+
+
+/**
+ * @override
+ */
+blk.modes.fps.server.FpsServerController.prototype.deletePlayer =
+    function(player) {
+  var simulator = this.getSimulator();
+
+  // TODO(benvanik): delete other player entities
+
+  simulator.removeEntity(player);
+};

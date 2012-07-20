@@ -81,6 +81,34 @@ blk.sim.entities.MapEntity.prototype.update = function(time, timeDelta) {
 };
 
 
+if (gf.CLIENT) {
+  /**
+   * Processes the map for rendering.
+   * @this {blk.sim.entities.MapEntity}
+   * @param {!gf.RenderFrame} frame Current render frame.
+   * @param {!gf.vec.Viewport} viewport Current viewport.
+   * @param {!blk.graphics.RenderList} renderList Render command list.
+   */
+  blk.sim.entities.MapEntity.prototype.render = function(
+      frame, viewport, renderList) {
+    var db = this.getSpatialDatabase();
+
+    // Walk all entities in the viewport and queue for rendering
+    db.forEachInViewport(viewport,
+        /**
+         * @param {!gf.sim.entities.SpatialEntity} spatialEntity Entity.
+         * @param {number} distanceToViewport Distance.
+         * @return {boolean|undefined}
+         */
+        function(spatialEntity, distanceToViewport) {
+          var entity = /** @type {!blk.sim.entities.ModelEntity} */ (
+              spatialEntity);
+          entity.render(frame, viewport, distanceToViewport, renderList);
+        });
+  };
+}
+
+
 
 /**
  * Map entity state.

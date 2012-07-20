@@ -254,19 +254,27 @@ PlayerEntity[ControllerEntity]:
 
 blk.sim.MapEntity
 blk.sim.MusicEntity
-blk.sim.PositionedEntity
+blk.sim.PlayerEntity
+gf.sim.SpatialEntity
   blk.sim.ModelEntity
     blk.sim.ActorEntity
     blk.sim.ToolEntity
-      blk.sim.tools.PickaxeEntity
-      blk.sim.tools.RocketLauncherEntity
+      blk.sim.tools.PickaxeTool
+      blk.sim.tools.RocketLauncherTool
     blk.sim.ProjectileEntity
-      blk.sim.tools.RocketEntity
+      blk.sim.tools.RocketProjectile
 blk.sim.ControllerEntity
-  blk.sim.controllers.PlayerEntity
+  blk.sim.controllers.PlayerController
 
 
 how does controller entity set pos/orientation on parent so pred/interp
 entity parenting
 
 // SIMDEPRECATED
+
+
+blk.sim.PlayerEntity:
+    - user session id
+    - skin info (color/etc)
+    - controller ent id
+    - actor ent id

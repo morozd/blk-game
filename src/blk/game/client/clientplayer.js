@@ -16,7 +16,7 @@
 
 goog.provide('blk.game.client.ClientPlayer');
 
-goog.require('blk.game.Player');
+goog.require('goog.Disposable');
 
 
 
@@ -24,13 +24,40 @@ goog.require('blk.game.Player');
  * Client-side player.
  *
  * @constructor
- * @extends {blk.game.Player}
+ * @extends {goog.Disposable}
  * @param {!gf.net.User} user Net user.
  */
 blk.game.client.ClientPlayer = function(user) {
-  goog.base(this, user);
+  goog.base(this);
+
+  /**
+   * Net user.
+   * @protected
+   * @type {!gf.net.User}
+   */
+  this.user = user;
+
+  /**
+   * Entity assigned to this player, if any.
+   * @type {blk.env.Entity}
+   */
+  this.entity = null;
+
+  /**
+   * Chunk view.
+   * @type {blk.env.ChunkView}
+   */
+  this.view = null;
 };
-goog.inherits(blk.game.client.ClientPlayer, blk.game.Player);
+goog.inherits(blk.game.client.ClientPlayer, goog.Disposable);
+
+
+/**
+ * @return {!gf.net.User} The net user the player is associated with.
+ */
+blk.game.client.ClientPlayer.prototype.getUser = function() {
+  return this.user;
+};
 
 
 /**
@@ -49,7 +76,8 @@ blk.game.client.ClientPlayer.prototype.attachEntity = function(entity) {
 
 
 /**
- * @override
+ * Updates the player-related logic.
+ * @param {!gf.UpdateFrame} frame Current frame.
  */
 blk.game.client.ClientPlayer.prototype.update = function(frame) {
 };

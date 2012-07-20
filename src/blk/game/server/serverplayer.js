@@ -18,11 +18,11 @@ goog.provide('blk.game.server.ServerPlayer');
 
 goog.require('blk.env.Chunk');
 goog.require('blk.env.Entity');
-goog.require('blk.game.Player');
 goog.require('blk.net.packets.ChunkData');
 goog.require('blk.net.packets.EntityPosition');
 goog.require('blk.physics.ServerMovement');
 goog.require('gf.net.PacketWriter');
+goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.asserts');
 goog.require('goog.vec.Vec3');
@@ -33,18 +33,37 @@ goog.require('goog.vec.Vec3');
  * Server-side player.
  *
  * @constructor
- * @extends {blk.game.Player}
+ * @extends {goog.Disposable}
  * @param {!blk.game.server.ServerController} controller Server controller.
  * @param {!gf.net.User} user Net user.
  */
 blk.game.server.ServerPlayer = function(controller, user) {
-  goog.base(this, user);
+  goog.base(this);
 
   /**
    * @private
    * @type {!blk.game.server.ServerController}
    */
   this.controller_ = controller;
+
+  /**
+   * Net user.
+   * @protected
+   * @type {!gf.net.User}
+   */
+  this.user = user;
+
+  /**
+   * Entity assigned to this player, if any.
+   * @type {blk.env.Entity}
+   */
+  this.entity = null;
+
+  /**
+   * Chunk view.
+   * @type {blk.env.ChunkView}
+   */
+  this.view = null;
 
   /**
    * Movement controller, if any.
@@ -72,7 +91,15 @@ blk.game.server.ServerPlayer = function(controller, user) {
    */
   this.lastSortTime_ = 0;
 };
-goog.inherits(blk.game.server.ServerPlayer, blk.game.Player);
+goog.inherits(blk.game.server.ServerPlayer, goog.Disposable);
+
+
+/**
+ * @return {!gf.net.User} The net user the player is associated with.
+ */
+blk.game.server.ServerPlayer.prototype.getUser = function() {
+  return this.user;
+};
 
 
 /**
@@ -114,7 +141,8 @@ blk.game.server.ServerPlayer.prototype.queueMovementCommands =
 
 
 /**
- * @override
+ * Updates the player-related logic.
+ * @param {!gf.UpdateFrame} frame Current frame.
  */
 blk.game.server.ServerPlayer.prototype.update = function(frame) {
   // Process movement

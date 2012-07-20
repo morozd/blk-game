@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Google, Inc. All Rights Reserved.
+ * Copyright 2012 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,21 +18,20 @@
  * @author benvanik@google.com (Ben Vanik)
  */
 
-goog.provide('blk.sim.entities.EntityType');
+goog.provide('blk.graphics.RenderList');
+
+goog.require('goog.Disposable');
+
 
 
 /**
- * Entity type table.
- * Entities need only have unique IDs in a single module; in this case, BLK.
- * @enum {number}
+ * Optimized rendering command list.
+ * Queues up mesh renders to enable sorted batching on draw.
+ *
+ * @constructor
+ * @extends {goog.Disposable}
  */
-blk.sim.entities.EntityType = {
-  /** {@see blk.sim.entities.MapEntity} */
-  MAP: 0,
-  /** {@see blk.sim.PlayerEntity} */
-  PLAYER: 1,
-  /** {@see blk.sim.controllers.PlayerEntity} */
-  PLAYER_CONTROLLER: 2,
-  /** {@see blk.sim.tools.PickaxeEntity} */
-  PICKAXE_TOOL: 3
+blk.graphics.RenderList = function() {
+  goog.base(this);
 };
+goog.inherits(blk.graphics.RenderList, goog.Disposable);

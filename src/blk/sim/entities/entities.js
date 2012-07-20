@@ -20,6 +20,7 @@
 
 goog.provide('blk.sim.entities');
 
+goog.require('blk.sim.PlayerEntity');
 goog.require('blk.sim.controllers.PlayerEntity');
 goog.require('blk.sim.entities.MapEntity');
 goog.require('blk.sim.tools.PickaxeEntity');
@@ -36,6 +37,12 @@ blk.sim.entities.registerEntities = function(simulator) {
       blk.sim.entities.MapEntity.ID,
       blk.sim.entities.MapEntity,
       blk.sim.entities.MapEntity.State));
+
+  // PLAYER
+  simulator.registerEntityFactory(new gf.sim.EntityFactory(
+      blk.sim.PlayerEntity.ID,
+      blk.sim.PlayerEntity,
+      blk.sim.PlayerEntity.State));
 
   // PLAYER_CONTROLLER
   simulator.registerEntityFactory(new gf.sim.EntityFactory(
