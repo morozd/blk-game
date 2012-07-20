@@ -18,50 +18,52 @@
  * @author benvanik@google.com (Ben Vanik)
  */
 
-goog.provide('blk.sim.entities.ControllerEntity');
+goog.provide('blk.sim.Actor');
 
-goog.require('gf.sim.Entity');
-goog.require('gf.sim.EntityState');
+goog.require('blk.sim.Model');
 
 
 
 /**
- * Abstract actor controller entity.
- * Can be parented to an actor and assigned as a controller.
+ * Abstract renderable actor entity.
+ * Actors are controllable entities like players, monsters, or vehicles.
  *
  * @constructor
- * @extends {gf.sim.Entity}
+ * @extends {blk.sim.Model}
  * @param {!gf.sim.Simulator} simulator Owning simulator.
  * @param {!gf.sim.EntityFactory} entityFactory Entity factory.
  * @param {number} entityId Entity ID.
  * @param {number} entityFlags Bitmask of {@see gf.sim.EntityFlag} values.
  */
-blk.sim.entities.ControllerEntity = function(
+blk.sim.Actor = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
+
+  // TODO(benvanik): add vars:
+  // - controller entity ID
 };
-goog.inherits(blk.sim.entities.ControllerEntity, gf.sim.Entity);
+goog.inherits(blk.sim.Actor, blk.sim.Model);
 
 
 
 /**
- * Controller entity state.
+ * Actor entity state.
  * @constructor
- * @extends {gf.sim.EntityState}
+ * @extends {blk.sim.Model.State}
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
  * @param {!gf.sim.VariableTable} variableTable A subclass's variable table.
  */
-blk.sim.entities.ControllerEntity.State = function(entity, variableTable) {
+blk.sim.Actor.State = function(entity, variableTable) {
   goog.base(this, entity, variableTable);
 };
-goog.inherits(blk.sim.entities.ControllerEntity.State,
-    gf.sim.EntityState);
+goog.inherits(blk.sim.Actor.State,
+    blk.sim.Model.State);
 
 
 /**
  * @override
  */
-blk.sim.entities.ControllerEntity.State.declareVariables = function(
+blk.sim.Actor.State.declareVariables = function(
     variableList) {
-  gf.sim.EntityState.declareVariables(variableList);
+  blk.sim.Model.State.declareVariables(variableList);
 };

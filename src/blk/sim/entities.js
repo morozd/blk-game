@@ -20,10 +20,10 @@
 
 goog.provide('blk.sim.entities');
 
-goog.require('blk.sim.PlayerEntity');
-goog.require('blk.sim.controllers.PlayerEntity');
-goog.require('blk.sim.entities.MapEntity');
-goog.require('blk.sim.tools.PickaxeEntity');
+goog.require('blk.sim.Player');
+goog.require('blk.sim.World');
+goog.require('blk.sim.controllers.PlayerController');
+goog.require('blk.sim.tools.PickaxeTool');
 goog.require('gf.sim.EntityFactory');
 
 
@@ -32,27 +32,27 @@ goog.require('gf.sim.EntityFactory');
  * @param {!gf.sim.Simulator} simulator Simulator.
  */
 blk.sim.entities.registerEntities = function(simulator) {
-  // MAP
+  // WORLD
   simulator.registerEntityFactory(new gf.sim.EntityFactory(
-      blk.sim.entities.MapEntity.ID,
-      blk.sim.entities.MapEntity,
-      blk.sim.entities.MapEntity.State));
+      blk.sim.World.ID,
+      blk.sim.World,
+      blk.sim.World.State));
 
   // PLAYER
   simulator.registerEntityFactory(new gf.sim.EntityFactory(
-      blk.sim.PlayerEntity.ID,
-      blk.sim.PlayerEntity,
-      blk.sim.PlayerEntity.State));
+      blk.sim.Player.ID,
+      blk.sim.Player,
+      blk.sim.Player.State));
 
   // PLAYER_CONTROLLER
   simulator.registerEntityFactory(new gf.sim.EntityFactory(
-      blk.sim.controllers.PlayerEntity.ID,
-      blk.sim.controllers.PlayerEntity,
-      blk.sim.controllers.PlayerEntity.State));
+      blk.sim.controllers.PlayerController.ID,
+      blk.sim.controllers.PlayerController,
+      blk.sim.controllers.PlayerController.State));
 
   // PICKAXE_TOOL
   simulator.registerEntityFactory(new gf.sim.EntityFactory(
-      blk.sim.tools.PickaxeEntity.ID,
-      blk.sim.tools.PickaxeEntity,
-      blk.sim.tools.PickaxeEntity.State));
+      blk.sim.tools.PickaxeTool.ID,
+      blk.sim.tools.PickaxeTool,
+      blk.sim.tools.PickaxeTool.State));
 };

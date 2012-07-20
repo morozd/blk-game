@@ -18,13 +18,13 @@
  * @author benvanik@google.com (Ben Vanik)
  */
 
-goog.provide('blk.sim.entities.ModelEntity');
+goog.provide('blk.sim.Model');
 
 goog.require('gf');
 goog.require('gf.log');
+goog.require('gf.sim.SpatialEntity');
 goog.require('gf.sim.Variable');
 goog.require('gf.sim.VariableFlag');
-goog.require('gf.sim.entities.SpatialEntity');
 
 
 
@@ -32,13 +32,13 @@ goog.require('gf.sim.entities.SpatialEntity');
  * Abstract renderable model entity.
  *
  * @constructor
- * @extends {gf.sim.entities.SpatialEntity}
+ * @extends {gf.sim.SpatialEntity}
  * @param {!gf.sim.Simulator} simulator Owning simulator.
  * @param {!gf.sim.EntityFactory} entityFactory Entity factory.
  * @param {number} entityId Entity ID.
  * @param {number} entityFlags Bitmask of {@see gf.sim.EntityFlag} values.
  */
-blk.sim.entities.ModelEntity = function(
+blk.sim.Model = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 
@@ -48,15 +48,15 @@ blk.sim.entities.ModelEntity = function(
   // - render state
   // - attachments (track child add/remove)
 };
-goog.inherits(blk.sim.entities.ModelEntity, gf.sim.entities.SpatialEntity);
+goog.inherits(blk.sim.Model, gf.sim.SpatialEntity);
 
 
 /**
  * Gets a list of attachments currently on the model.
  * The list returned is mutable and should not be cached.
- * @return {!Array.<!blk.sim.entities.ModelEntity>} A list of attachments.
+ * @return {!Array.<!blk.sim.Model>} A list of attachments.
  */
-blk.sim.entities.ModelEntity.prototype.getAttachments = function() {
+blk.sim.Model.prototype.getAttachments = function() {
   // TODO(benvanik): get attachments
   return [];
 };
@@ -65,14 +65,14 @@ blk.sim.entities.ModelEntity.prototype.getAttachments = function() {
 if (gf.CLIENT) {
   /**
    * Processes the model for rendering.
-   * @this {blk.sim.entities.ModelEntity}
+   * @this {blk.sim.Model}
    * @param {!gf.RenderFrame} frame Current render frame.
    * @param {!gf.vec.Viewport} viewport Current viewport.
    * @param {number} distanceToViewport Distance from the entity to the viewport
    *     eye point.
    * @param {!blk.graphics.RenderList} renderList Render command list.
    */
-  blk.sim.entities.ModelEntity.prototype.render = function(
+  blk.sim.Model.prototype.render = function(
       frame, viewport, distanceToViewport, renderList) {
     // TODO(benvanik): queue for rendering
     gf.log.debug('would render ' + this.getId());
@@ -86,11 +86,11 @@ if (gf.CLIENT) {
 /**
  * Model entity state.
  * @constructor
- * @extends {gf.sim.entities.SpatialEntity.State}
+ * @extends {gf.sim.SpatialEntity.State}
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
  * @param {!gf.sim.VariableTable} variableTable A subclass's variable table.
  */
-blk.sim.entities.ModelEntity.State = function(entity, variableTable) {
+blk.sim.Model.State = function(entity, variableTable) {
   goog.base(this, entity, variableTable);
 
   // TODO(benvanik): add vars:
@@ -111,7 +111,7 @@ blk.sim.entities.ModelEntity.State = function(entity, variableTable) {
    * @type {number}
    */
   this.modelNameOrdinal_ = variableTable.getOrdinal(
-      blk.sim.entities.ModelEntity.State.tags_.modelName);
+      blk.sim.Model.State.tags_.modelName);
 
   /**
    * Model color modulation as 0xAABBGGRR.
@@ -125,7 +125,7 @@ blk.sim.entities.ModelEntity.State = function(entity, variableTable) {
    * @type {number}
    */
   this.modelColorOrdinal_ = variableTable.getOrdinal(
-      blk.sim.entities.ModelEntity.State.tags_.modelColor);
+      blk.sim.Model.State.tags_.modelColor);
 
   /**
    * Attachment point.
@@ -139,17 +139,17 @@ blk.sim.entities.ModelEntity.State = function(entity, variableTable) {
    * @type {number}
    */
   this.attachPointOrdinal_ = variableTable.getOrdinal(
-      blk.sim.entities.ModelEntity.State.tags_.attachPoint);
+      blk.sim.Model.State.tags_.attachPoint);
 };
-goog.inherits(blk.sim.entities.ModelEntity.State,
-    gf.sim.entities.SpatialEntity.State);
+goog.inherits(blk.sim.Model.State,
+    gf.sim.SpatialEntity.State);
 
 
 /**
  * @private
  * @type {!Object.<number>}
  */
-blk.sim.entities.ModelEntity.State.tag_ = {
+blk.sim.Model.State.tag_ = {
   modelName: gf.sim.Variable.getUniqueTag(),
   modelColor: gf.sim.Variable.getUniqueTag(),
   attachPoint: gf.sim.Variable.getUniqueTag()
@@ -160,7 +160,7 @@ blk.sim.entities.ModelEntity.State.tag_ = {
  * Gets the model name.
  * @return {string} Current value.
  */
-blk.sim.entities.ModelEntity.State.prototype.getModelName = function() {
+blk.sim.Model.State.prototype.getModelName = function() {
   return this.modelName_;
 };
 
@@ -169,7 +169,7 @@ blk.sim.entities.ModelEntity.State.prototype.getModelName = function() {
  * Sets the model name.
  * @param {string} value New value.
  */
-blk.sim.entities.ModelEntity.State.prototype.setModelName = function(value) {
+blk.sim.Model.State.prototype.setModelName = function(value) {
   if (this.modelName_ != value) {
     this.modelName_ = value;
     this.setVariableDirty(this.modelNameOrdinal_);
@@ -181,7 +181,7 @@ blk.sim.entities.ModelEntity.State.prototype.setModelName = function(value) {
  * Gets the model color as 0xAABBGGRR.
  * @return {number} Current value.
  */
-blk.sim.entities.ModelEntity.State.prototype.getModelColor = function() {
+blk.sim.Model.State.prototype.getModelColor = function() {
   return this.modelColor_;
 };
 
@@ -190,7 +190,7 @@ blk.sim.entities.ModelEntity.State.prototype.getModelColor = function() {
  * Sets the model color as 0xAABBGGRR.
  * @param {number} value New value.
  */
-blk.sim.entities.ModelEntity.State.prototype.setModelColor = function(value) {
+blk.sim.Model.State.prototype.setModelColor = function(value) {
   if (this.modelColor_ != value) {
     this.modelColor_ = value;
     this.setVariableDirty(this.modelColorOrdinal_);
@@ -202,7 +202,7 @@ blk.sim.entities.ModelEntity.State.prototype.setModelColor = function(value) {
  * Gets the attachment point.
  * @return {number} Current value.
  */
-blk.sim.entities.ModelEntity.State.prototype.getAttachPoint = function() {
+blk.sim.Model.State.prototype.getAttachPoint = function() {
   return this.attachPoint_;
 };
 
@@ -211,7 +211,7 @@ blk.sim.entities.ModelEntity.State.prototype.getAttachPoint = function() {
  * Sets the attachment point.
  * @param {number} value New value.
  */
-blk.sim.entities.ModelEntity.State.prototype.setAttachPoint = function(value) {
+blk.sim.Model.State.prototype.setAttachPoint = function(value) {
   if (this.attachPoint_ != value) {
     this.attachPoint_ = value;
     this.setVariableDirty(this.attachPointOrdinal_);
@@ -222,21 +222,21 @@ blk.sim.entities.ModelEntity.State.prototype.setAttachPoint = function(value) {
 /**
  * @override
  */
-blk.sim.entities.ModelEntity.State.declareVariables = function(variableList) {
-  gf.sim.entities.SpatialEntity.State.declareVariables(variableList);
+blk.sim.Model.State.declareVariables = function(variableList) {
+  gf.sim.SpatialEntity.State.declareVariables(variableList);
   variableList.push(new gf.sim.Variable.String(
-      blk.sim.entities.ModelEntity.State.tag_.modelName,
+      blk.sim.Model.State.tag_.modelName,
       0,
-      blk.sim.entities.ModelEntity.State.prototype.getModelName,
-      blk.sim.entities.ModelEntity.State.prototype.setModelName));
+      blk.sim.Model.State.prototype.getModelName,
+      blk.sim.Model.State.prototype.setModelName));
   variableList.push(new gf.sim.Variable.Color(
-      blk.sim.entities.ModelEntity.State.tag_.modelColor,
+      blk.sim.Model.State.tag_.modelColor,
       gf.sim.VariableFlag.UPDATED_FREQUENTLY | gf.sim.VariableFlag.INTERPOLATED,
-      blk.sim.entities.ModelEntity.State.prototype.getModelColor,
-      blk.sim.entities.ModelEntity.State.prototype.setModelColor));
+      blk.sim.Model.State.prototype.getModelColor,
+      blk.sim.Model.State.prototype.setModelColor));
   variableList.push(new gf.sim.Variable.Integer(
-      blk.sim.entities.ModelEntity.State.tag_.attachPoint,
+      blk.sim.Model.State.tag_.attachPoint,
       0,
-      blk.sim.entities.ModelEntity.State.prototype.getAttachPoint,
-      blk.sim.entities.ModelEntity.State.prototype.setAttachPoint));
+      blk.sim.Model.State.prototype.getAttachPoint,
+      blk.sim.Model.State.prototype.setAttachPoint));
 };

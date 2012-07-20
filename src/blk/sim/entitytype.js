@@ -18,7 +18,7 @@
  * @author benvanik@google.com (Ben Vanik)
  */
 
-goog.provide('blk.sim.entities.EntityType');
+goog.provide('blk.sim.EntityType');
 
 
 /**
@@ -26,13 +26,13 @@ goog.provide('blk.sim.entities.EntityType');
  * Entities need only have unique IDs in a single module; in this case, BLK.
  * @enum {number}
  */
-blk.sim.entities.EntityType = {
-  /** {@see blk.sim.entities.MapEntity} */
-  MAP: 0,
-  /** {@see blk.sim.PlayerEntity} */
+blk.sim.EntityType = {
+  /** {@see blk.sim.World} */
+  WORLD: 0,
+  /** {@see blk.sim.Player} */
   PLAYER: 1,
-  /** {@see blk.sim.controllers.PlayerEntity} */
+  /** {@see blk.sim.controllers.PlayerController} */
   PLAYER_CONTROLLER: 2,
-  /** {@see blk.sim.tools.PickaxeEntity} */
+  /** {@see blk.sim.tools.PickaxeTool} */
   PICKAXE_TOOL: 3
 };

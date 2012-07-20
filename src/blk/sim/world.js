@@ -18,17 +18,17 @@
  * @author benvanik@google.com (Ben Vanik)
  */
 
-goog.provide('blk.sim.entities.MapEntity');
+goog.provide('blk.sim.World');
 
 goog.require('blk.sim');
-goog.require('blk.sim.entities.EntityType');
+goog.require('blk.sim.EntityType');
 goog.require('gf');
 goog.require('gf.log');
 goog.require('gf.sim');
 goog.require('gf.sim.EntityState');
+goog.require('gf.sim.SceneEntity');
 goog.require('gf.sim.SchedulingPriority');
 goog.require('gf.sim.Variable');
-goog.require('gf.sim.entities.SceneEntity');
 goog.require('gf.sim.search.ListDatabase');
 
 
@@ -38,13 +38,13 @@ goog.require('gf.sim.search.ListDatabase');
  * The spatial scene root for all spatial entities.
  *
  * @constructor
- * @extends {gf.sim.entities.SceneEntity}
+ * @extends {gf.sim.SceneEntity}
  * @param {!gf.sim.Simulator} simulator Owning simulator.
  * @param {!gf.sim.EntityFactory} entityFactory Entity factory.
  * @param {number} entityId Entity ID.
  * @param {number} entityFlags Bitmask of {@see gf.sim.EntityFlag} values.
  */
-blk.sim.entities.MapEntity = function(
+blk.sim.World = function(
     simulator, entityFactory, entityId, entityFlags) {
   // TODO(benvanik): custom search database
   var db = new gf.sim.search.ListDatabase();
@@ -52,7 +52,7 @@ blk.sim.entities.MapEntity = function(
 
   this.scheduleUpdate(gf.sim.SchedulingPriority.NORMAL);
 };
-goog.inherits(blk.sim.entities.MapEntity, gf.sim.entities.SceneEntity);
+goog.inherits(blk.sim.World, gf.sim.SceneEntity);
 
 
 /**
@@ -60,15 +60,15 @@ goog.inherits(blk.sim.entities.MapEntity, gf.sim.entities.SceneEntity);
  * @const
  * @type {number}
  */
-blk.sim.entities.MapEntity.ID = gf.sim.createTypeId(
-    blk.sim.BLK_MODULE_ID, blk.sim.entities.EntityType.MAP);
+blk.sim.World.ID = gf.sim.createTypeId(
+    blk.sim.BLK_MODULE_ID, blk.sim.EntityType.WORLD);
 
 
 /**
  * @override
  */
-blk.sim.entities.MapEntity.prototype.update = function(time, timeDelta) {
-  var state = /** @type {!blk.sim.entities.MapEntity.State} */ (
+blk.sim.World.prototype.update = function(time, timeDelta) {
+  var state = /** @type {!blk.sim.World.State} */ (
       this.getState());
 
   if (gf.CLIENT) {
@@ -84,24 +84,24 @@ blk.sim.entities.MapEntity.prototype.update = function(time, timeDelta) {
 if (gf.CLIENT) {
   /**
    * Processes the map for rendering.
-   * @this {blk.sim.entities.MapEntity}
+   * @this {blk.sim.World}
    * @param {!gf.RenderFrame} frame Current render frame.
    * @param {!gf.vec.Viewport} viewport Current viewport.
    * @param {!blk.graphics.RenderList} renderList Render command list.
    */
-  blk.sim.entities.MapEntity.prototype.render = function(
+  blk.sim.World.prototype.render = function(
       frame, viewport, renderList) {
     var db = this.getSpatialDatabase();
 
     // Walk all entities in the viewport and queue for rendering
     db.forEachInViewport(viewport,
         /**
-         * @param {!gf.sim.entities.SpatialEntity} spatialEntity Entity.
+         * @param {!gf.sim.SpatialEntity} spatialEntity Entity.
          * @param {number} distanceToViewport Distance.
          * @return {boolean|undefined}
          */
         function(spatialEntity, distanceToViewport) {
-          var entity = /** @type {!blk.sim.entities.ModelEntity} */ (
+          var entity = /** @type {!blk.sim.Model} */ (
               spatialEntity);
           entity.render(frame, viewport, distanceToViewport, renderList);
         });
@@ -113,14 +113,14 @@ if (gf.CLIENT) {
 /**
  * Map entity state.
  * @constructor
- * @extends {gf.sim.entities.SceneEntity.State}
+ * @extends {gf.sim.SceneEntity.State}
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
  * @param {!gf.sim.VariableTable=} opt_variableTable A subclass's variable
  *     table, if subclassed.
  */
-blk.sim.entities.MapEntity.State = function(entity, opt_variableTable) {
+blk.sim.World.State = function(entity, opt_variableTable) {
   var variableTable = opt_variableTable || gf.sim.EntityState.getVariableTable(
-      blk.sim.entities.MapEntity.State.declareVariables);
+      blk.sim.World.State.declareVariables);
   goog.base(this, entity, variableTable);
 
   // TODO(benvanik): add vars:
@@ -142,17 +142,17 @@ blk.sim.entities.MapEntity.State = function(entity, opt_variableTable) {
    * @type {number}
    */
   this.testVarOrdinal_ = variableTable.getOrdinal(
-      blk.sim.entities.MapEntity.State.tags_.testVar);
+      blk.sim.World.State.tags_.testVar);
 };
-goog.inherits(blk.sim.entities.MapEntity.State,
-    gf.sim.entities.SceneEntity.State);
+goog.inherits(blk.sim.World.State,
+    gf.sim.SceneEntity.State);
 
 
 /**
  * @private
  * @type {!Object.<number>}
  */
-blk.sim.entities.MapEntity.State.tags_ = {
+blk.sim.World.State.tags_ = {
   testVar: gf.sim.Variable.getUniqueTag()
 };
 
@@ -161,7 +161,7 @@ blk.sim.entities.MapEntity.State.tags_ = {
  * Gets test var.
  * @return {number} Current value.
  */
-blk.sim.entities.MapEntity.State.prototype.getTestVar = function() {
+blk.sim.World.State.prototype.getTestVar = function() {
   return this.testVar_;
 };
 
@@ -170,7 +170,7 @@ blk.sim.entities.MapEntity.State.prototype.getTestVar = function() {
  * Sets test var.
  * @param {number} value New value.
  */
-blk.sim.entities.MapEntity.State.prototype.setTestVar = function(value) {
+blk.sim.World.State.prototype.setTestVar = function(value) {
   gf.log.write('setTestVar(' + value + ')');
   if (this.testVar_ != value) {
     this.testVar_ = value;
@@ -182,11 +182,11 @@ blk.sim.entities.MapEntity.State.prototype.setTestVar = function(value) {
 /**
  * @override
  */
-blk.sim.entities.MapEntity.State.declareVariables = function(variableList) {
-  gf.sim.entities.SceneEntity.State.declareVariables(variableList);
+blk.sim.World.State.declareVariables = function(variableList) {
+  gf.sim.SceneEntity.State.declareVariables(variableList);
   variableList.push(new gf.sim.Variable.Float(
-      blk.sim.entities.MapEntity.State.tags_.testVar,
+      blk.sim.World.State.tags_.testVar,
       0,
-      blk.sim.entities.MapEntity.State.prototype.getTestVar,
-      blk.sim.entities.MapEntity.State.prototype.setTestVar));
+      blk.sim.World.State.prototype.getTestVar,
+      blk.sim.World.State.prototype.setTestVar));
 };

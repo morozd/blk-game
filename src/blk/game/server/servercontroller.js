@@ -36,9 +36,9 @@ goog.require('blk.net.packets.Move');
 goog.require('blk.net.packets.ReadyPlayer');
 goog.require('blk.net.packets.RequestChunkData');
 goog.require('blk.net.packets.SetBlock');
+goog.require('blk.sim.World');
 goog.require('blk.sim.commands');
 goog.require('blk.sim.entities');
-goog.require('blk.sim.entities.MapEntity');
 goog.require('gf');
 goog.require('gf.log');
 goog.require('gf.net.NetworkService');
@@ -122,9 +122,9 @@ blk.game.server.ServerController = function(game, session, mapStore) {
   /**
    * Map entity.
    * @private
-   * @type {blk.sim.entities.MapEntity}
+   * @type {blk.sim.World}
    */
-  this.mapEntity_ = null;
+  this.world_ = null;
 
   /**
    * Player listing.
@@ -256,11 +256,10 @@ blk.game.server.ServerController.prototype.load = function() {
  */
 blk.game.server.ServerController.prototype.setupSimulation = function() {
   // Map
-  this.mapEntity_ = /** @type {!blk.sim.entities.MapEntity} */ (
+  this.world_ = /** @type {!blk.sim.World} */ (
       this.simulator_.createEntity(
-          blk.sim.entities.MapEntity.ID,
+          blk.sim.World.ID,
           0));
-  this.simulator_.addEntity(this.mapEntity_);
 };
 
 
@@ -344,7 +343,7 @@ blk.game.server.ServerController.prototype.userConnected = function(user) {
  * Creates a player entity for the given user and adds it to the simulation.
  * @protected
  * @param {!gf.net.User} user User the player represents.
- * @return {!blk.sim.PlayerEntity} Player entity.
+ * @return {!blk.sim.Player} Player entity.
  */
 blk.game.server.ServerController.prototype.createPlayer = goog.abstractMethod;
 
@@ -390,7 +389,7 @@ blk.game.server.ServerController.prototype.userDisconnected = function(user) {
 /**
  * Deletes a player entity and removes it from the simulation.
  * @protected
- * @param {!blk.sim.PlayerEntity} player Player entity.
+ * @param {!blk.sim.Player} player Player entity.
  */
 blk.game.server.ServerController.prototype.deletePlayer = goog.abstractMethod;
 

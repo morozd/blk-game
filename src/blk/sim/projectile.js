@@ -18,9 +18,9 @@
  * @author benvanik@google.com (Ben Vanik)
  */
 
-goog.provide('blk.sim.entities.ProjectileEntity');
+goog.provide('blk.sim.Projectile');
 
-goog.require('blk.sim.entities.ModelEntity');
+goog.require('blk.sim.Model');
 
 
 
@@ -28,38 +28,38 @@ goog.require('blk.sim.entities.ModelEntity');
  * Abstract renderable projectile entity.
  *
  * @constructor
- * @extends {blk.sim.entities.ModelEntity}
+ * @extends {blk.sim.Model}
  * @param {!gf.sim.Simulator} simulator Owning simulator.
  * @param {!gf.sim.EntityFactory} entityFactory Entity factory.
  * @param {number} entityId Entity ID.
  * @param {number} entityFlags Bitmask of {@see gf.sim.EntityFlag} values.
  */
-blk.sim.entities.ProjectileEntity = function(
+blk.sim.Projectile = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
-goog.inherits(blk.sim.entities.ProjectileEntity, blk.sim.entities.ModelEntity);
+goog.inherits(blk.sim.Projectile, blk.sim.Model);
 
 
 
 /**
  * Projectile entity state.
  * @constructor
- * @extends {blk.sim.entities.ModelEntity.State}
+ * @extends {blk.sim.Model.State}
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
  * @param {!gf.sim.VariableTable} variableTable A subclass's variable table.
  */
-blk.sim.entities.ProjectileEntity.State = function(entity, variableTable) {
+blk.sim.Projectile.State = function(entity, variableTable) {
   goog.base(this, entity, variableTable);
 };
-goog.inherits(blk.sim.entities.ProjectileEntity.State,
-    blk.sim.entities.ModelEntity.State);
+goog.inherits(blk.sim.Projectile.State,
+    blk.sim.Model.State);
 
 
 /**
  * @override
  */
-blk.sim.entities.ProjectileEntity.State.declareVariables = function(
+blk.sim.Projectile.State.declareVariables = function(
     variableList) {
-  blk.sim.entities.ModelEntity.State.declareVariables(variableList);
+  blk.sim.Model.State.declareVariables(variableList);
 };

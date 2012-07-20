@@ -18,57 +18,50 @@
  * @author benvanik@google.com (Ben Vanik)
  */
 
-goog.provide('blk.sim.entities.ToolEntity');
+goog.provide('blk.sim.Controller');
 
-goog.require('blk.sim.entities.ModelEntity');
+goog.require('gf.sim.Entity');
+goog.require('gf.sim.EntityState');
 
 
 
 /**
- * Abstract renderable tool entity.
- *
- * Tools can be held (attached on some actor), contained within something
- * (parented to an inventory or box), or standalone in the world (no parent).
- * Held:
- * - Position/etc indicates relative position to parent attachment point
- * Contained:
- * - Position ignored
- * Standalone:
- * - Position is world position
+ * Abstract actor controller entity.
+ * Can be parented to an actor and assigned as a controller.
  *
  * @constructor
- * @extends {blk.sim.entities.ModelEntity}
+ * @extends {gf.sim.Entity}
  * @param {!gf.sim.Simulator} simulator Owning simulator.
  * @param {!gf.sim.EntityFactory} entityFactory Entity factory.
  * @param {number} entityId Entity ID.
  * @param {number} entityFlags Bitmask of {@see gf.sim.EntityFlag} values.
  */
-blk.sim.entities.ToolEntity = function(
+blk.sim.Controller = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
-goog.inherits(blk.sim.entities.ToolEntity, blk.sim.entities.ModelEntity);
+goog.inherits(blk.sim.Controller, gf.sim.Entity);
 
 
 
 /**
- * Tool entity state.
+ * Controller entity state.
  * @constructor
- * @extends {blk.sim.entities.ModelEntity.State}
+ * @extends {gf.sim.EntityState}
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
  * @param {!gf.sim.VariableTable} variableTable A subclass's variable table.
  */
-blk.sim.entities.ToolEntity.State = function(entity, variableTable) {
+blk.sim.Controller.State = function(entity, variableTable) {
   goog.base(this, entity, variableTable);
 };
-goog.inherits(blk.sim.entities.ToolEntity.State,
-    blk.sim.entities.ModelEntity.State);
+goog.inherits(blk.sim.Controller.State,
+    gf.sim.EntityState);
 
 
 /**
  * @override
  */
-blk.sim.entities.ToolEntity.State.declareVariables = function(
+blk.sim.Controller.State.declareVariables = function(
     variableList) {
-  blk.sim.entities.ModelEntity.State.declareVariables(variableList);
+  gf.sim.EntityState.declareVariables(variableList);
 };

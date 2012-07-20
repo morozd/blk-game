@@ -18,65 +18,54 @@
  * @author benvanik@google.com (Ben Vanik)
  */
 
-goog.provide('blk.sim.tools.PickaxeEntity');
+goog.provide('blk.sim.controllers.PlayerController');
 
-goog.require('blk.sim');
-goog.require('blk.sim.entities.EntityType');
-goog.require('blk.sim.entities.ToolEntity');
-goog.require('gf.sim');
+goog.require('blk.sim.Controller');
 goog.require('gf.sim.EntityState');
 
 
 
 /**
- * Pickaxe tool entity.
- * A melee tool for thwacking the world.
+ * Abstract actor controller entity.
+ * Can be parented to an actor and assigned as a controller.
  *
  * @constructor
- * @extends {blk.sim.entities.ToolEntity}
+ * @extends {blk.sim.Controller}
  * @param {!gf.sim.Simulator} simulator Owning simulator.
  * @param {!gf.sim.EntityFactory} entityFactory Entity factory.
  * @param {number} entityId Entity ID.
  * @param {number} entityFlags Bitmask of {@see gf.sim.EntityFlag} values.
  */
-blk.sim.tools.PickaxeEntity = function(
+blk.sim.controllers.PlayerController = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
-goog.inherits(blk.sim.tools.PickaxeEntity, blk.sim.entities.ToolEntity);
-
-
-/**
- * Entity ID.
- * @const
- * @type {number}
- */
-blk.sim.tools.PickaxeEntity.ID = gf.sim.createTypeId(
-    blk.sim.BLK_MODULE_ID, blk.sim.entities.EntityType.PICKAXE_TOOL);
+goog.inherits(blk.sim.controllers.PlayerController,
+    blk.sim.Controller);
 
 
 
 /**
- * Pickaxe entity state.
+ * Controller entity state.
  * @constructor
- * @extends {blk.sim.entities.ToolEntity.State}
+ * @extends {blk.sim.Controller.State}
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
-* @param {!gf.sim.VariableTable=} opt_variableTable A subclass's variable
+ * @param {!gf.sim.VariableTable=} opt_variableTable A subclass's variable
  *     table, if subclassed.
  */
-blk.sim.tools.PickaxeEntity.State = function(entity, opt_variableTable) {
+blk.sim.controllers.PlayerController.State = function(entity, opt_variableTable) {
   var variableTable = opt_variableTable || gf.sim.EntityState.getVariableTable(
-      blk.sim.tools.PickaxeEntity.State.declareVariables);
+      blk.sim.controllers.PlayerController.State.declareVariables);
   goog.base(this, entity, variableTable);
 };
-goog.inherits(blk.sim.tools.PickaxeEntity.State,
-    blk.sim.entities.ToolEntity.State);
+goog.inherits(blk.sim.controllers.PlayerController.State,
+    blk.sim.Controller.State);
 
 
 /**
  * @override
  */
-blk.sim.tools.PickaxeEntity.State.declareVariables = function(
+blk.sim.controllers.PlayerController.State.declareVariables = function(
     variableList) {
-  blk.sim.entities.ToolEntity.State.declareVariables(variableList);
+  blk.sim.Controller.State.declareVariables(variableList);
 };

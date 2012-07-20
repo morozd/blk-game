@@ -252,18 +252,18 @@ PlayerEntity[ControllerEntity]:
     - blk.env.ChunkView
 
 
-blk.sim.MapEntity
-blk.sim.MusicEntity
-blk.sim.PlayerEntity
+blk.sim.World
+blk.sim.MusicDirector
+blk.sim.Player
 gf.sim.SpatialEntity
-  blk.sim.ModelEntity
-    blk.sim.ActorEntity
-    blk.sim.ToolEntity
+  blk.sim.Model
+    blk.sim.Actor
+    blk.sim.Tool
       blk.sim.tools.PickaxeTool
       blk.sim.tools.RocketLauncherTool
-    blk.sim.ProjectileEntity
+    blk.sim.Projectile
       blk.sim.tools.RocketProjectile
-blk.sim.ControllerEntity
+blk.sim.Controller
   blk.sim.controllers.PlayerController
 
 
@@ -273,7 +273,7 @@ entity parenting
 // SIMDEPRECATED
 
 
-blk.sim.PlayerEntity:
+blk.sim.Player:
     - user session id
     - skin info (color/etc)
     - controller ent id

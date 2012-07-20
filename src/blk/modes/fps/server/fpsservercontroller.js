@@ -21,7 +21,7 @@
 goog.provide('blk.modes.fps.server.FpsServerController');
 
 goog.require('blk.game.server.ServerController');
-goog.require('blk.sim.PlayerEntity');
+goog.require('blk.sim.Player');
 
 
 
@@ -48,11 +48,10 @@ blk.modes.fps.server.FpsServerController.prototype.createPlayer =
   var simulator = this.getSimulator();
 
   // Create player
-  var player = /** @type {!blk.sim.PlayerEntity} */ (
+  var player = /** @type {!blk.sim.Player} */ (
       simulator.createEntity(
-          blk.sim.PlayerEntity.ID,
+          blk.sim.Player.ID,
           0));
-  simulator.addEntity(player);
 
   // Spawn the player
   //player.spawn();
