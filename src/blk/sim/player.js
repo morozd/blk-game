@@ -84,6 +84,15 @@ blk.sim.Player.ID = gf.sim.createTypeId(
     blk.sim.BLK_MODULE_ID, blk.sim.EntityType.PLAYER);
 
 
+/**
+ * @return {!gf.net.User} User this player represents.
+ */
+blk.sim.Player.prototype.getUser = function() {
+  goog.asserts.assert(this.user_);
+  return this.user_;
+};
+
+
 if (gf.SERVER) {
   /**
    * Sets up the player entity for the given user.

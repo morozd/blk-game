@@ -123,6 +123,13 @@ blk.game.client.ClientController = function(game, session) {
   this.inputData_ = new gf.input.Data(this.game.getInputManager());
 
   /**
+   * Screen-aligned ortho viewport.
+   * @private
+   * @type {!gf.vec.Viewport}
+   */
+  this.screenViewport_ = new gf.vec.Viewport();
+
+  /**
    * UI widgets.
    * @private
    * @type {!Array.<!blk.ui.Widget>}
@@ -196,6 +203,14 @@ blk.game.client.ClientController.prototype.getSimulator = function() {
  */
 blk.game.client.ClientController.prototype.getMap = function() {
   return this.map_;
+};
+
+
+/**
+ * @return {!gf.vec.Viewport} Screen viewport.
+ */
+blk.game.client.ClientController.prototype.getScreenViewport = function() {
+  return this.screenViewport_;
 };
 
 
@@ -456,9 +471,9 @@ blk.game.client.ClientController.prototype.render = function(frame) {
     return;
   }
 
-  // var viewport = this.viewport;
-  // viewport.far = this.localView.getDrawDistance();
-  // viewport.reset(this.display.getSize());
+  // Reset screen viewport
+  var display = this.game.getDisplay();
+  this.screenViewport_.reset(display.getSize());
 
   // Grab latest input data as early in the frame as possible
   this.inputData_.poll();
@@ -549,21 +564,29 @@ blk.game.client.ClientController.prototype.drawWorld = function(frame) {
 
 /**
  * Draws any overlays and UI to the screen.
+ * @protected
  * @param {!gf.RenderFrame} frame Current render frame.
  * @param {!gf.input.Data} inputData Updated input data.
  */
 blk.game.client.ClientController.prototype.drawOverlays =
     function(frame, inputData) {
-  var localPlayer = this.getLocalPlayer();
-  var viewport = localPlayer.getViewport();
   var mapStats = this.map_.getStatisticsString();
-  var playerInfo = localPlayer.getDebugInfo();
-  this.console_.render(frame, viewport, mapStats, playerInfo);
+  var extraInfo = this.getDebugInfo();
+  this.console_.render(frame, this.screenViewport_, mapStats, extraInfo);
 };
 
 
 /**
+ * Gets additional debugging information that will be printed to the console.
+ * @protected
+ * @return {string} Extra debugging information for the console.
+ */
+blk.game.client.ClientController.prototype.getDebugInfo = goog.nullFunction;
+
+
+/**
  * Ends drawing the game.
+ * @protected
  * Called immediately before ending the graphics context.
  * @param {!gf.RenderFrame} frame Current render frame.
  */

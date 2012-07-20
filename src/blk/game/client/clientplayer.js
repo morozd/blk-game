@@ -37,12 +37,21 @@ blk.game.client.ClientPlayer = function(user) {
    */
   this.user = user;
 
+  // SIMDEPRECATED
   /**
    * Entity assigned to this player, if any.
    * @type {blk.env.Entity}
    */
   this.entity = null;
 
+  /**
+   * Primary player entity.
+   * @protected
+   * @type {blk.sim.Player}
+   */
+  this.entity2 = null;
+
+  // SIMDEPRECATED
   /**
    * Chunk view.
    * @type {blk.env.ChunkView}
@@ -60,6 +69,7 @@ blk.game.client.ClientPlayer.prototype.getUser = function() {
 };
 
 
+// SIMDEPRECATED
 /**
  * Attaches an entity to a player.
  * @param {!blk.env.Entity} entity Player entity.

@@ -105,6 +105,7 @@ blk.modes.fps.client.FpsClientController = function(game, session) {
    */
   this.world_ = null;
 
+  // Register to be notified about entity events
   var simulator = this.getSimulator();
   simulator.addWatcher(this);
 };
@@ -118,7 +119,16 @@ goog.inherits(blk.modes.fps.client.FpsClientController,
 blk.modes.fps.client.FpsClientController.prototype.entityAdded =
     function(entity) {
   if (entity instanceof blk.sim.World) {
+    // Setup world
+    // This binds the map and the world together
     this.world_ = entity;
+    this.world_.setMap(this.getMap());
+  } else if (entity instanceof blk.sim.Player) {
+    // Attach entity to the player container for tracking
+    var user = entity.getUser();
+    var player = this.getPlayerBySessionId(user.sessionId);
+    player.entity2 = entity;
+    gf.log.write('got player entity');
   }
 };
 
@@ -273,8 +283,8 @@ blk.modes.fps.client.FpsClientController.prototype.drawWorld =
 
   // SIMDEPRECATED
   // Render the map and entities
-  var player = this.getLocalPlayer();
-  player.renderViewport(frame);
+  var localPlayer = this.getLocalPlayer();
+  localPlayer.renderViewport(frame);
 };
 
 
@@ -288,6 +298,15 @@ blk.modes.fps.client.FpsClientController.prototype.drawOverlays =
   // Draw UI
   this.drawInputUI_(frame, inputData);
   this.drawBlockTypes_(frame);
+};
+
+
+/**
+ * @override
+ */
+blk.modes.fps.client.FpsClientController.prototype.getDebugInfo = function() {
+  var localPlayer = this.getLocalPlayer();
+  return localPlayer.getDebugInfo();
 };
 
 

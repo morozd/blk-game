@@ -58,7 +58,7 @@ blk.sim.World = function(
    */
   this.map_ = null;
 
-  this.scheduleUpdate(gf.sim.SchedulingPriority.NORMAL);
+  //this.scheduleUpdate(gf.sim.SchedulingPriority.NORMAL);
 };
 goog.inherits(blk.sim.World, gf.sim.SceneEntity);
 

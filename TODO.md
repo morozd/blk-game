@@ -278,3 +278,13 @@ blk.sim.Player:
     - skin info (color/etc)
     - controller ent id
     - actor ent id
+
+
+move map into world
+setupMap()
+getMap()
+
+clientcontroller:
+- needs localPlayer
+
+rename entity2 -> entity
