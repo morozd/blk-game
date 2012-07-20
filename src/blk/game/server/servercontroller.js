@@ -716,12 +716,3 @@ blk.game.server.ServerController.NetService_.prototype.handleMove_ =
 
   return true;
 };
-
-
-/**
- * Shared packet writer.
- * @private
- * @type {!gf.net.PacketWriter}
- */
-blk.game.server.ServerController.NetService_.packetWriter_ =
-    new gf.net.PacketWriter();

@@ -31,6 +31,7 @@ blk.env.client.SegmentCache = function() {
 
   /**
    * A set of all chunk segment renderers in the cache, mapped by ID.
+   * @private
    * @type {!Object.<!blk.env.client.SegmentRenderer>}
    */
   this.entries_ = {};

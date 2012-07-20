@@ -98,7 +98,7 @@ if (gf.CLIENT) {
         /**
          * @param {!gf.sim.SpatialEntity} spatialEntity Entity.
          * @param {number} distanceToViewport Distance.
-         * @return {boolean|undefined}
+         * @return {boolean|undefined} Cancel flag.
          */
         function(spatialEntity, distanceToViewport) {
           var entity = /** @type {!blk.sim.Model} */ (

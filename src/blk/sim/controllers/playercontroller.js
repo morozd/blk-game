@@ -53,7 +53,8 @@ goog.inherits(blk.sim.controllers.PlayerController,
  * @param {!gf.sim.VariableTable=} opt_variableTable A subclass's variable
  *     table, if subclassed.
  */
-blk.sim.controllers.PlayerController.State = function(entity, opt_variableTable) {
+blk.sim.controllers.PlayerController.State = function(
+    entity, opt_variableTable) {
   var variableTable = opt_variableTable || gf.sim.EntityState.getVariableTable(
       blk.sim.controllers.PlayerController.State.declareVariables);
   goog.base(this, entity, variableTable);

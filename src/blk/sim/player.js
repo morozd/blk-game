@@ -103,8 +103,8 @@ blk.sim.Player.prototype.setup = gf.SERVER ? function(user) {
           gf.sim.EntityFlag.LATENCY_COMPENSATED));
 
   // Create player controller
-  this.playerController_ = /** @type {!blk.sim.controllers.PlayerController} */ (
-      simulator.createEntity(
+  this.playerController_ = /** @type {!blk.sim.controllers.PlayerController} */
+      (simulator.createEntity(
           blk.sim.controllers.PlayerController.ID,
           gf.sim.EntityFlag.UPDATED_FREQUENTLY));
   this.playerController_.setParent(this.actor_);
