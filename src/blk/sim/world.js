@@ -30,6 +30,7 @@ goog.require('gf.sim.SceneEntity');
 goog.require('gf.sim.SchedulingPriority');
 goog.require('gf.sim.Variable');
 goog.require('gf.sim.search.ListDatabase');
+goog.require('goog.asserts');
 
 
 

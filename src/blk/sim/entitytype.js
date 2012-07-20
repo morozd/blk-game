@@ -33,6 +33,8 @@ blk.sim.EntityType = {
   PLAYER: 1,
   /** {@see blk.sim.controllers.PlayerController} */
   PLAYER_CONTROLLER: 2,
+  /** {@see blk.sim.Actor} */
+  ACTOR: 3,
   /** {@see blk.sim.tools.PickaxeTool} */
-  PICKAXE_TOOL: 3
+  PICKAXE_TOOL: 4
 };

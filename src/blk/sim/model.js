@@ -149,7 +149,7 @@ goog.inherits(blk.sim.Model.State,
  * @private
  * @type {!Object.<number>}
  */
-blk.sim.Model.State.tag_ = {
+blk.sim.Model.State.tags_ = {
   modelName: gf.sim.Variable.getUniqueTag(),
   modelColor: gf.sim.Variable.getUniqueTag(),
   attachPoint: gf.sim.Variable.getUniqueTag()
@@ -225,17 +225,17 @@ blk.sim.Model.State.prototype.setAttachPoint = function(value) {
 blk.sim.Model.State.declareVariables = function(variableList) {
   gf.sim.SpatialEntity.State.declareVariables(variableList);
   variableList.push(new gf.sim.Variable.String(
-      blk.sim.Model.State.tag_.modelName,
+      blk.sim.Model.State.tags_.modelName,
       0,
       blk.sim.Model.State.prototype.getModelName,
       blk.sim.Model.State.prototype.setModelName));
   variableList.push(new gf.sim.Variable.Color(
-      blk.sim.Model.State.tag_.modelColor,
+      blk.sim.Model.State.tags_.modelColor,
       gf.sim.VariableFlag.UPDATED_FREQUENTLY | gf.sim.VariableFlag.INTERPOLATED,
       blk.sim.Model.State.prototype.getModelColor,
       blk.sim.Model.State.prototype.setModelColor));
   variableList.push(new gf.sim.Variable.Integer(
-      blk.sim.Model.State.tag_.attachPoint,
+      blk.sim.Model.State.tags_.attachPoint,
       0,
       blk.sim.Model.State.prototype.getAttachPoint,
       blk.sim.Model.State.prototype.setAttachPoint));

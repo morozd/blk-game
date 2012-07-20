@@ -50,6 +50,12 @@ blk.sim.entities.registerEntities = function(simulator) {
       blk.sim.controllers.PlayerController,
       blk.sim.controllers.PlayerController.State));
 
+  // ACTOR
+  simulator.registerEntityFactory(new gf.sim.EntityFactory(
+      blk.sim.Actor.ID,
+      blk.sim.Actor,
+      blk.sim.Actor.State));
+
   // PICKAXE_TOOL
   simulator.registerEntityFactory(new gf.sim.EntityFactory(
       blk.sim.tools.PickaxeTool.ID,

@@ -20,7 +20,10 @@
 
 goog.provide('blk.sim.controllers.PlayerController');
 
+goog.require('blk.sim');
 goog.require('blk.sim.Controller');
+goog.require('blk.sim.EntityType');
+goog.require('gf.sim');
 goog.require('gf.sim.EntityState');
 
 
@@ -42,6 +45,15 @@ blk.sim.controllers.PlayerController = function(
 };
 goog.inherits(blk.sim.controllers.PlayerController,
     blk.sim.Controller);
+
+
+/**
+ * Entity ID.
+ * @const
+ * @type {number}
+ */
+blk.sim.controllers.PlayerController.ID = gf.sim.createTypeId(
+    blk.sim.BLK_MODULE_ID, blk.sim.EntityType.PLAYER_CONTROLLER);
 
 
 

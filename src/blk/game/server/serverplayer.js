@@ -245,7 +245,7 @@ blk.game.server.ServerPlayer.prototype.processSendQueue_ = function(frame) {
     blk.env.Chunk.sortByDistanceFromPoint(this.sendQueue_, this.view.center);
   }
 
-  var writer = blk.game.server.ServerPlayer.packetWriter_;
+  var writer = gf.net.PacketWriter.getSharedWriter();
   var packet = blk.net.packets.ChunkData.writeInstance;
   var chunkSerializer = this.controller_.getChunkSerializer();
   for (var n = 0; n < sendCount; n++) {
@@ -268,19 +268,3 @@ blk.game.server.ServerPlayer.prototype.processSendQueue_ = function(frame) {
     writer.drop();
   }
 };
-
-
-/**
- * Shared vec3 for math.
- * @private
- * @type {!goog.vec.Vec3.Float32}
- */
-blk.game.server.ServerPlayer.tmpVec3_ = goog.vec.Vec3.createFloat32();
-
-
-/**
- * Shared packet writer.
- * @private
- * @type {!gf.net.PacketWriter}
- */
-blk.game.server.ServerPlayer.packetWriter_ = new gf.net.PacketWriter();
