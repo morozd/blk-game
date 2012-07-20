@@ -67,7 +67,7 @@ blk.sim.Player = function(
    * @private
    * @type {blk.sim.controllers.PlayerController}
    */
-  this.playerController_ = null;
+  this.controller_ = null;
 };
 goog.inherits(blk.sim.Player, gf.sim.Entity);
 
@@ -89,9 +89,11 @@ blk.sim.Player.ID = gf.sim.createTypeId(
  */
 blk.sim.Player.prototype.setup = gf.SERVER ? function(user) {
   var simulator = this.getSimulator();
+  var state = /** @type {!blk.sim.Player.State} */ (this.getState());
 
   goog.asserts.assert(!this.user_);
   this.user_ = user;
+  state.setUserId(user.sessionId);
 
   // Create actor
   this.actor_ = /** @type {!blk.sim.Actor} */ (
@@ -101,16 +103,38 @@ blk.sim.Player.prototype.setup = gf.SERVER ? function(user) {
           gf.sim.EntityFlag.PREDICTED |
           gf.sim.EntityFlag.INTERPOLATED |
           gf.sim.EntityFlag.LATENCY_COMPENSATED));
+  state.setActorId(this.actor_.getId());
 
   // Create player controller
-  this.playerController_ = /** @type {!blk.sim.controllers.PlayerController} */
-      (simulator.createEntity(
+  this.controller_ = /** @type {!blk.sim.controllers.PlayerController} */ (
+      simulator.createEntity(
           blk.sim.controllers.PlayerController.ID,
           gf.sim.EntityFlag.UPDATED_FREQUENTLY));
-  this.playerController_.setParent(this.actor_);
+  this.controller_.setParent(this.actor_);
+  state.setControllerId(this.controller_.getId());
 
   // TODO(benvanik): create inventory system
 } : goog.nullFunction;
+
+
+if (gf.CLIENT) {
+  /**
+   * @override
+   */
+  blk.sim.Player.prototype.postNetworkUpdate = function() {
+    var simulator = this.getSimulator();
+    var state = /** @type {!blk.sim.Player.State} */ (this.getState());
+
+    // Player was created - find entities
+    if (this.dirtyFlags & gf.sim.EntityDirtyFlag.CREATED) {
+      this.user_ = simulator.getUser(state.getUserId());
+      this.actor_ = /** @type {!blk.sim.Actor} */ (
+          simulator.getEntity(state.getActorId()));
+      this.controller_ = /** @type {!blk.sim.controllers.PlayerController} */ (
+          simulator.getEntity(state.getControllerId()));
+    }
+  };
+}
 
 
 
@@ -126,16 +150,143 @@ blk.sim.Player.State = function(entity, opt_variableTable) {
       blk.sim.Player.State.declareVariables);
   goog.base(this, entity, variableTable);
 
-  // TODO(benvanik): user session ID
+  /**
+   * User session ID.
+   * @private
+   * @type {string}
+   */
+  this.userId_ = '';
+
+  /**
+   * @private
+   * @type {number}
+   */
+  this.userIdOrdinal_ = variableTable.getOrdinal(
+      blk.sim.Player.State.tags_.userId);
+
+  /**
+   * Actor entity ID.
+   * @private
+   * @type {number}
+   */
+  this.actorId_ = 0;
+
+  /**
+   * @private
+   * @type {number}
+   */
+  this.actorIdOrdinal_ = variableTable.getOrdinal(
+      blk.sim.Player.State.tags_.actorId);
+
+  /**
+   * Controller entity ID.
+   * @private
+   * @type {number}
+   */
+  this.controllerId_ = 0;
+
+  /**
+   * @private
+   * @type {number}
+   */
+  this.controllerIdOrdinal_ = variableTable.getOrdinal(
+      blk.sim.Player.State.tags_.controllerId);
 };
-goog.inherits(blk.sim.Player.State,
-    gf.sim.EntityState);
+goog.inherits(blk.sim.Player.State, gf.sim.EntityState);
+
+
+/**
+ * @private
+ * @type {!Object.<number>}
+ */
+blk.sim.Player.State.tags_ = {
+  userId: gf.sim.Variable.getUniqueTag(),
+  actorId: gf.sim.Variable.getUniqueTag(),
+  controllerId: gf.sim.Variable.getUniqueTag()
+};
+
+
+/**
+ * Gets the user session ID.
+ * @return {string} Current value.
+ */
+blk.sim.Player.State.prototype.getUserId = function() {
+  return this.userId_;
+};
+
+
+/**
+ * Sets the user session ID.
+ * @param {string} value New value.
+ */
+blk.sim.Player.State.prototype.setUserId = function(value) {
+  if (!this.userId_ != value) {
+    this.userId_ = value;
+    this.setVariableDirty(this.userIdOrdinal_);
+  }
+};
+
+
+/**
+ * Gets the actor entity ID.
+ * @return {number} Current value.
+ */
+blk.sim.Player.State.prototype.getActorId = function() {
+  return this.actorId_;
+};
+
+
+/**
+ * Sets the actor entity ID.
+ * @param {number} value New value.
+ */
+blk.sim.Player.State.prototype.setActorId = function(value) {
+  if (!this.actorId_ != value) {
+    this.actorId_ = value;
+    this.setVariableDirty(this.actorIdOrdinal_);
+  }
+};
+
+
+/**
+ * Gets the controller entity ID.
+ * @return {number} Current value.
+ */
+blk.sim.Player.State.prototype.getControllerId = function() {
+  return this.controllerId_;
+};
+
+
+/**
+ * Sets the controller entity ID.
+ * @param {number} value New value.
+ */
+blk.sim.Player.State.prototype.setControllerId = function(value) {
+  if (!this.actorId_ != value) {
+    this.controllerId_ = value;
+    this.setVariableDirty(this.controllerIdOrdinal_);
+  }
+};
 
 
 /**
  * @override
  */
-blk.sim.Player.State.declareVariables = function(
-    variableList) {
+blk.sim.Player.State.declareVariables = function(variableList) {
   gf.sim.EntityState.declareVariables(variableList);
+  variableList.push(new gf.sim.Variable.String(
+      blk.sim.Player.State.tags_.userId,
+      0,
+      blk.sim.Player.State.prototype.getUserId,
+      blk.sim.Player.State.prototype.setUserId));
+  variableList.push(new gf.sim.Variable.EntityID(
+      blk.sim.Player.State.tags_.actorId,
+      0,
+      blk.sim.Player.State.prototype.getActorId,
+      blk.sim.Player.State.prototype.setActorId));
+  variableList.push(new gf.sim.Variable.EntityID(
+      blk.sim.Player.State.tags_.controllerId,
+      0,
+      blk.sim.Player.State.prototype.getControllerId,
+      blk.sim.Player.State.prototype.setControllerId));
 };
