@@ -20,6 +20,7 @@
 
 goog.provide('blk.sim.entities');
 
+goog.require('blk.sim.Actor');
 goog.require('blk.sim.Player');
 goog.require('blk.sim.World');
 goog.require('blk.sim.controllers.PlayerController');

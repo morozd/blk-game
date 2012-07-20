@@ -126,7 +126,7 @@ blk.sim.Player.State = function(entity, opt_variableTable) {
       blk.sim.Player.State.declareVariables);
   goog.base(this, entity, variableTable);
 
-  //
+  // TODO(benvanik): user session ID
 };
 goog.inherits(blk.sim.Player.State,
     gf.sim.EntityState);

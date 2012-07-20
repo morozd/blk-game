@@ -81,7 +81,7 @@ blk.modes.fps.server.FpsServerController.prototype.createPlayer =
           0));
 
   // Add to world
-  player.setup();
+  player.setup(user);
   player.setParent(this.world_);
 
   // Spawn the player

@@ -40,7 +40,7 @@ goog.require('blk.ui.screens.StatusScreen');
 goog.require('gf.input.Data');
 goog.require('gf.log');
 goog.require('gf.net.DisconnectReason');
-goog.require('gf.net.NetworkService');
+goog.require('gf.net.INetworkService');
 goog.require('gf.net.SessionState');
 goog.require('gf.net.chat.ClientChatService');
 goog.require('gf.sim.ClientSimulator');
@@ -57,6 +57,7 @@ goog.require('goog.vec.Vec4');
  * Abstract client game controller.
  * @constructor
  * @extends {goog.Disposable}
+ * @implements {gf.net.INetworkService}
  * @param {!blk.game.client.ClientGame} game Client game.
  * @param {!gf.net.ClientSession} session Network session.
  */
@@ -78,14 +79,15 @@ blk.game.client.ClientController = function(game, session) {
    * @type {!gf.net.ClientSession}
    */
   this.session = session;
+  this.session.registerService(this);
+  this.setupSwitch(session.packetSwitch);
 
   /**
-   * Client net service.
+   * Cached chunk serialization utility.
    * @private
-   * @type {!blk.game.client.ClientController.NetService_}
+   * @type {!blk.io.ChunkSerializer}
    */
-  this.netService_ = new blk.game.client.ClientController.NetService_(this);
-  this.session.registerService(this.netService_);
+  this.chunkSerializer_ = new blk.io.ChunkSerializer();
 
   /**
    * Chat client.
@@ -618,39 +620,12 @@ blk.game.client.ClientController.prototype.setBlock =
 };
 
 
-
 /**
- * Client network handling.
- *
- * @private
- * @constructor
- * @extends {gf.net.NetworkService}
- * @param {!blk.game.client.ClientController} controller Client controller.
+ * Sets up the packet switching handlers for the service.
+ * @protected
+ * @param {!gf.net.PacketSwitch} packetSwitch Packet switch.
  */
-blk.game.client.ClientController.NetService_ = function(controller) {
-  goog.base(this, controller.session);
-
-  /**
-   * @private
-   * @type {!blk.game.client.ClientController}
-   */
-  this.controller_ = controller;
-
-  /**
-   * Cached chunk serialization utility.
-   * @private
-   * @type {!blk.io.ChunkSerializer}
-   */
-  this.chunkSerializer_ = new blk.io.ChunkSerializer();
-};
-goog.inherits(blk.game.client.ClientController.NetService_,
-    gf.net.NetworkService);
-
-
-/**
- * @override
- */
-blk.game.client.ClientController.NetService_.prototype.setupSwitch =
+blk.game.client.ClientController.prototype.setupSwitch =
     function(packetSwitch) {
   packetSwitch.register(
       blk.net.packets.ChunkData.ID,
@@ -680,44 +655,28 @@ blk.game.client.ClientController.NetService_.prototype.setupSwitch =
 /**
  * @override
  */
-blk.game.client.ClientController.NetService_.prototype.connected =
-    function() {
-};
-
-
-/**
- * @override
- */
-blk.game.client.ClientController.NetService_.prototype.disconnected =
-    function() {
-};
-
-
-/**
- * @override
- */
-blk.game.client.ClientController.NetService_.prototype.userConnected =
+blk.game.client.ClientController.prototype.userConnected =
     function(user) {
   // Create player
   var player = new blk.game.client.ClientPlayer(user);
   user.data = player;
-  this.controller_.players_.push(player);
+  this.players_.push(player);
 
   // Play a sound
-  this.controller_.game.playPlayerJoin();
+  this.game.playPlayerJoin();
 
-  this.controller_.console_.log(
+  this.console_.log(
       user.info.displayName + ' (' + user.sessionId + ') connected on ' +
       user.agent.toString());
 
-  this.controller_.handlePlayersChanged();
+  this.handlePlayersChanged();
 };
 
 
 /**
  * @override
  */
-blk.game.client.ClientController.NetService_.prototype.userDisconnected =
+blk.game.client.ClientController.prototype.userDisconnected =
     function(user) {
   var player = /** @type {blk.game.client.ClientPlayer} */ (user.data);
   goog.asserts.assert(player);
@@ -726,32 +685,32 @@ blk.game.client.ClientController.NetService_.prototype.userDisconnected =
   }
 
   // Remove from roster
-  goog.array.remove(this.controller_.players_, player);
+  goog.array.remove(this.players_, player);
   goog.dispose(player);
 
   // Play a sound
-  this.controller_.game.playPlayerLeave();
+  this.game.playPlayerLeave();
 
-  this.controller_.console_.log(
+  this.console_.log(
       user.info.displayName + ' (' + user.sessionId + ') disconnected:',
       gf.net.DisconnectReason.toString(user.disconnectReason));
 
-  this.controller_.handlePlayersChanged();
+  this.handlePlayersChanged();
 };
 
 
 /**
  * @override
  */
-blk.game.client.ClientController.NetService_.prototype.userUpdated =
+blk.game.client.ClientController.prototype.userUpdated =
     function(user) {
   // SIMDEPRECATED
-  var player = this.controller_.getPlayerBySessionId(user.sessionId);
+  var player = this.getPlayerBySessionId(user.sessionId);
   if (player && player.entity) {
     player.entity.title = user.info.displayName;
   }
 
-  this.controller_.handlePlayersChanged();
+  this.handlePlayersChanged();
 };
 
 
@@ -763,14 +722,14 @@ blk.game.client.ClientController.NetService_.prototype.userUpdated =
  * @param {!gf.net.PacketReader} reader Packet reader.
  * @return {boolean} True if the packet was handled successfully.
  */
-blk.game.client.ClientController.NetService_.prototype.handleChunkData_ =
+blk.game.client.ClientController.prototype.handleChunkData_ =
     function(packet, packetType, reader) {
   var chunkData = blk.net.packets.ChunkData.read(reader);
   if (!chunkData) {
     return false;
   }
 
-  var map = this.controller_.getMap();
+  var map = this.getMap();
 
   // Grab chunk from the cache, load
   var chunk = map.getChunk(chunkData.x, chunkData.y, chunkData.z);
@@ -793,7 +752,7 @@ blk.game.client.ClientController.NetService_.prototype.handleChunkData_ =
  * @param {!gf.net.PacketReader} reader Packet reader.
  * @return {boolean} True if the packet was handled successfully.
  */
-blk.game.client.ClientController.NetService_.prototype.handleReadyPlayer_ =
+blk.game.client.ClientController.prototype.handleReadyPlayer_ =
     function(packet, packetType, reader) {
   var readyPlayer = blk.net.packets.ReadyPlayer.read(reader);
   if (!readyPlayer) {
@@ -816,7 +775,7 @@ blk.game.client.ClientController.NetService_.prototype.handleReadyPlayer_ =
  * @param {!gf.net.PacketReader} reader Packet reader.
  * @return {boolean} True if the packet was handled successfully.
  */
-blk.game.client.ClientController.NetService_.prototype.handleSetBlock_ =
+blk.game.client.ClientController.prototype.handleSetBlock_ =
     function(packet, packetType, reader) {
   var setBlock = blk.net.packets.SetBlock.read(reader);
   if (!setBlock) {
@@ -830,7 +789,7 @@ blk.game.client.ClientController.NetService_.prototype.handleSetBlock_ =
   var z = setBlock.z;
   var blockData = setBlock.blockData;
 
-  this.controller_.setBlock(x, y, z, blockData);
+  this.setBlock(x, y, z, blockData);
 
   return true;
 };
@@ -845,7 +804,7 @@ blk.game.client.ClientController.NetService_.prototype.handleSetBlock_ =
  * @param {!gf.net.PacketReader} reader Packet reader.
  * @return {boolean} True if the packet was handled successfully.
  */
-blk.game.client.ClientController.NetService_.prototype.handleEntityCreate_ =
+blk.game.client.ClientController.prototype.handleEntityCreate_ =
     function(packet, packetType, reader) {
   var entityCreate = blk.net.packets.EntityCreate.read(reader);
   if (!entityCreate) {
@@ -862,13 +821,13 @@ blk.game.client.ClientController.NetService_.prototype.handleEntityCreate_ =
   goog.vec.Vec3.setFromArray(entity.state.velocity, entityCreate.velocity);
 
   // Bind the entity and its player together
-  var player = this.controller_.getPlayerByWireId(userId);
+  var player = this.getPlayerByWireId(userId);
   if (player) {
     player.attachEntity(entity);
   }
 
   // Add the entity to the map
-  var map = this.controller_.getMap();
+  var map = this.getMap();
   map.addEntity(entity);
 
   return true;
@@ -884,7 +843,7 @@ blk.game.client.ClientController.NetService_.prototype.handleEntityCreate_ =
  * @param {!gf.net.PacketReader} reader Packet reader.
  * @return {boolean} True if the packet was handled successfully.
  */
-blk.game.client.ClientController.NetService_.prototype.handleEntityDelete_ =
+blk.game.client.ClientController.prototype.handleEntityDelete_ =
     function(packet, packetType, reader) {
   var entityDelete = blk.net.packets.EntityDelete.read(reader);
   if (!entityDelete) {
@@ -893,7 +852,7 @@ blk.game.client.ClientController.NetService_.prototype.handleEntityDelete_ =
 
   var entityId = entityDelete.id;
 
-  var map = this.controller_.getMap();
+  var map = this.getMap();
   var entity = map.getEntity(entityId);
   if (entity) {
     map.removeEntity(entity);
@@ -912,7 +871,7 @@ blk.game.client.ClientController.NetService_.prototype.handleEntityDelete_ =
  * @param {!gf.net.PacketReader} reader Packet reader.
  * @return {boolean} True if the packet was handled successfully.
  */
-blk.game.client.ClientController.NetService_.prototype.handleEntityPosition_ =
+blk.game.client.ClientController.prototype.handleEntityPosition_ =
     function(packet, packetType, reader) {
   var entityPosition = blk.net.packets.EntityPosition.read(reader);
   if (!entityPosition) {
@@ -920,11 +879,11 @@ blk.game.client.ClientController.NetService_.prototype.handleEntityPosition_ =
   }
 
   // Update local movement
-  var localPlayer = this.controller_.getLocalPlayer();
+  var localPlayer = this.getLocalPlayer();
   localPlayer.confirmMovementSequence(entityPosition.sequence);
 
   // Update entity positions
-  var map = this.controller_.getMap();
+  var map = this.getMap();
   for (var n = 0; n < entityPosition.states.length; n++) {
     var entityState = entityPosition.states[n];
     entityState.time /= 1000;
@@ -943,3 +902,15 @@ blk.game.client.ClientController.NetService_.prototype.handleEntityPosition_ =
 
   return true;
 };
+
+
+/**
+ * @override
+ */
+blk.game.client.ClientController.prototype.connected = goog.nullFunction;
+
+
+/**
+ * @override
+ */
+blk.game.client.ClientController.prototype.disconnected = goog.nullFunction;

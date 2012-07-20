@@ -25,7 +25,6 @@ goog.require('gf.net.PacketWriter');
 goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.asserts');
-goog.require('goog.vec.Vec3');
 
 
 

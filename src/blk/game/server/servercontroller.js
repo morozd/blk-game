@@ -38,7 +38,7 @@ goog.require('blk.sim.commands');
 goog.require('blk.sim.entities');
 goog.require('gf');
 goog.require('gf.log');
-goog.require('gf.net.NetworkService');
+goog.require('gf.net.INetworkService');
 goog.require('gf.net.SessionState');
 goog.require('gf.net.chat.ServerChatService');
 goog.require('gf.sim.ServerSimulator');
@@ -53,6 +53,7 @@ goog.require('goog.vec.Vec3');
  * Abstract server game controller.
  * @constructor
  * @extends {goog.Disposable}
+ * @implements {gf.net.INetworkService}
  * @param {!blk.game.server.ServerGame} game Server game.
  * @param {!gf.net.ServerSession} session Network session.
  * @param {!blk.io.MapStore} mapStore Map storage provider, ownership
@@ -76,14 +77,13 @@ blk.game.server.ServerController = function(game, session, mapStore) {
    * @type {!gf.net.ServerSession}
    */
   this.session = session;
-
-  /**
-   * Server net service.
-   * @private
-   * @type {!blk.game.server.ServerController.NetService_}
-   */
-  this.netService_ = new blk.game.server.ServerController.NetService_(this);
-  this.session.registerService(this.netService_);
+  this.session.registerService(this);
+  this.session.packetSwitch.register(
+      blk.net.packets.SetBlock.ID,
+      this.handleSetBlock_, this);
+  this.session.packetSwitch.register(
+      blk.net.packets.Move.ID,
+      this.handleMove_, this);
 
   /**
    * Chat server.
@@ -368,7 +368,9 @@ blk.game.server.ServerController.prototype.userDisconnected = function(user) {
   // SIMDEPRECATED -----
 
   // Delete player entity
-  this.deletePlayer(player.entity2);
+  if (player.entity2) {
+    this.deletePlayer(player.entity2);
+  }
 
   // Remove from roster
   goog.array.remove(this.players_, player);
@@ -382,6 +384,12 @@ blk.game.server.ServerController.prototype.userDisconnected = function(user) {
  * @param {!blk.sim.Player} player Player entity.
  */
 blk.game.server.ServerController.prototype.deletePlayer = goog.abstractMethod;
+
+
+/**
+ * @override
+ */
+blk.game.server.ServerController.prototype.userUpdated = goog.nullFunction;
 
 
 /**
@@ -514,69 +522,6 @@ blk.game.server.ServerController.prototype.setBlock =
 };
 
 
-
-/**
- * Server network handling.
- *
- * @private
- * @constructor
- * @extends {gf.net.NetworkService}
- * @param {!blk.game.server.ServerController} controller Server controller.
- */
-blk.game.server.ServerController.NetService_ = function(controller) {
-  goog.base(this, controller.session);
-
-  /**
-   * @private
-   * @type {!blk.game.server.ServerController}
-   */
-  this.controller_ = controller;
-};
-goog.inherits(blk.game.server.ServerController.NetService_,
-    gf.net.NetworkService);
-
-
-/**
- * @override
- */
-blk.game.server.ServerController.NetService_.prototype.setupSwitch =
-    function(packetSwitch) {
-  packetSwitch.register(
-      blk.net.packets.SetBlock.ID,
-      this.handleSetBlock_, this);
-  packetSwitch.register(
-      blk.net.packets.Move.ID,
-      this.handleMove_, this);
-};
-
-
-/**
- * @override
- */
-blk.game.server.ServerController.NetService_.prototype.userConnected =
-    function(user) {
-  this.controller_.userConnected(user);
-};
-
-
-/**
- * @override
- */
-blk.game.server.ServerController.NetService_.prototype.userDisconnected =
-    function(user) {
-  this.controller_.userDisconnected(user);
-};
-
-
-/**
- * @override
- */
-blk.game.server.ServerController.NetService_.prototype.userUpdated =
-    function(user) {
-  gf.log.write('user ' + user + ' changed name');
-};
-
-
 // SIMDEPRECATED
 /**
  * Handles set block packets.
@@ -586,7 +531,7 @@ blk.game.server.ServerController.NetService_.prototype.userUpdated =
  * @param {!gf.net.PacketReader} reader Packet reader.
  * @return {boolean} True if the packet was handled successfully.
  */
-blk.game.server.ServerController.NetService_.prototype.handleSetBlock_ =
+blk.game.server.ServerController.prototype.handleSetBlock_ =
     function(packet, packetType, reader) {
   var setBlock = blk.net.packets.SetBlock.read(reader);
   if (!setBlock) {
@@ -598,7 +543,7 @@ blk.game.server.ServerController.NetService_.prototype.handleSetBlock_ =
     return false;
   }
 
-  return this.controller_.setBlock(
+  return this.setBlock(
       user,
       setBlock.x, setBlock.y, setBlock.z, setBlock.blockData);
 };
@@ -613,7 +558,7 @@ blk.game.server.ServerController.NetService_.prototype.handleSetBlock_ =
  * @param {!gf.net.PacketReader} reader Packet reader.
  * @return {boolean} True if the packet was handled successfully.
  */
-blk.game.server.ServerController.NetService_.prototype.handleMove_ =
+blk.game.server.ServerController.prototype.handleMove_ =
     function(packet, packetType, reader) {
   var move = blk.net.packets.Move.read(reader);
   if (!move) {
@@ -633,3 +578,15 @@ blk.game.server.ServerController.NetService_.prototype.handleMove_ =
 
   return true;
 };
+
+
+/**
+ * @override
+ */
+blk.game.server.ServerController.prototype.connected = goog.nullFunction;
+
+
+/**
+ * @override
+ */
+blk.game.server.ServerController.prototype.disconnected = goog.nullFunction;
