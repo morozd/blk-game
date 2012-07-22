@@ -238,7 +238,7 @@ blk.game.client.ClientController.prototype.getPlayerByWireId =
 
 
 /**
- * @return {!blk.game.client.LocalPlayer} The local player.
+ * @return {blk.sim.Player} The local player.
  */
 blk.game.client.ClientController.prototype.getLocalPlayer = function() {
   return this.localPlayer_;
@@ -531,7 +531,7 @@ blk.game.client.ClientController.prototype.drawOverlays =
 /**
  * Gets additional debugging information that will be printed to the console.
  * @protected
- * @return {string} Extra debugging information for the console.
+ * @return {string?} Extra debugging information for the console.
  */
 blk.game.client.ClientController.prototype.getDebugInfo = goog.nullFunction;
 

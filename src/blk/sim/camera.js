@@ -58,6 +58,13 @@ blk.sim.Camera = function(
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 
   /**
+   * Map.
+   * @private
+   * @type {blk.env.Map}
+   */
+  this.map_ = null;
+
+  /**
    * Chunk view.
    * @private
    * @type {blk.env.ChunkView}
@@ -86,8 +93,10 @@ goog.inherits(blk.sim.Camera, gf.sim.SpatialEntity);
  */
 blk.sim.Camera.prototype.disposeInternal = function() {
   // Remove view from map and destroy
-  map.removeChunkView(this.view_);
-  goog.dispose(this.view_);
+  if (this.map_ && this.view_) {
+    this.map_.removeChunkView(this.view_);
+    goog.dispose(this.view_);
+  }
 
   goog.base(this, 'disposeInternal');
 };
@@ -107,6 +116,7 @@ blk.sim.Camera.ID = gf.sim.createTypeId(
  * @return {!blk.env.Map} The map.
  */
 blk.sim.Camera.prototype.getMap = function() {
+  goog.asserts.assert(this.map_);
   return this.map_;
 };
 

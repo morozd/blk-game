@@ -482,14 +482,6 @@ blk.env.client.ViewManager.prototype.render = function(frame, viewport) {
       var segment = this.visibleSegmentsPass1_[n];
       segment.renderDebug(frame, viewport);
     }
-
-    // Draw entity debug visuals
-    for (var n = 0; n < visibleEntities.length; n++) {
-      var entity = visibleEntities[n];
-      var entityRenderer = /** @type {blk.env.client.EntityRenderer} */ (
-          entity.renderData);
-      entityRenderer.renderDebug(frame, viewport);
-    }
   }
 
   // Draw map chunks (pass 1)

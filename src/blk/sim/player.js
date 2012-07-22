@@ -223,7 +223,8 @@ if (gf.CLIENT) {
 
       this.user_ = simulator.getUser(state.getUserId());
       this.actor_ = state.getActorIdEntity();
-      this.controller_ = state.getControllerIdEntity();
+      this.controller_ = /** @type {!blk.sim.controllers.PlayerController} */ (
+          state.getControllerIdEntity());
       this.camera_ = state.getCameraIdEntity();
     }
   };
