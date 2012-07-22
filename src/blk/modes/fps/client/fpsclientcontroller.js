@@ -21,6 +21,7 @@
 goog.provide('blk.modes.fps.client.FpsClientController');
 
 goog.require('blk.assets.audio.Music');
+goog.require('blk.env.client.ViewManager');
 goog.require('blk.game.client.ClientController');
 goog.require('blk.sim.Player');
 goog.require('blk.sim.World');
@@ -28,7 +29,6 @@ goog.require('blk.ui.Menubar');
 goog.require('blk.ui.PlayerListing');
 goog.require('gf.input.MouseButton');
 goog.require('gf.log');
-goog.require('gf.sim.IEntityWatcher');
 goog.require('gf.vec.Viewport');
 goog.require('goog.events.KeyCodes');
 goog.require('goog.vec.Mat4');
@@ -41,7 +41,6 @@ goog.require('goog.vec.Vec4');
  * Can be subclassed or used on its own.
  * @constructor
  * @extends {blk.game.client.ClientController}
- * @implements {gf.sim.IEntityWatcher}
  * @param {!blk.game.client.ClientGame} game Client game.
  * @param {!gf.net.ClientSession} session Network session.
  */
@@ -115,9 +114,13 @@ blk.modes.fps.client.FpsClientController = function(game, session) {
    */
   this.playerViewport_ = new gf.vec.Viewport();
 
-  // Register to be notified about entity events
-  var simulator = this.getSimulator();
-  simulator.addWatcher(this);
+  // TODO(benvanik): move to client camera?
+  /**
+   * Map view renderer.
+   * @private
+   * @type {blk.env.client.ViewManager}
+   */
+  this.viewManager_ = null;
 };
 goog.inherits(blk.modes.fps.client.FpsClientController,
     blk.game.client.ClientController);
@@ -128,17 +131,20 @@ goog.inherits(blk.modes.fps.client.FpsClientController,
  */
 blk.modes.fps.client.FpsClientController.prototype.entityAdded =
     function(entity) {
+  goog.base(this, 'entityAdded', entity);
+
   if (entity instanceof blk.sim.World) {
     // Setup world
     // This binds the map and the world together
     this.world_ = entity;
     this.world_.setMap(this.getMap());
-  } else if (entity instanceof blk.sim.Player) {
-    // Attach entity to the player container for tracking
-    var user = entity.getUser();
-    var player = this.getPlayerBySessionId(user.sessionId);
-    player.entity2 = entity;
-    gf.log.write('got player entity');
+  } else if (entity instanceof blk.sim.Camera) {
+    entity.setMap(this.getMap());
+
+    // Setup view manager
+    this.viewManager_ = new blk.env.client.ViewManager(
+        this.game.getRenderState(), this.getMap(), entity.getView());
+    this.registerDisposable(this.viewManager_);
   }
 };
 
@@ -147,7 +153,9 @@ blk.modes.fps.client.FpsClientController.prototype.entityAdded =
  * @override
  */
 blk.modes.fps.client.FpsClientController.prototype.entityRemoved =
-    goog.nullFunction;
+    function(entity) {
+  goog.base(this, 'entityRemoved', entity);
+};
 
 
 /**
@@ -179,17 +187,6 @@ blk.modes.fps.client.FpsClientController.prototype.processInput =
     return true;
   }
 
-  // TODO(benvanik): cleanup
-  var player = this.getLocalPlayer();
-  if (player && player.entity2) {
-    var controller = player.entity2.getController();
-    if (!controller.processInput(frame, inputData)) {
-      // Failed for some reason - likely prediction errors
-      this.handleError('Input backup');
-      return true;
-    }
-  }
-
   var keyboardData = inputData.keyboard;
   var mouseData = inputData.mouse;
 
@@ -219,47 +216,58 @@ blk.modes.fps.client.FpsClientController.prototype.processInput =
 
   // Block switching
   // TODO(benvanik): move to inventory system
+  // var localPlayer = this.getLocalPlayer();
+  // var didSwitchBlock = false;
+  // if (mouseData.dz) {
+  //   didSwitchBlock = true;
+  //   // TODO(benvanik): mac touchpad scroll
+  //   var dz = mouseData.dz > 0 ? 1 : -1;
+  //   var blockTypeCount = localPlayer.blockTypes.length;
+  //   localPlayer.blockIndex = (localPlayer.blockIndex + dz) % blockTypeCount;
+  //   if (localPlayer.blockIndex < 0) {
+  //     localPlayer.blockIndex = blockTypeCount - 1;
+  //   }
+  // }
+  // if (keyboardData.didKeyGoDown(goog.events.KeyCodes.ONE)) {
+  //   didSwitchBlock = true;
+  //   localPlayer.blockIndex = 0;
+  // } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.TWO)) {
+  //   didSwitchBlock = true;
+  //   localPlayer.blockIndex = 1;
+  // } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.THREE)) {
+  //   didSwitchBlock = true;
+  //   localPlayer.blockIndex = 2;
+  // } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.FOUR)) {
+  //   didSwitchBlock = true;
+  //   localPlayer.blockIndex = 3;
+  // } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.FIVE)) {
+  //   didSwitchBlock = true;
+  //   localPlayer.blockIndex = 4;
+  // }
+  // if (didSwitchBlock) {
+  //   this.game.playClick();
+  // }
+  // if (mouseData.buttonsUp & gf.input.MouseButton.LEFT) {
+  //   var clickedIndex = this.hitTestBlockTypes_(mouseData);
+  //   if (goog.isDef(clickedIndex)) {
+  //     localPlayer.blockIndex = clickedIndex;
+  //     this.game.playClick();
+  //     return true;
+  //   }
+  // }
+
+  // Process controller input
+  // TODO(benvanik): cleanup
   var localPlayer = this.getLocalPlayer();
-  var didSwitchBlock = false;
-  if (mouseData.dz) {
-    didSwitchBlock = true;
-    // TODO(benvanik): mac touchpad scroll
-    var dz = mouseData.dz > 0 ? 1 : -1;
-    var blockTypeCount = localPlayer.blockTypes.length;
-    localPlayer.blockIndex = (localPlayer.blockIndex + dz) % blockTypeCount;
-    if (localPlayer.blockIndex < 0) {
-      localPlayer.blockIndex = blockTypeCount - 1;
-    }
-  }
-  if (keyboardData.didKeyGoDown(goog.events.KeyCodes.ONE)) {
-    didSwitchBlock = true;
-    localPlayer.blockIndex = 0;
-  } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.TWO)) {
-    didSwitchBlock = true;
-    localPlayer.blockIndex = 1;
-  } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.THREE)) {
-    didSwitchBlock = true;
-    localPlayer.blockIndex = 2;
-  } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.FOUR)) {
-    didSwitchBlock = true;
-    localPlayer.blockIndex = 3;
-  } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.FIVE)) {
-    didSwitchBlock = true;
-    localPlayer.blockIndex = 4;
-  }
-  if (didSwitchBlock) {
-    this.game.playClick();
-  }
-  if (mouseData.buttonsUp & gf.input.MouseButton.LEFT) {
-    var clickedIndex = this.hitTestBlockTypes_(mouseData);
-    if (goog.isDef(clickedIndex)) {
-      localPlayer.blockIndex = clickedIndex;
-      this.game.playClick();
+  if (localPlayer) {
+    var controller = localPlayer.getController();
+    if (!controller.processInput(frame, inputData)) {
+      // Failed for some reason - likely prediction errors
+      this.handleError('Input backup');
       return true;
     }
   }
-
-  return localPlayer.processInput(frame, inputData);
+  return false;
 };
 
 
@@ -299,23 +307,27 @@ blk.modes.fps.client.FpsClientController.prototype.drawWorld =
   // Initialize viewport
   var viewport = this.playerViewport_;
   var display = this.game.getDisplay();
-  viewport.far = 100;//this.view.getDrawDistance();
-  viewport.reset(display.getSize());
-  var player = this.getLocalPlayer();
-  if (player && player.entity2) {
-    // TODO(benvanik): cleanup eww
-    player.entity2.getActor().calculateViewport(viewport);
+  var localPlayer = this.getLocalPlayer();
+  if (localPlayer) {
+    var camera = localPlayer.getCamera();
+    viewport.far = camera.getView().getDrawDistance();
+    viewport.reset(display.getSize());
+    camera.calculateViewport(viewport);
+  } else {
+    viewport.far = 100;
+    viewport.reset(display.getSize());
+    // ?
+  }
+
+  // Render map
+  if (this.viewManager_) {
+    this.viewManager_.render(frame, viewport);
   }
 
   // Render the simulation
   if (this.world_) {
     this.world_.render(frame, viewport, renderList);
   }
-
-  // SIMDEPRECATED
-  // Render the map and entities
-  var localPlayer = this.getLocalPlayer();
-  localPlayer.renderViewport(frame);
 };
 
 
@@ -336,8 +348,7 @@ blk.modes.fps.client.FpsClientController.prototype.drawOverlays =
  * @override
  */
 blk.modes.fps.client.FpsClientController.prototype.getDebugInfo = function() {
-  var localPlayer = this.getLocalPlayer();
-  return localPlayer.getDebugInfo();
+  return this.viewManager_ ? this.viewManager_.getStatisticsString() : null;
 };
 
 
@@ -350,8 +361,7 @@ blk.modes.fps.client.FpsClientController.prototype.getDebugInfo = function() {
 blk.modes.fps.client.FpsClientController.prototype.drawInputUI_ =
     function(frame, inputData) {
   var renderState = this.game.getRenderState();
-  var localPlayer = this.getLocalPlayer();
-  var viewport = localPlayer.getViewport();
+  var viewport = this.getScreenViewport();
 
   var uiAtlas = renderState.uiAtlas;
 
@@ -394,15 +404,15 @@ blk.modes.fps.client.FpsClientController.prototype.drawInputUI_ =
 blk.modes.fps.client.FpsClientController.prototype.drawBlockTypes_ =
     function(frame) {
   var renderState = this.game.getRenderState();
-  var localPlayer = this.getLocalPlayer();
-  var viewport = localPlayer.getViewport();
+  var viewport = this.getScreenViewport();
   var blockAtlas = renderState.blockAtlas;
+
+  var selectedIndex = 0;//localPlayer.blockIndex;
+  var blockTypes = [];//localPlayer.blockTypes;
 
   var spriteBuffer = this.spriteBuffer_;
   spriteBuffer.clear();
 
-  // TODO(benvanik): add block types
-  var blockTypes = localPlayer.blockTypes;
   var x = 0;
   var width = blockTypes.length * (16 + 1);
   var height = 16;
@@ -413,7 +423,7 @@ blk.modes.fps.client.FpsClientController.prototype.drawBlockTypes_ =
     spriteBuffer.add(
         texCoords[0], texCoords[1],
         texCoords[2] - texCoords[0], texCoords[3] - texCoords[1],
-        localPlayer.blockIndex == n ? 0xFFFFFFFF : 0xFF777777,
+        selectedIndex == n ? 0xFFFFFFFF : 0xFF777777,
         x, 0, 16, 16);
     x += 16 + 1;
   }
@@ -438,9 +448,9 @@ blk.modes.fps.client.FpsClientController.prototype.drawBlockTypes_ =
  */
 blk.modes.fps.client.FpsClientController.prototype.hitTestBlockTypes_ =
     function(mouseData) {
-  var localPlayer = this.getLocalPlayer();
-  var viewport = localPlayer.getViewport();
-  var blockTypes = localPlayer.blockTypes;
+  var viewport = this.getScreenViewport();
+
+  var blockTypes = [];//localPlayer.blockTypes;
 
   var scale = 2;
   var itemSize = (16 + 1) * scale;

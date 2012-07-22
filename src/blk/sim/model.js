@@ -84,11 +84,11 @@ if (gf.CLIENT) {
 /**
  * Model entity state.
  * @constructor
- * @extends {gf.sim.SpatialEntity.State}
+ * @extends {gf.sim.SpatialEntityState}
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
  * @param {!gf.sim.VariableTable} variableTable A subclass's variable table.
  */
-blk.sim.Model.State = function(entity, variableTable) {
+blk.sim.ModelState = function(entity, variableTable) {
   goog.base(this, entity, variableTable);
 
   // TODO(benvanik): add vars:
@@ -109,7 +109,7 @@ blk.sim.Model.State = function(entity, variableTable) {
    * @type {number}
    */
   this.modelNameOrdinal_ = variableTable.getOrdinal(
-      blk.sim.Model.State.tags_.modelName);
+      blk.sim.ModelState.tags_.modelName);
 
   /**
    * Model color modulation as 0xAABBGGRR.
@@ -123,7 +123,7 @@ blk.sim.Model.State = function(entity, variableTable) {
    * @type {number}
    */
   this.modelColorOrdinal_ = variableTable.getOrdinal(
-      blk.sim.Model.State.tags_.modelColor);
+      blk.sim.ModelState.tags_.modelColor);
 
   /**
    * Attachment point.
@@ -137,17 +137,17 @@ blk.sim.Model.State = function(entity, variableTable) {
    * @type {number}
    */
   this.attachPointOrdinal_ = variableTable.getOrdinal(
-      blk.sim.Model.State.tags_.attachPoint);
+      blk.sim.ModelState.tags_.attachPoint);
 };
-goog.inherits(blk.sim.Model.State,
-    gf.sim.SpatialEntity.State);
+goog.inherits(blk.sim.ModelState,
+    gf.sim.SpatialEntityState);
 
 
 /**
  * @private
  * @type {!Object.<number>}
  */
-blk.sim.Model.State.tags_ = {
+blk.sim.ModelState.tags_ = {
   modelName: gf.sim.Variable.getUniqueTag(),
   modelColor: gf.sim.Variable.getUniqueTag(),
   attachPoint: gf.sim.Variable.getUniqueTag()
@@ -158,7 +158,7 @@ blk.sim.Model.State.tags_ = {
  * Gets the model name.
  * @return {string} Current value.
  */
-blk.sim.Model.State.prototype.getModelName = function() {
+blk.sim.ModelState.prototype.getModelName = function() {
   return this.modelName_;
 };
 
@@ -167,7 +167,7 @@ blk.sim.Model.State.prototype.getModelName = function() {
  * Sets the model name.
  * @param {string} value New value.
  */
-blk.sim.Model.State.prototype.setModelName = function(value) {
+blk.sim.ModelState.prototype.setModelName = function(value) {
   if (this.modelName_ != value) {
     this.modelName_ = value;
     this.setVariableDirty(this.modelNameOrdinal_);
@@ -179,7 +179,7 @@ blk.sim.Model.State.prototype.setModelName = function(value) {
  * Gets the model color as 0xAABBGGRR.
  * @return {number} Current value.
  */
-blk.sim.Model.State.prototype.getModelColor = function() {
+blk.sim.ModelState.prototype.getModelColor = function() {
   return this.modelColor_;
 };
 
@@ -188,7 +188,7 @@ blk.sim.Model.State.prototype.getModelColor = function() {
  * Sets the model color as 0xAABBGGRR.
  * @param {number} value New value.
  */
-blk.sim.Model.State.prototype.setModelColor = function(value) {
+blk.sim.ModelState.prototype.setModelColor = function(value) {
   if (this.modelColor_ != value) {
     this.modelColor_ = value;
     this.setVariableDirty(this.modelColorOrdinal_);
@@ -200,7 +200,7 @@ blk.sim.Model.State.prototype.setModelColor = function(value) {
  * Gets the attachment point.
  * @return {number} Current value.
  */
-blk.sim.Model.State.prototype.getAttachPoint = function() {
+blk.sim.ModelState.prototype.getAttachPoint = function() {
   return this.attachPoint_;
 };
 
@@ -209,7 +209,7 @@ blk.sim.Model.State.prototype.getAttachPoint = function() {
  * Sets the attachment point.
  * @param {number} value New value.
  */
-blk.sim.Model.State.prototype.setAttachPoint = function(value) {
+blk.sim.ModelState.prototype.setAttachPoint = function(value) {
   if (this.attachPoint_ != value) {
     this.attachPoint_ = value;
     this.setVariableDirty(this.attachPointOrdinal_);
@@ -220,21 +220,21 @@ blk.sim.Model.State.prototype.setAttachPoint = function(value) {
 /**
  * @override
  */
-blk.sim.Model.State.declareVariables = function(variableList) {
-  gf.sim.SpatialEntity.State.declareVariables(variableList);
+blk.sim.ModelState.declareVariables = function(variableList) {
+  gf.sim.SpatialEntityState.declareVariables(variableList);
   variableList.push(new gf.sim.Variable.String(
-      blk.sim.Model.State.tags_.modelName,
+      blk.sim.ModelState.tags_.modelName,
       0,
-      blk.sim.Model.State.prototype.getModelName,
-      blk.sim.Model.State.prototype.setModelName));
+      blk.sim.ModelState.prototype.getModelName,
+      blk.sim.ModelState.prototype.setModelName));
   variableList.push(new gf.sim.Variable.Color(
-      blk.sim.Model.State.tags_.modelColor,
+      blk.sim.ModelState.tags_.modelColor,
       gf.sim.VariableFlag.UPDATED_FREQUENTLY | gf.sim.VariableFlag.INTERPOLATED,
-      blk.sim.Model.State.prototype.getModelColor,
-      blk.sim.Model.State.prototype.setModelColor));
+      blk.sim.ModelState.prototype.getModelColor,
+      blk.sim.ModelState.prototype.setModelColor));
   variableList.push(new gf.sim.Variable.Integer(
-      blk.sim.Model.State.tags_.attachPoint,
+      blk.sim.ModelState.tags_.attachPoint,
       0,
-      blk.sim.Model.State.prototype.getAttachPoint,
-      blk.sim.Model.State.prototype.setAttachPoint));
+      blk.sim.ModelState.prototype.getAttachPoint,
+      blk.sim.ModelState.prototype.setAttachPoint));
 };

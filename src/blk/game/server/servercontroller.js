@@ -20,23 +20,12 @@
 
 goog.provide('blk.game.server.ServerController');
 
-goog.require('blk.env.ChunkView');
-goog.require('blk.env.Entity');
 goog.require('blk.env.MapParameters');
 goog.require('blk.env.server.ServerMap');
-goog.require('blk.game.server.ServerMapObserver');
-goog.require('blk.game.server.ServerPlayer');
 goog.require('blk.game.server.SimulationObserver');
-goog.require('blk.io.ChunkSerializer');
-goog.require('blk.io.CompressionFormat');
-goog.require('blk.net.packets.EntityCreate');
-goog.require('blk.net.packets.EntityDelete');
-goog.require('blk.net.packets.Move');
 goog.require('blk.net.packets.ReadyPlayer');
-goog.require('blk.net.packets.SetBlock');
 goog.require('blk.sim.commands');
 goog.require('blk.sim.entities');
-goog.require('gf');
 goog.require('gf.log');
 goog.require('gf.net.INetworkService');
 goog.require('gf.net.SessionState');
@@ -45,7 +34,6 @@ goog.require('gf.sim.ServerSimulator');
 goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.async.Deferred');
-goog.require('goog.vec.Vec3');
 
 
 
@@ -78,12 +66,6 @@ blk.game.server.ServerController = function(game, session, mapStore) {
    */
   this.session = session;
   this.session.registerService(this);
-  this.session.packetSwitch.register(
-      blk.net.packets.SetBlock.ID,
-      this.handleSetBlock_, this);
-  this.session.packetSwitch.register(
-      blk.net.packets.Move.ID,
-      this.handleMove_, this);
 
   /**
    * Chat server.
@@ -118,29 +100,9 @@ blk.game.server.ServerController = function(game, session, mapStore) {
   /**
    * Player listing.
    * @private
-   * @type {!Array.<!blk.game.server.ServerPlayer>}
+   * @type {!Array.<!blk.sim.Player>}
    */
   this.players_ = [];
-
-  // If running in a web worker, don't use compression (it's a waste)
-  var compressionFormat;
-  if (gf.SERVER && !gf.NODE) {
-    compressionFormat = blk.io.CompressionFormat.UNCOMPRESSED;
-  }
-
-  /**
-   * Cached chunk serialization utility used when sending chunks to clients.
-   * @private
-   * @type {!blk.io.ChunkSerializer}
-   */
-  this.chunkSerializer_ = new blk.io.ChunkSerializer(compressionFormat);
-
-  // SIMDEPRECATED
-  /**
-   * @private
-   * @type {number}
-   */
-  this.nextEntityId_ = 0;
 };
 goog.inherits(blk.game.server.ServerController, goog.Disposable);
 
@@ -163,17 +125,9 @@ blk.game.server.ServerController.prototype.getMap = function() {
 
 
 /**
- * @return {!blk.io.ChunkSerializer} Chunk serialization utility.
- */
-blk.game.server.ServerController.prototype.getChunkSerializer = function() {
-  return this.chunkSerializer_;
-};
-
-
-/**
  * Gets a list of all currently connected players.
  * Do not modify the results. The results may change at any time.
- * @return {!Array.<!blk.game.server.ServerPlayer>} A list of players.
+ * @return {!Array.<!blk.sim.Player>} A list of players.
  */
 blk.game.server.ServerController.prototype.getPlayerList = function() {
   return this.players_;
@@ -183,13 +137,13 @@ blk.game.server.ServerController.prototype.getPlayerList = function() {
 /**
  * Gets a player by session ID.
  * @param {string} sessionId User session ID.
- * @return {blk.game.server.ServerPlayer} Player, if found.
+ * @return {blk.sim.Player} Player, if found.
  */
 blk.game.server.ServerController.prototype.getPlayerBySessionId =
     function(sessionId) {
   var user = this.session.getUserBySessionId(sessionId);
   if (user) {
-    return /** @type {blk.game.server.ServerPlayer} */ (user.data);
+    return /** @type {blk.sim.Player} */ (user.data);
   }
   return null;
 };
@@ -198,13 +152,13 @@ blk.game.server.ServerController.prototype.getPlayerBySessionId =
 /**
  * Gets a player by wire ID.
  * @param {number} wireId User wire ID.
- * @return {blk.game.server.ServerPlayer} Player, if found.
+ * @return {blk.sim.Player} Player, if found.
  */
 blk.game.server.ServerController.prototype.getPlayerByWireId =
     function(wireId) {
   var user = this.session.getUserByWireId(wireId);
   if (user) {
-    return /** @type {blk.game.server.ServerPlayer} */ (user.data);
+    return /** @type {blk.sim.Player} */ (user.data);
   }
   return null;
 };
@@ -256,67 +210,13 @@ blk.game.server.ServerController.prototype.userConnected = function(user) {
 
   gf.log.write('client connected', user.sessionId, user.info, user.agent);
 
-  // Create player object to track entities/etc
-  var player = new blk.game.server.ServerPlayer(this, user);
-  user.data = player;
-  this.players_.push(player);
-
   // Add to chat channels
   this.chatService_.join(user, 'main');
 
   // Create player entity
-  player.entity2 = this.createPlayer(user);
-
-  // SIMDEPRECATED -----
-  // Pick a spawn position
-  var spawnPosition = goog.vec.Vec3.createFloat32FromValues(0, 80, 0);
-
-  // Create view - must be cleaned up on player disconnect
-  var view = new blk.env.ChunkView(map,
-      blk.env.ChunkView.HIGH_CHUNK_RADIUS_XZ);
-  //blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ);
-  map.addChunkView(view);
-  player.view = view;
-
-  // Setup observer
-  var observer = new blk.game.server.ServerMapObserver(player, view);
-  view.addObserver(observer);
-
-  // Initialize view - must be done after observers are added
-  view.initialize(spawnPosition);
-
-  // Send all existing entities
-  for (var n = 0; n < map.entities.length; n++) {
-    var entity = map.entities[n];
-    this.session.send(blk.net.packets.EntityCreate.createData(
-        entity.id,
-        entity.flags,
-        entity.player ? entity.player.getUser().wireId : 0xFF,
-        entity.state.position,
-        entity.state.rotation,
-        entity.state.velocity), user);
-  }
-
-  // Create entity
-  var entity = new blk.env.Entity(this.nextEntityId_++);
-  map.addEntity(entity);
-  goog.vec.Vec3.setFromArray(entity.state.position, spawnPosition);
-
-  // Setup movement controller
-  player.attachEntity(entity);
-
-  // Broadcast new entity
-  this.session.send(blk.net.packets.EntityCreate.createData(
-      entity.id,
-      entity.flags,
-      entity.player ? entity.player.getUser().wireId : 0xFF,
-      entity.state.position,
-      entity.state.rotation,
-      entity.state.velocity));
-
-  // TODO(benvanik): send all map chunks
-
-  // SIMDEPRECATED -----
+  var player = this.createPlayer(user);
+  user.data = player;
+  this.players_.push(player);
 
   // Signal player ready
   this.session.send(blk.net.packets.ReadyPlayer.createData(), user);
@@ -344,33 +244,13 @@ blk.game.server.ServerController.prototype.userDisconnected = function(user) {
 
   gf.log.write('client disconnected', user.sessionId);
 
-  var player = /** @type {blk.game.server.ServerPlayer} */ (user.data);
+  var player = /** @type {blk.sim.Player} */ (user.data);
   if (!player) {
     return;
   }
 
-  // SIMDEPRECATED -----
-
-  // Delete entity
-  var entity = player.entity;
-  if (entity) {
-    map.removeEntity(entity);
-    this.session.send(blk.net.packets.EntityDelete.createData(entity.id));
-  }
-
-  // Remove view
-  if (player.view) {
-    map.removeChunkView(player.view);
-    goog.dispose(player.view);
-    player.view = null;
-  }
-
-  // SIMDEPRECATED -----
-
   // Delete player entity
-  if (player.entity2) {
-    this.deletePlayer(player.entity2);
-  }
+  this.deletePlayer(player);
 
   // Remove from roster
   goog.array.remove(this.players_, player);
@@ -445,31 +325,6 @@ blk.game.server.ServerController.prototype.update = function(frame) {
 
   // Update simulation
   this.simulator_.update(frame);
-
-  // SIMDEPRECATED
-  // Update each player, sending any additional data (map pieces/etc)
-  for (var n = 0; n < this.players_.length; n++) {
-    var player = this.players_[n];
-    player.update(frame);
-  }
-
-  // SIMDEPRECATED
-  // Broadcast any pending updates to users
-  // TODO(benvanik): only send updates relevant to each user vs. broadcast all
-  // NOTE: always sending, even if not updates, so sequence numbers get ACKed
-  var entityStates = [];
-  for (var n = 0; n < this.map_.entities.length; n++) {
-    var entity = this.map_.entities[n];
-    if (!entity.hasSentLatestState) {
-      entity.state.time = (frame.time * 1000) | 0;
-      entityStates.push(entity.state);
-      entity.hasSentLatestState = true;
-    }
-  }
-  for (var n = 0; n < this.players_.length; n++) {
-    var player = this.players_[n];
-    player.sendUpdate(frame, entityStates);
-  }
 };
 
 
@@ -481,102 +336,44 @@ blk.game.server.ServerController.prototype.render = function(frame) {
 };
 
 
-// SIMDEPRECATED
-/**
- * Sets a block and broadcasts the update.
- * @param {!gf.net.User} user User who performed the change.
- * @param {number} x Block X.
- * @param {number} y Block Y.
- * @param {number} z Block Z.
- * @param {number} blockData Block data.
- * @return {boolean} False if an error occurred setting the block.
- */
-blk.game.server.ServerController.prototype.setBlock =
-    function(user, x, y, z, blockData) {
-  var player = /** @type {blk.game.server.ServerPlayer} */ (user.data);
-  if (!player || !player.view) {
-    return false;
-  }
+// // SIMDEPRECATED
+// /**
+//  * Sets a block and broadcasts the update.
+//  * @param {!gf.net.User} user User who performed the change.
+//  * @param {number} x Block X.
+//  * @param {number} y Block Y.
+//  * @param {number} z Block Z.
+//  * @param {number} blockData Block data.
+//  * @return {boolean} False if an error occurred setting the block.
+//  */
+// blk.game.server.ServerController.prototype.setBlock =
+//     function(user, x, y, z, blockData) {
+//   var player = /** @type {blk.sim.Player} */ (user.data);
+//   if (!player || !player.view) {
+//     return false;
+//   }
 
-  var view = player.view;
+//   var view = player.view;
 
-  // TODO(benvanik): verify user can act on the block (distance check/etc)
+//   // TODO(benvanik): verify user can act on the block (distance check/etc)
 
-  // Validate block type
-  if (blockData && !this.map_.blockSet.hasBlockWithId(blockData >> 8)) {
-    gf.log.write('unknown block type');
-    return false;
-  }
+//   // Validate block type
+//   if (blockData && !this.map_.blockSet.hasBlockWithId(blockData >> 8)) {
+//     gf.log.write('unknown block type');
+//     return false;
+//   }
 
-  // Set
-  var changed = view.setBlock(x, y, z, blockData);
+//   // Set
+//   var changed = view.setBlock(x, y, z, blockData);
 
-  // Broadcast update, if it changed
-  if (changed) {
-    this.session.send(blk.net.packets.SetBlock.createData(
-        x, y, z, blockData));
-  }
+//   // Broadcast update, if it changed
+//   if (changed) {
+//     this.session.send(blk.net.packets.SetBlock.createData(
+//         x, y, z, blockData));
+//   }
 
-  return true;
-};
-
-
-// SIMDEPRECATED
-/**
- * Handles set block packets.
- * @private
- * @param {!gf.net.Packet} packet Packet.
- * @param {number} packetType Packet type ID.
- * @param {!gf.net.PacketReader} reader Packet reader.
- * @return {boolean} True if the packet was handled successfully.
- */
-blk.game.server.ServerController.prototype.handleSetBlock_ =
-    function(packet, packetType, reader) {
-  var setBlock = blk.net.packets.SetBlock.read(reader);
-  if (!setBlock) {
-    return false;
-  }
-
-  var user = packet.user;
-  if (!user) {
-    return false;
-  }
-
-  return this.setBlock(
-      user,
-      setBlock.x, setBlock.y, setBlock.z, setBlock.blockData);
-};
-
-
-// SIMDEPRECATED
-/**
- * Handles move packets.
- * @private
- * @param {!gf.net.Packet} packet Packet.
- * @param {number} packetType Packet type ID.
- * @param {!gf.net.PacketReader} reader Packet reader.
- * @return {boolean} True if the packet was handled successfully.
- */
-blk.game.server.ServerController.prototype.handleMove_ =
-    function(packet, packetType, reader) {
-  var move = blk.net.packets.Move.read(reader);
-  if (!move) {
-    return false;
-  }
-
-  var user = packet.user;
-  if (!user) {
-    return false;
-  }
-  var player = /** @type {blk.game.server.ServerPlayer} */ (user.data);
-  if (!player) {
-    return false;
-  }
-
-  player.queueMovementCommands(move.commands);
-
-  return true;
-};
+//   return true;
+// };
 
 
 /**

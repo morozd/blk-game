@@ -100,7 +100,7 @@ blk.sim.World.prototype.setMap = function(map) {
  * @override
  */
 blk.sim.World.prototype.update = function(time, timeDelta) {
-  var state = /** @type {!blk.sim.World.State} */ (
+  var state = /** @type {!blk.sim.WorldState} */ (
       this.getState());
 
   if (gf.CLIENT) {
@@ -144,14 +144,14 @@ if (gf.CLIENT) {
 /**
  * Map entity state.
  * @constructor
- * @extends {gf.sim.SceneEntity.State}
+ * @extends {gf.sim.SceneEntityState}
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
  * @param {!gf.sim.VariableTable=} opt_variableTable A subclass's variable
  *     table, if subclassed.
  */
-blk.sim.World.State = function(entity, opt_variableTable) {
+blk.sim.WorldState = function(entity, opt_variableTable) {
   var variableTable = opt_variableTable || gf.sim.EntityState.getVariableTable(
-      blk.sim.World.State.declareVariables);
+      blk.sim.WorldState.declareVariables);
   goog.base(this, entity, variableTable);
 
   // TODO(benvanik): add vars:
@@ -173,17 +173,17 @@ blk.sim.World.State = function(entity, opt_variableTable) {
    * @type {number}
    */
   this.testVarOrdinal_ = variableTable.getOrdinal(
-      blk.sim.World.State.tags_.testVar);
+      blk.sim.WorldState.tags_.testVar);
 };
-goog.inherits(blk.sim.World.State,
-    gf.sim.SceneEntity.State);
+goog.inherits(blk.sim.WorldState,
+    gf.sim.SceneEntityState);
 
 
 /**
  * @private
  * @type {!Object.<number>}
  */
-blk.sim.World.State.tags_ = {
+blk.sim.WorldState.tags_ = {
   testVar: gf.sim.Variable.getUniqueTag()
 };
 
@@ -192,7 +192,7 @@ blk.sim.World.State.tags_ = {
  * Gets test var.
  * @return {number} Current value.
  */
-blk.sim.World.State.prototype.getTestVar = function() {
+blk.sim.WorldState.prototype.getTestVar = function() {
   return this.testVar_;
 };
 
@@ -201,7 +201,7 @@ blk.sim.World.State.prototype.getTestVar = function() {
  * Sets test var.
  * @param {number} value New value.
  */
-blk.sim.World.State.prototype.setTestVar = function(value) {
+blk.sim.WorldState.prototype.setTestVar = function(value) {
   gf.log.write('setTestVar(' + value + ')');
   if (this.testVar_ != value) {
     this.testVar_ = value;
@@ -213,11 +213,11 @@ blk.sim.World.State.prototype.setTestVar = function(value) {
 /**
  * @override
  */
-blk.sim.World.State.declareVariables = function(variableList) {
-  gf.sim.SceneEntity.State.declareVariables(variableList);
+blk.sim.WorldState.declareVariables = function(variableList) {
+  gf.sim.SceneEntityState.declareVariables(variableList);
   variableList.push(new gf.sim.Variable.Float(
-      blk.sim.World.State.tags_.testVar,
+      blk.sim.WorldState.tags_.testVar,
       0,
-      blk.sim.World.State.prototype.getTestVar,
-      blk.sim.World.State.prototype.setTestVar));
+      blk.sim.WorldState.prototype.getTestVar,
+      blk.sim.WorldState.prototype.setTestVar));
 };

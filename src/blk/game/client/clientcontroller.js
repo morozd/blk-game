@@ -22,17 +22,11 @@ goog.provide('blk.game.client.ClientController');
 
 goog.require('blk.assets.audio.BlockSounds');
 goog.require('blk.env');
-goog.require('blk.env.Entity');
 goog.require('blk.env.client.ClientMap');
-goog.require('blk.game.client.ClientPlayer');
-goog.require('blk.game.client.LocalPlayer');
 goog.require('blk.io.ChunkSerializer');
 goog.require('blk.net.packets.ChunkData');
-goog.require('blk.net.packets.EntityCreate');
-goog.require('blk.net.packets.EntityDelete');
-goog.require('blk.net.packets.EntityPosition');
 goog.require('blk.net.packets.ReadyPlayer');
-goog.require('blk.net.packets.SetBlock');
+goog.require('blk.sim.Player');
 goog.require('blk.sim.commands');
 goog.require('blk.sim.entities');
 goog.require('blk.ui.Console');
@@ -44,13 +38,12 @@ goog.require('gf.net.INetworkService');
 goog.require('gf.net.SessionState');
 goog.require('gf.net.chat.ClientChatService');
 goog.require('gf.sim.ClientSimulator');
+goog.require('gf.sim.IEntityWatcher');
 goog.require('gf.vec.Viewport');
 goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.asserts');
 goog.require('goog.async.Deferred');
-goog.require('goog.vec.Vec3');
-goog.require('goog.vec.Vec4');
 
 
 
@@ -59,6 +52,7 @@ goog.require('goog.vec.Vec4');
  * @constructor
  * @extends {goog.Disposable}
  * @implements {gf.net.INetworkService}
+ * @implements {gf.sim.IEntityWatcher}
  * @param {!blk.game.client.ClientGame} game Client game.
  * @param {!gf.net.ClientSession} session Network session.
  */
@@ -82,13 +76,6 @@ blk.game.client.ClientController = function(game, session) {
   this.session = session;
   this.session.registerService(this);
   this.setupSwitch(session.packetSwitch);
-
-  /**
-   * Cached chunk serialization utility.
-   * @private
-   * @type {!blk.io.ChunkSerializer}
-   */
-  this.chunkSerializer_ = new blk.io.ChunkSerializer();
 
   /**
    * Chat client.
@@ -115,6 +102,7 @@ blk.game.client.ClientController = function(game, session) {
   this.registerDisposable(this.simulator_);
   blk.sim.commands.registerCommands(this.simulator_);
   blk.sim.entities.registerEntities(this.simulator_);
+  this.simulator_.addWatcher(this);
 
   /**
    * Input data storage.
@@ -159,22 +147,16 @@ blk.game.client.ClientController = function(game, session) {
   /**
    * Player listing.
    * @private
-   * @type {!Array.<!blk.game.client.ClientPlayer>}
+   * @type {!Array.<!blk.sim.Player>}
    */
   this.players_ = [];
 
-  // Add all players currently in the session
-  this.addInitialPlayers_();
-  var localPlayer = /** @type {blk.game.client.LocalPlayer} */ (
-      this.getPlayerBySessionId(this.session.id));
-  goog.asserts.assert(localPlayer);
-
   /**
-   * The local player.
+   * The local player, if it has been received yet.
    * @private
-   * @type {!blk.game.client.LocalPlayer}
+   * @type {blk.sim.Player}
    */
-  this.localPlayer_ = localPlayer;
+  this.localPlayer_ = null;
 
   // Simulated latency
   var launchOptions = this.game.launchOptions;
@@ -216,28 +198,9 @@ blk.game.client.ClientController.prototype.getScreenViewport = function() {
 
 
 /**
- * Adds all players initially in the session.
- * @private
- */
-blk.game.client.ClientController.prototype.addInitialPlayers_ = function() {
-  for (var n = 0; n < this.session.users.length; n++) {
-    var user = this.session.users[n];
-    var player;
-    if (user == this.session.getLocalUser()) {
-      player = new blk.game.client.LocalPlayer(this, user);
-    } else {
-      player = new blk.game.client.ClientPlayer(user);
-    }
-    user.data = player;
-    this.players_.push(player);
-  }
-};
-
-
-/**
  * Gets a list of all currently connected players.
  * Do not modify the results. The results may change at any time.
- * @return {!Array.<!blk.game.client.ClientPlayer>} A list of players.
+ * @return {!Array.<!blk.sim.Player>} A list of players.
  */
 blk.game.client.ClientController.prototype.getPlayerList = function() {
   return this.players_;
@@ -247,13 +210,13 @@ blk.game.client.ClientController.prototype.getPlayerList = function() {
 /**
  * Gets a player by session ID.
  * @param {string} sessionId User session ID.
- * @return {blk.game.client.ClientPlayer} Player, if found.
+ * @return {blk.sim.Player} Player, if found.
  */
 blk.game.client.ClientController.prototype.getPlayerBySessionId =
     function(sessionId) {
   var user = this.session.getUserBySessionId(sessionId);
   if (user) {
-    return /** @type {blk.game.client.ClientPlayer} */ (user.data);
+    return /** @type {blk.sim.Player} */ (user.data);
   }
   return null;
 };
@@ -262,13 +225,13 @@ blk.game.client.ClientController.prototype.getPlayerBySessionId =
 /**
  * Gets a player by wire ID.
  * @param {number} wireId User wire ID.
- * @return {blk.game.client.ClientPlayer} Player, if found.
+ * @return {blk.sim.Player} Player, if found.
  */
 blk.game.client.ClientController.prototype.getPlayerByWireId =
     function(wireId) {
   var user = this.session.getUserByWireId(wireId);
   if (user) {
-    return /** @type {blk.game.client.ClientPlayer} */ (user.data);
+    return /** @type {blk.sim.Player} */ (user.data);
   }
   return null;
 };
@@ -434,16 +397,11 @@ blk.game.client.ClientController.prototype.update = function(frame) {
     return;
   }
 
-  // SIMDEPRECATED?
-  // TODO(benvanik): move this logic into World?
   // Update game state
   this.map_.update(frame);
 
   // Update simulation
   this.simulator_.update(frame);
-
-  // SIMDEPRECATED
-  this.localPlayer_.update(frame);
 
   // Update UI bits
   this.console_.update(frame);
@@ -479,22 +437,14 @@ blk.game.client.ClientController.prototype.render = function(frame) {
   // Grab latest input data as early in the frame as possible
   this.inputData_.poll();
 
-  // Process physics
-  this.processPhysics(frame);
-
-  // SIMDEPRECATED
-  // NOTE: this is done without the interpolation delay so real times get used
-  if (!this.localPlayer_.processPhysics(frame, this.inputData_)) {
-    // Physics inconsistency - no way to proceed
-    this.handleError('Network physics backup');
-    return;
-  }
-
   // Handle user input
   // Let the console eat the data first, if it wants to
   if (!this.console_.processInput(frame, this.inputData_)) {
     this.processInput(frame, this.inputData_);
   }
+
+  // Process physics
+  this.processPhysics(frame);
 
   // Timeshift by interpolation delay
   // This ensures we render at the time we should be
@@ -616,40 +566,83 @@ blk.game.client.ClientController.prototype.playPointSound =
 };
 
 
-// SIMDEPRECATED
+// // SIMDEPRECATED
+// /**
+//  * Sets a block and plays sound if required.
+//  * Note that the block specified may have originated from the network and as
+//  * such it may not be in our view but may be in the cache. Because of this,
+//  * we must pass the change off to the map, which will try to update the
+//  * chunk.
+//  *
+//  * @param {number} x Block X.
+//  * @param {number} y Block Y.
+//  * @param {number} z Block Z.
+//  * @param {number} blockData Block Data.
+//  */
+// blk.game.client.ClientController.prototype.setBlock =
+//     function(x, y, z, blockData) {
+//   var map = this.getMap();
+
+//   var oldData = 0;
+//   if (!blockData) {
+//     oldData = map.getBlock(x, y, z);
+//   }
+//   var changed = map.setBlock(x, y, z, blockData);
+
+//   // Play block sound, if any and only if needed
+//   if (changed) {
+//     var soundData = blockData ? blockData : oldData;
+//     if (soundData >> 8) {
+//       var block = map.blockSet.getBlockWithId(soundData >> 8);
+//       var cue = block ? block.material.actionCue : null;
+//       if (cue) {
+//         var soundPosition = goog.vec.Vec3.createFloat32FromValues(x, y, z);
+//         var soundBank = this.blockSoundBank_;
+//         this.playPointSound(soundBank, cue, soundPosition);
+//       }
+//     }
+//   }
+// };
+
+
 /**
- * Sets a block and plays sound if required.
- * Note that the block specified may have originated from the network and as
- * such it may not be in our view but may be in the cache. Because of this, we
- * must pass the change off to the map, which will try to update the chunk.
- *
- * @param {number} x Block X.
- * @param {number} y Block Y.
- * @param {number} z Block Z.
- * @param {number} blockData Block Data.
+ * @override
  */
-blk.game.client.ClientController.prototype.setBlock =
-    function(x, y, z, blockData) {
-  var map = this.getMap();
+blk.game.client.ClientController.prototype.entityAdded = function(entity) {
+  if (entity instanceof blk.sim.Player) {
+    var player = /** @type {!blk.sim.Player} */ (entity);
 
-  var oldData = 0;
-  if (!blockData) {
-    oldData = map.getBlock(x, y, z);
-  }
-  var changed = map.setBlock(x, y, z, blockData);
+    // Add to roster
+    var user = entity.getUser();
+    user.data = player;
+    this.players_.push(player);
 
-  // Play block sound, if any and only if needed
-  if (changed) {
-    var soundData = blockData ? blockData : oldData;
-    if (soundData >> 8) {
-      var block = map.blockSet.getBlockWithId(soundData >> 8);
-      var cue = block ? block.material.actionCue : null;
-      if (cue) {
-        var soundPosition = goog.vec.Vec3.createFloat32FromValues(x, y, z);
-        var soundBank = this.blockSoundBank_;
-        this.playPointSound(soundBank, cue, soundPosition);
-      }
+    if (user == this.session.getLocalUser()) {
+      this.localPlayer_ = player;
     }
+
+    this.handlePlayersChanged();
+    gf.log.write('got player entity');
+  }
+};
+
+
+/**
+ * @override
+ */
+blk.game.client.ClientController.prototype.entityRemoved = function(entity) {
+  if (entity instanceof blk.sim.Player) {
+    var player = /** @type {!blk.sim.Player} */ (entity);
+
+    // Remove from roster
+    goog.array.remove(this.players_, player);
+
+    if (player == this.localPlayer_) {
+      // Hrm - deleting self?
+      gf.log.debug('Server deleted client entity while connected');
+    }
+
+    this.handlePlayersChanged();
   }
 };
 
@@ -667,22 +660,6 @@ blk.game.client.ClientController.prototype.setupSwitch =
   packetSwitch.register(
       blk.net.packets.ReadyPlayer.ID,
       this.handleReadyPlayer_, this);
-
-  // SIMDEPRECATED
-  packetSwitch.register(
-      blk.net.packets.SetBlock.ID,
-      this.handleSetBlock_, this);
-
-  // SIMDEPRECATED
-  packetSwitch.register(
-      blk.net.packets.EntityCreate.ID,
-      this.handleEntityCreate_, this);
-  packetSwitch.register(
-      blk.net.packets.EntityDelete.ID,
-      this.handleEntityDelete_, this);
-  packetSwitch.register(
-      blk.net.packets.EntityPosition.ID,
-      this.handleEntityPosition_, this);
 };
 
 
@@ -691,19 +668,12 @@ blk.game.client.ClientController.prototype.setupSwitch =
  */
 blk.game.client.ClientController.prototype.userConnected =
     function(user) {
-  // Create player
-  var player = new blk.game.client.ClientPlayer(user);
-  user.data = player;
-  this.players_.push(player);
-
   // Play a sound
   this.game.playPlayerJoin();
 
   this.console_.log(
       user.info.displayName + ' (' + user.sessionId + ') connected on ' +
       user.agent.toString());
-
-  this.handlePlayersChanged();
 };
 
 
@@ -712,24 +682,12 @@ blk.game.client.ClientController.prototype.userConnected =
  */
 blk.game.client.ClientController.prototype.userDisconnected =
     function(user) {
-  var player = /** @type {blk.game.client.ClientPlayer} */ (user.data);
-  goog.asserts.assert(player);
-  if (!player) {
-    return;
-  }
-
-  // Remove from roster
-  goog.array.remove(this.players_, player);
-  goog.dispose(player);
-
   // Play a sound
   this.game.playPlayerLeave();
 
   this.console_.log(
       user.info.displayName + ' (' + user.sessionId + ') disconnected:',
       gf.net.DisconnectReason.toString(user.disconnectReason));
-
-  this.handlePlayersChanged();
 };
 
 
@@ -740,9 +698,9 @@ blk.game.client.ClientController.prototype.userUpdated =
     function(user) {
   // SIMDEPRECATED
   var player = this.getPlayerBySessionId(user.sessionId);
-  if (player && player.entity) {
-    player.entity.title = user.info.displayName;
-  }
+  // if (player && player.entity) {
+  //   player.entity.title = user.info.displayName;
+  // }
 
   this.handlePlayersChanged();
 };
@@ -764,10 +722,11 @@ blk.game.client.ClientController.prototype.handleChunkData_ =
   }
 
   var map = this.getMap();
+  var chunkSerializer = blk.io.ChunkSerializer.getSharedSerializer();
 
   // Grab chunk from the cache, load
   var chunk = map.getChunk(chunkData.x, chunkData.y, chunkData.z);
-  if (!this.chunkSerializer_.deserializeFromReader(chunk, reader)) {
+  if (!chunkSerializer.deserializeFromReader(chunk, reader)) {
     // TODO(benvanik): signal load failure? set state?
     return false;
   }
@@ -800,142 +759,46 @@ blk.game.client.ClientController.prototype.handleReadyPlayer_ =
 };
 
 
-// SIMDEPRECATED
-/**
- * Handles set block packets.
- * @private
- * @param {!gf.net.Packet} packet Packet.
- * @param {number} packetType Packet type ID.
- * @param {!gf.net.PacketReader} reader Packet reader.
- * @return {boolean} True if the packet was handled successfully.
- */
-blk.game.client.ClientController.prototype.handleSetBlock_ =
-    function(packet, packetType, reader) {
-  var setBlock = blk.net.packets.SetBlock.read(reader);
-  if (!setBlock) {
-    return false;
-  }
+// // SIMDEPRECATED
+// /**
+//  * Handles entity position packets.
+//  * @private
+//  * @param {!gf.net.Packet} packet Packet.
+//  * @param {number} packetType Packet type ID.
+//  * @param {!gf.net.PacketReader} reader Packet reader.
+//  * @return {boolean} True if the packet was handled successfully.
+//  */
+// blk.game.client.ClientController.prototype.handleEntityPosition_ =
+//     function(packet, packetType, reader) {
+//   var entityPosition = blk.net.packets.EntityPosition.read(reader);
+//   if (!entityPosition) {
+//     return false;
+//   }
 
-  // TODO(benvanik): all of this should be made predicted behavior
+//   // Update local movement
+//   var localPlayer = this.getLocalPlayer();
+//   localPlayer.confirmMovementSequence(entityPosition.sequence);
 
-  var x = setBlock.x;
-  var y = setBlock.y;
-  var z = setBlock.z;
-  var blockData = setBlock.blockData;
+//   // Update entity positions
+//   var map = this.getMap();
+//   for (var n = 0; n < entityPosition.states.length; n++) {
+//     var entityState = entityPosition.states[n];
+//     entityState.time /= 1000;
+//     var entity = map.getEntity(entityState.entityId);
+//     if (entity) {
+//       if (entity.player == localPlayer) {
+//         // Update entity confirmed state
+//         entity.confirmedState.setFromState(entityState);
+//       } else {
+//         // Others
+//         // TODO(benvanik): lerp
+//         entity.updateState(entityState);
+//       }
+//     }
+//   }
 
-  this.setBlock(x, y, z, blockData);
-
-  return true;
-};
-
-
-// SIMDEPRECATED
-/**
- * Handles entity create packets.
- * @private
- * @param {!gf.net.Packet} packet Packet.
- * @param {number} packetType Packet type ID.
- * @param {!gf.net.PacketReader} reader Packet reader.
- * @return {boolean} True if the packet was handled successfully.
- */
-blk.game.client.ClientController.prototype.handleEntityCreate_ =
-    function(packet, packetType, reader) {
-  var entityCreate = blk.net.packets.EntityCreate.read(reader);
-  if (!entityCreate) {
-    return false;
-  }
-
-  var entityId = entityCreate.id;
-  var userId = entityCreate.playerWireId;
-
-  // Create the entity
-  var entity = new blk.env.Entity(entityId);
-  goog.vec.Vec3.setFromArray(entity.state.position, entityCreate.position);
-  goog.vec.Vec4.setFromArray(entity.state.rotation, entityCreate.rotation);
-  goog.vec.Vec3.setFromArray(entity.state.velocity, entityCreate.velocity);
-
-  // Bind the entity and its player together
-  var player = this.getPlayerByWireId(userId);
-  if (player) {
-    player.attachEntity(entity);
-  }
-
-  // Add the entity to the map
-  var map = this.getMap();
-  map.addEntity(entity);
-
-  return true;
-};
-
-
-// SIMDEPRECATED
-/**
- * Handles entity delete packets.
- * @private
- * @param {!gf.net.Packet} packet Packet.
- * @param {number} packetType Packet type ID.
- * @param {!gf.net.PacketReader} reader Packet reader.
- * @return {boolean} True if the packet was handled successfully.
- */
-blk.game.client.ClientController.prototype.handleEntityDelete_ =
-    function(packet, packetType, reader) {
-  var entityDelete = blk.net.packets.EntityDelete.read(reader);
-  if (!entityDelete) {
-    return false;
-  }
-
-  var entityId = entityDelete.id;
-
-  var map = this.getMap();
-  var entity = map.getEntity(entityId);
-  if (entity) {
-    map.removeEntity(entity);
-  }
-
-  return true;
-};
-
-
-// SIMDEPRECATED
-/**
- * Handles entity position packets.
- * @private
- * @param {!gf.net.Packet} packet Packet.
- * @param {number} packetType Packet type ID.
- * @param {!gf.net.PacketReader} reader Packet reader.
- * @return {boolean} True if the packet was handled successfully.
- */
-blk.game.client.ClientController.prototype.handleEntityPosition_ =
-    function(packet, packetType, reader) {
-  var entityPosition = blk.net.packets.EntityPosition.read(reader);
-  if (!entityPosition) {
-    return false;
-  }
-
-  // Update local movement
-  var localPlayer = this.getLocalPlayer();
-  localPlayer.confirmMovementSequence(entityPosition.sequence);
-
-  // Update entity positions
-  var map = this.getMap();
-  for (var n = 0; n < entityPosition.states.length; n++) {
-    var entityState = entityPosition.states[n];
-    entityState.time /= 1000;
-    var entity = map.getEntity(entityState.entityId);
-    if (entity) {
-      if (entity.player == localPlayer) {
-        // Update entity confirmed state
-        entity.confirmedState.setFromState(entityState);
-      } else {
-        // Others
-        // TODO(benvanik): lerp
-        entity.updateState(entityState);
-      }
-    }
-  }
-
-  return true;
-};
+//   return true;
+// };
 
 
 /**

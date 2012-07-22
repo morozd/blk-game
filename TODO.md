@@ -6,6 +6,8 @@ Before Release
 * skip block building if any neighbors missing
 * lighting
 
+* first ServerPlayer send pass is not sorted, make lastTime negative?
+
 M3: Replace UI with DOM
 ================================================================================
 
@@ -284,7 +286,6 @@ move map into world
 setupMap()
 getMap()
 
-clientcontroller:
-- needs localPlayer
+
 
 rename entity2 -> entity

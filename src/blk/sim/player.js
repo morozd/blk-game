@@ -22,6 +22,7 @@ goog.provide('blk.sim.Player');
 
 goog.require('blk.sim');
 goog.require('blk.sim.Actor');
+goog.require('blk.sim.Camera');
 goog.require('blk.sim.EntityType');
 goog.require('blk.sim.controllers.PlayerController');
 goog.require('gf');
@@ -71,6 +72,13 @@ blk.sim.Player = function(
    * @type {blk.sim.controllers.PlayerController}
    */
   this.controller_ = null;
+
+  /**
+   * Player camera.
+   * @private
+   * @type {blk.sim.Camera}
+   */
+  this.camera_ = null;
 };
 goog.inherits(blk.sim.Player, gf.sim.Entity);
 
@@ -82,6 +90,16 @@ goog.inherits(blk.sim.Player, gf.sim.Entity);
  */
 blk.sim.Player.ID = gf.sim.createTypeId(
     blk.sim.BLK_MODULE_ID, blk.sim.EntityType.PLAYER);
+
+
+/**
+ * @return {!blk.sim.World} World entity.
+ */
+blk.sim.Player.prototype.getWorld = function() {
+  var parent = this.getParent();
+  goog.asserts.assert(parent);
+  return /** @type {!blk.sim.World} */ (parent);
+};
 
 
 /**
@@ -111,6 +129,15 @@ blk.sim.Player.prototype.getController = function() {
 };
 
 
+/**
+ * @return {!blk.sim.Camera} Player camera.
+ */
+blk.sim.Player.prototype.getCamera = function() {
+  goog.asserts.assert(this.camera_);
+  return this.camera_;
+};
+
+
 if (gf.SERVER) {
   /**
    * Sets up the player entity for the given user.
@@ -120,11 +147,14 @@ if (gf.SERVER) {
    */
   blk.sim.Player.prototype.setup = function(user, world) {
     var simulator = this.getSimulator();
-    var state = /** @type {!blk.sim.Player.State} */ (this.getState());
+    var state = /** @type {!blk.sim.PlayerState} */ (this.getState());
 
     goog.asserts.assert(!this.user_);
     this.user_ = user;
     state.setUserId(user.sessionId);
+
+    // Parent to the world
+    this.setParent(world);
 
     // Create actor
     this.actor_ = /** @type {!blk.sim.Actor} */ (
@@ -144,10 +174,18 @@ if (gf.SERVER) {
     this.controller_.setParent(this.actor_);
     state.setControllerId(this.controller_.getId());
 
-    // TODO(benvanik): create inventory system
+    // Create camera
+    this.camera_ = /** @type {!blk.sim.Camera} */ (
+        simulator.createEntity(
+            blk.sim.Camera.ID,
+            gf.sim.EntityFlag.UPDATED_FREQUENTLY |
+            gf.sim.EntityFlag.PREDICTED |
+            gf.sim.EntityFlag.INTERPOLATED));
+    this.camera_.setParent(this.actor_);
+    this.camera_.setup(user, world);
+    state.setCameraId(this.camera_.getId());
 
-    // Parent to the world
-    this.setParent(world);
+    // TODO(benvanik): create inventory system
   };
 
 
@@ -180,16 +218,18 @@ if (gf.CLIENT) {
    * @override
    */
   blk.sim.Player.prototype.postNetworkUpdate = function() {
-    var simulator = this.getSimulator();
-    var state = /** @type {!blk.sim.Player.State} */ (this.getState());
-
     // Player was created - find entities
     if (this.dirtyFlags & gf.sim.EntityDirtyFlag.CREATED) {
+      var simulator = this.getSimulator();
+      var state = /** @type {!blk.sim.PlayerState} */ (this.getState());
+
       this.user_ = simulator.getUser(state.getUserId());
       this.actor_ = /** @type {!blk.sim.Actor} */ (
           simulator.getEntity(state.getActorId()));
       this.controller_ = /** @type {!blk.sim.controllers.PlayerController} */ (
           simulator.getEntity(state.getControllerId()));
+      this.camera_ = /** @type {!blk.sim.Camera} */ (
+          simulator.getEntity(state.getCameraId()));
     }
   };
 }
@@ -203,9 +243,9 @@ if (gf.CLIENT) {
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
  * @param {gf.sim.VariableTable=} opt_variableTable A subclass's variable table.
  */
-blk.sim.Player.State = function(entity, opt_variableTable) {
+blk.sim.PlayerState = function(entity, opt_variableTable) {
   var variableTable = opt_variableTable || gf.sim.EntityState.getVariableTable(
-      blk.sim.Player.State.declareVariables);
+      blk.sim.PlayerState.declareVariables);
   goog.base(this, entity, variableTable);
 
   /**
@@ -220,7 +260,7 @@ blk.sim.Player.State = function(entity, opt_variableTable) {
    * @type {number}
    */
   this.userIdOrdinal_ = variableTable.getOrdinal(
-      blk.sim.Player.State.tags_.userId);
+      blk.sim.PlayerState.tags_.userId);
 
   /**
    * Actor entity ID.
@@ -234,7 +274,7 @@ blk.sim.Player.State = function(entity, opt_variableTable) {
    * @type {number}
    */
   this.actorIdOrdinal_ = variableTable.getOrdinal(
-      blk.sim.Player.State.tags_.actorId);
+      blk.sim.PlayerState.tags_.actorId);
 
   /**
    * Controller entity ID.
@@ -248,19 +288,34 @@ blk.sim.Player.State = function(entity, opt_variableTable) {
    * @type {number}
    */
   this.controllerIdOrdinal_ = variableTable.getOrdinal(
-      blk.sim.Player.State.tags_.controllerId);
+      blk.sim.PlayerState.tags_.controllerId);
+
+  /**
+   * Camera entity ID.
+   * @private
+   * @type {number}
+   */
+  this.cameraId_ = 0;
+
+  /**
+   * @private
+   * @type {number}
+   */
+  this.cameraIdOrdinal_ = variableTable.getOrdinal(
+      blk.sim.PlayerState.tags_.cameraId);
 };
-goog.inherits(blk.sim.Player.State, gf.sim.EntityState);
+goog.inherits(blk.sim.PlayerState, gf.sim.EntityState);
 
 
 /**
  * @private
  * @type {!Object.<number>}
  */
-blk.sim.Player.State.tags_ = {
+blk.sim.PlayerState.tags_ = {
   userId: gf.sim.Variable.getUniqueTag(),
   actorId: gf.sim.Variable.getUniqueTag(),
-  controllerId: gf.sim.Variable.getUniqueTag()
+  controllerId: gf.sim.Variable.getUniqueTag(),
+  cameraId: gf.sim.Variable.getUniqueTag()
 };
 
 
@@ -268,7 +323,7 @@ blk.sim.Player.State.tags_ = {
  * Gets the user session ID.
  * @return {string} Current value.
  */
-blk.sim.Player.State.prototype.getUserId = function() {
+blk.sim.PlayerState.prototype.getUserId = function() {
   return this.userId_;
 };
 
@@ -277,8 +332,8 @@ blk.sim.Player.State.prototype.getUserId = function() {
  * Sets the user session ID.
  * @param {string} value New value.
  */
-blk.sim.Player.State.prototype.setUserId = function(value) {
-  if (!this.userId_ != value) {
+blk.sim.PlayerState.prototype.setUserId = function(value) {
+  if (this.userId_ != value) {
     this.userId_ = value;
     this.setVariableDirty(this.userIdOrdinal_);
   }
@@ -289,7 +344,7 @@ blk.sim.Player.State.prototype.setUserId = function(value) {
  * Gets the actor entity ID.
  * @return {number} Current value.
  */
-blk.sim.Player.State.prototype.getActorId = function() {
+blk.sim.PlayerState.prototype.getActorId = function() {
   return this.actorId_;
 };
 
@@ -298,8 +353,8 @@ blk.sim.Player.State.prototype.getActorId = function() {
  * Sets the actor entity ID.
  * @param {number} value New value.
  */
-blk.sim.Player.State.prototype.setActorId = function(value) {
-  if (!this.actorId_ != value) {
+blk.sim.PlayerState.prototype.setActorId = function(value) {
+  if (this.actorId_ != value) {
     this.actorId_ = value;
     this.setVariableDirty(this.actorIdOrdinal_);
   }
@@ -310,7 +365,7 @@ blk.sim.Player.State.prototype.setActorId = function(value) {
  * Gets the controller entity ID.
  * @return {number} Current value.
  */
-blk.sim.Player.State.prototype.getControllerId = function() {
+blk.sim.PlayerState.prototype.getControllerId = function() {
   return this.controllerId_;
 };
 
@@ -319,8 +374,8 @@ blk.sim.Player.State.prototype.getControllerId = function() {
  * Sets the controller entity ID.
  * @param {number} value New value.
  */
-blk.sim.Player.State.prototype.setControllerId = function(value) {
-  if (!this.actorId_ != value) {
+blk.sim.PlayerState.prototype.setControllerId = function(value) {
+  if (this.controllerId_ != value) {
     this.controllerId_ = value;
     this.setVariableDirty(this.controllerIdOrdinal_);
   }
@@ -328,23 +383,49 @@ blk.sim.Player.State.prototype.setControllerId = function(value) {
 
 
 /**
+ * Gets the camera entity ID.
+ * @return {number} Current value.
+ */
+blk.sim.PlayerState.prototype.getCameraId = function() {
+  return this.cameraId_;
+};
+
+
+/**
+ * Sets the camera entity ID.
+ * @param {number} value New value.
+ */
+blk.sim.PlayerState.prototype.setCameraId = function(value) {
+  if (this.cameraId_ != value) {
+    this.cameraId_ = value;
+    this.setVariableDirty(this.cameraIdOrdinal_);
+  }
+};
+
+
+/**
  * @override
  */
-blk.sim.Player.State.declareVariables = function(variableList) {
+blk.sim.PlayerState.declareVariables = function(variableList) {
   gf.sim.EntityState.declareVariables(variableList);
   variableList.push(new gf.sim.Variable.String(
-      blk.sim.Player.State.tags_.userId,
+      blk.sim.PlayerState.tags_.userId,
       0,
-      blk.sim.Player.State.prototype.getUserId,
-      blk.sim.Player.State.prototype.setUserId));
+      blk.sim.PlayerState.prototype.getUserId,
+      blk.sim.PlayerState.prototype.setUserId));
   variableList.push(new gf.sim.Variable.EntityID(
-      blk.sim.Player.State.tags_.actorId,
+      blk.sim.PlayerState.tags_.actorId,
       0,
-      blk.sim.Player.State.prototype.getActorId,
-      blk.sim.Player.State.prototype.setActorId));
+      blk.sim.PlayerState.prototype.getActorId,
+      blk.sim.PlayerState.prototype.setActorId));
   variableList.push(new gf.sim.Variable.EntityID(
-      blk.sim.Player.State.tags_.controllerId,
+      blk.sim.PlayerState.tags_.controllerId,
       0,
-      blk.sim.Player.State.prototype.getControllerId,
-      blk.sim.Player.State.prototype.setControllerId));
+      blk.sim.PlayerState.prototype.getControllerId,
+      blk.sim.PlayerState.prototype.setControllerId));
+  variableList.push(new gf.sim.Variable.EntityID(
+      blk.sim.PlayerState.tags_.cameraId,
+      0,
+      blk.sim.PlayerState.prototype.getCameraId,
+      blk.sim.PlayerState.prototype.setCameraId));
 };

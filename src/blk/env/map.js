@@ -29,7 +29,6 @@ goog.require('gf.log');
 goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.asserts');
-goog.require('goog.object');
 
 
 
@@ -74,23 +73,6 @@ blk.env.Map = function() {
    */
   this.chunkCache_ = new blk.env.ChunkCache();
   this.registerDisposable(this.chunkCache_);
-
-  // SIMDEPRECATED
-  /**
-   * All active entities in the map.
-   * HACK: THIS IS DEPRECATED AND WILL BE MOVING TO CHUNKS
-   * @type {!Array.<!blk.env.Entity>}
-   */
-  this.entities = [];
-
-  // SIMDEPRECATED
-  /**
-   * Map of entities by entity ID.
-   * HACK: THIS IS DEPRECATED AND WILL BE MOVING TO CHUNKS
-   * @private
-   * @type {!Object.<number, !blk.env.Entity>}
-   */
-  this.entityList_ = {};
 };
 goog.inherits(blk.env.Map, goog.Disposable);
 
@@ -143,15 +125,6 @@ blk.env.Map.prototype.removeChunkView = function(view) {
 blk.env.Map.prototype.update = function(frame) {
   // Handle environment first, in case it changes things
   this.environment.update(frame);
-
-  // SIMDEPRECATED
-  // Update all entities
-  // HACK: deprecated, will be moving
-  for (var n = 0; n < this.entities.length; n++) {
-    var entity = this.entities[n];
-    entity.update(frame);
-    // TODO(benvanik): notify observers
-  }
 
   // Handle chunk cache
   this.chunkCache_.update(frame);
@@ -289,46 +262,4 @@ blk.env.Map.prototype.setBlock = function(x, y, z, value) {
   }
 
   return true;
-};
-
-
-// SIMDEPRECATED
-/**
- * Adds an entity to the map.
- * HACK: deprecated
- * @param {!blk.env.Entity} entity Entity to add.
- */
-blk.env.Map.prototype.addEntity = function(entity) {
-  this.entities.push(entity);
-  this.entityList_[entity.id] = entity;
-
-  // TODO(benvanik): notify observers
-};
-
-
-// SIMDEPRECATED
-/**
- * Removes an entity from the map.
- * HACK: deprecated
- * @param {!blk.env.Entity} entity Entity to remove.
- */
-blk.env.Map.prototype.removeEntity = function(entity) {
-  // TODO(benvanik): don't use arrays - they don't scale globally
-  goog.array.remove(this.entities, entity);
-  goog.object.remove(this.entityList_, entity.id);
-  goog.dispose(entity);
-
-  // TODO(benvanik): notify observers
-};
-
-
-// SIMDEPRECATED
-/**
- * Gets an entity by ID.
- * HACK: deprecated
- * @param {number} entityId Entity ID.
- * @return {blk.env.Entity} Entity, if found.
- */
-blk.env.Map.prototype.getEntity = function(entityId) {
-  return this.entityList_[entityId];
 };

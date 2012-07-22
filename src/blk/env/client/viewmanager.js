@@ -21,7 +21,6 @@ goog.require('blk.env.Chunk');
 goog.require('blk.env.MapObserver');
 goog.require('blk.env.UpdatePriority');
 goog.require('blk.env.client.BuildQueue');
-goog.require('blk.env.client.EntityRenderer');
 goog.require('blk.env.client.SegmentCache');
 goog.require('blk.env.client.SegmentRenderer');
 goog.require('gf.vec.Containment');
@@ -197,15 +196,6 @@ blk.env.client.ViewManager.prototype.setDebugVisuals = function(value) {
   this.segmentCache_.forEach(function(segment) {
     segment.setDebugVisuals(value);
   });
-  var entities = this.map.entities;
-  for (var n = 0; n < entities.length; n++) {
-    var entity = entities[n];
-    var entityRenderer = /** @type {blk.env.client.EntityRenderer} */ (
-        entity.renderData);
-    if (entityRenderer) {
-      entityRenderer.setDebugVisuals(value);
-    }
-  }
 };
 
 
@@ -445,11 +435,8 @@ blk.env.client.ViewManager.prototype.rebuildAll = function() {
  * Renders the map.
  * @param {!gf.RenderFrame} frame Render frame.
  * @param {!gf.vec.Viewport} viewport Current viewport.
- * @param {blk.game.client.ClientPlayer=} opt_localPlayer Local player,
- *     to prevent rendering.
  */
-blk.env.client.ViewManager.prototype.render = function(frame, viewport,
-    opt_localPlayer) {
+blk.env.client.ViewManager.prototype.render = function(frame, viewport) {
   var graphicsContext = this.graphicsContext;
   var renderState = this.renderState;
   var map = this.map;
@@ -464,22 +451,6 @@ blk.env.client.ViewManager.prototype.render = function(frame, viewport,
   this.view.forEachInViewport(viewport, this.handleVisibleChunk_, this);
   // var visibleChunks = this.visibleChunkList_;
   // var visibleChunkCount = this.lastVisibleChunkCount_;
-
-  // TODO(benvanik): visible entities list
-  var visibleEntities = map.entities;
-  for (var n = 0; n < visibleEntities.length; n++) {
-    var entity = visibleEntities[n];
-    var entityRenderer = /** @type {blk.env.client.EntityRenderer} */ (
-        entity.renderData);
-    if (!entityRenderer) {
-      // Create renderer
-      entityRenderer = new blk.env.client.EntityRenderer(this.renderState,
-          entity);
-      entityRenderer.setDebugVisuals(this.debugVisuals);
-      // TODO(benvanik): cache/etc
-    }
-    entityRenderer.lastFrameInViewport = frame.frameNumber;
-  }
 
   // Process a bit of the build queue
   // Must occur after segment visibility has been checked
@@ -540,31 +511,6 @@ blk.env.client.ViewManager.prototype.render = function(frame, viewport,
       segment.render(frame, viewport);
       this.visibleSegmentsPass2_[n] = null;
     }
-  }
-
-  // Draw entities
-  renderState.beginEntities();
-  // TODO(benvanik): switch to player skin cache/etc
-  for (var n = 0; n < visibleEntities.length; n++) {
-    var entity = visibleEntities[n];
-    if (entity.player == opt_localPlayer) {
-      continue;
-    }
-    var entityRenderer = /** @type {blk.env.client.EntityRenderer} */ (
-        entity.renderData);
-    entityRenderer.render(frame, viewport);
-  }
-
-  // Draw entity adorners
-  renderState.beginSprites(this.renderState.font.atlas, true);
-  for (var n = 0; n < visibleEntities.length; n++) {
-    var entity = visibleEntities[n];
-    if (entity.player == opt_localPlayer) {
-      continue;
-    }
-    var entityRenderer = /** @type {blk.env.client.EntityRenderer} */ (
-        entity.renderData);
-    entityRenderer.renderAdorners(frame, viewport);
   }
 };
 

@@ -29,12 +29,14 @@ goog.provide('blk.sim.EntityType');
 blk.sim.EntityType = {
   /** {@see blk.sim.World} */
   WORLD: 0,
+  /** {@see blk.sim.Camera} */
+  CAMERA: 1,
   /** {@see blk.sim.Player} */
-  PLAYER: 1,
+  PLAYER: 2,
   /** {@see blk.sim.controllers.PlayerController} */
-  PLAYER_CONTROLLER: 2,
+  PLAYER_CONTROLLER: 3,
   /** {@see blk.sim.Actor} */
-  ACTOR: 3,
+  ACTOR: 4,
   /** {@see blk.sim.tools.PickaxeTool} */
-  PICKAXE_TOOL: 4
+  PICKAXE_TOOL: 5
 };

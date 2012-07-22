@@ -61,7 +61,7 @@ if (gf.CLIENT) {
    * @return {boolean} True if input is valid, false if input has failed.
    */
   blk.sim.Controller.prototype.processInput = goog.abstractMethod;
-};
+}
 
 
 
@@ -72,17 +72,17 @@ if (gf.CLIENT) {
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
  * @param {!gf.sim.VariableTable} variableTable A subclass's variable table.
  */
-blk.sim.Controller.State = function(entity, variableTable) {
+blk.sim.ControllerState = function(entity, variableTable) {
   goog.base(this, entity, variableTable);
 };
-goog.inherits(blk.sim.Controller.State,
+goog.inherits(blk.sim.ControllerState,
     gf.sim.EntityState);
 
 
 /**
  * @override
  */
-blk.sim.Controller.State.declareVariables = function(
+blk.sim.ControllerState.declareVariables = function(
     variableList) {
   gf.sim.EntityState.declareVariables(variableList);
 };

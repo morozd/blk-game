@@ -19,6 +19,7 @@ goog.provide('blk.io.ChunkSerializer');
 goog.require('blk.env.Chunk');
 goog.require('blk.io.CompressionFormat');
 goog.require('blk.io.rle');
+goog.require('gf');
 goog.require('gf.net.PacketReader');
 goog.require('gf.net.PacketWriter');
 goog.require('goog.asserts');
@@ -35,18 +36,6 @@ goog.require('goog.asserts');
  *     used when serializing chunks.
  */
 blk.io.ChunkSerializer = function(opt_compressionFormat) {
-  /**
-   * @private
-   * @type {!gf.net.PacketReader}
-   */
-  this.reader_ = new gf.net.PacketReader();
-
-  /**
-   * @private
-   * @type {!gf.net.PacketWriter}
-   */
-  this.writer_ = new gf.net.PacketWriter();
-
   /**
    * Compression format when serializing chunks.
    * @private
@@ -72,7 +61,7 @@ blk.io.ChunkSerializer.CURRENT_VERSION_ = 1;
  * @return {ArrayBuffer} Serialized chunk data, if successful.
  */
 blk.io.ChunkSerializer.prototype.serialize = function(chunk) {
-  var writer = this.writer_;
+  var writer = gf.net.PacketWriter.getSharedWriter();
   if (this.serializeToWriter(chunk, writer)) {
     return writer.finish();
   } else {
@@ -145,7 +134,7 @@ blk.io.ChunkSerializer.prototype.serializeV1_ = function(chunk, writer) {
  * @return {boolean} True if the data was successfully deserialized.
  */
 blk.io.ChunkSerializer.prototype.deserialize = function(chunk, data) {
-  var reader = this.reader_;
+  var reader = gf.net.PacketReader.getSharedReader();
   reader.begin(data, 0);
   return this.deserializeFromReader(chunk, reader);
 };
@@ -215,4 +204,29 @@ blk.io.ChunkSerializer.prototype.deserializeV1_ = function(chunk, reader) {
 
   chunk.endLoad();
   return true;
+};
+
+
+/**
+ * Shared chunk serializer singleton.
+ * Initialized on first access of {@see #getSharedSerializer}.
+ * @private
+ * @type {blk.io.ChunkSerializer}
+ */
+blk.io.ChunkSerializer.sharedSerializer_ = null;
+
+
+/**
+ * Gets a shared chunk serializer singleton.
+ * @return {!blk.io.ChunkSerializer} A shared serializer.
+ */
+blk.io.ChunkSerializer.getSharedSerializer = function() {
+  if (!blk.io.ChunkSerializer.sharedSerializer_) {
+    var compressionFormat = gf.SERVER && !gf.NODE ?
+        blk.io.CompressionFormat.UNCOMPRESSED :
+        blk.io.CompressionFormat.RLE;
+    blk.io.ChunkSerializer.sharedSerializer_ = new blk.io.ChunkSerializer(
+        compressionFormat);
+  }
+  return blk.io.ChunkSerializer.sharedSerializer_;
 };

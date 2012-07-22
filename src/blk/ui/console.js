@@ -316,8 +316,10 @@ blk.ui.Console.prototype.render = function(frame, viewport, var_args) {
   var y = 0;
 
   for (var n = 2; n < arguments.length; n++) {
-    var wh = font.prepareString(buffer, arguments[n], 0xFFFFFFFF, x, y);
-    y += wh[1] + blk.ui.Console.LINE_SPACING_;
+    if (arguments[n]) {
+      var wh = font.prepareString(buffer, arguments[n], 0xFFFFFFFF, x, y);
+      y += wh[1] + blk.ui.Console.LINE_SPACING_;
+    }
   }
 
   var start = 0;

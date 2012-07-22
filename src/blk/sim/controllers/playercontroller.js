@@ -63,7 +63,7 @@ if (gf.CLIENT) {
    */
   blk.sim.controllers.PlayerController.prototype.processInput = function(
       frame, inputData) {
-    var state = /** @type {!blk.sim.controllers.PlayerController.State} */ (
+    var state = /** @type {!blk.sim.controllers.PlayerControllerState} */ (
         this.getState());
     var target = this.getTarget();
 
@@ -78,25 +78,25 @@ if (gf.CLIENT) {
 /**
  * Controller entity state.
  * @constructor
- * @extends {blk.sim.Controller.State}
+ * @extends {blk.sim.ControllerState}
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
  * @param {!gf.sim.VariableTable=} opt_variableTable A subclass's variable
  *     table, if subclassed.
  */
-blk.sim.controllers.PlayerController.State = function(
+blk.sim.controllers.PlayerControllerState = function(
     entity, opt_variableTable) {
   var variableTable = opt_variableTable || gf.sim.EntityState.getVariableTable(
-      blk.sim.controllers.PlayerController.State.declareVariables);
+      blk.sim.controllers.PlayerControllerState.declareVariables);
   goog.base(this, entity, variableTable);
 };
-goog.inherits(blk.sim.controllers.PlayerController.State,
-    blk.sim.Controller.State);
+goog.inherits(blk.sim.controllers.PlayerControllerState,
+    blk.sim.ControllerState);
 
 
 /**
  * @override
  */
-blk.sim.controllers.PlayerController.State.declareVariables = function(
+blk.sim.controllers.PlayerControllerState.declareVariables = function(
     variableList) {
-  blk.sim.Controller.State.declareVariables(variableList);
+  blk.sim.ControllerState.declareVariables(variableList);
 };

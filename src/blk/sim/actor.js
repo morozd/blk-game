@@ -61,48 +61,25 @@ blk.sim.Actor.ID = gf.sim.createTypeId(
 
 
 /**
- * Calculates a viewport from the actors perspective.
- * @param {!gf.vec.Viewport} viewport Viewport to fill with the results.
- */
-blk.sim.Actor.prototype.calculateViewport = function(viewport) {
-  var state = /** @type {!blk.sim.Actor.State} */ (this.getState());
-
-  // Set matrix based on state
-  var vm = viewport.viewMatrix;
-  var position = state.getPosition();
-  var rotation = state.getRotation();
-  // TODO(benvanik): does scale matter?
-  goog.vec.Quaternion.toRotationMatrix4(rotation, vm);
-  goog.vec.Mat4.transpose(vm, vm);
-  goog.vec.Mat4.translate(vm,
-      -position[0], -position[1], -position[2]);
-
-  // Update viewport matrices/etc now that the controller logic has been applied
-  viewport.calculate();
-};
-
-
-
-/**
  * Actor entity state.
  * @constructor
- * @extends {blk.sim.Model.State}
+ * @extends {blk.sim.ModelState}
  * @param {!gf.sim.Entity} entity Entity that this object stores state for.
  * @param {gf.sim.VariableTable=} opt_variableTable A subclass's variable table.
  */
-blk.sim.Actor.State = function(entity, opt_variableTable) {
+blk.sim.ActorState = function(entity, opt_variableTable) {
   var variableTable = opt_variableTable || gf.sim.EntityState.getVariableTable(
-      blk.sim.Actor.State.declareVariables);
+      blk.sim.ActorState.declareVariables);
   goog.base(this, entity, variableTable);
 };
-goog.inherits(blk.sim.Actor.State,
-    blk.sim.Model.State);
+goog.inherits(blk.sim.ActorState,
+    blk.sim.ModelState);
 
 
 /**
  * @override
  */
-blk.sim.Actor.State.declareVariables = function(
+blk.sim.ActorState.declareVariables = function(
     variableList) {
-  blk.sim.Model.State.declareVariables(variableList);
+  blk.sim.ModelState.declareVariables(variableList);
 };
