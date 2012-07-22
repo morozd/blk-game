@@ -28,10 +28,12 @@ goog.require('blk.sim.Player');
 goog.require('blk.sim.PlayerState');
 goog.require('blk.sim.World');
 goog.require('blk.sim.WorldState');
-goog.require('blk.sim.controllers.PlayerController');
-goog.require('blk.sim.controllers.PlayerControllerState');
+goog.require('blk.sim.controllers.ClientFpsController');
+goog.require('blk.sim.controllers.FpsController');
+goog.require('blk.sim.controllers.FpsControllerState');
 goog.require('blk.sim.tools.PickaxeTool');
 goog.require('blk.sim.tools.PickaxeToolState');
+goog.require('gf');
 goog.require('gf.sim.EntityFactory');
 
 
@@ -58,11 +60,13 @@ blk.sim.entities.registerEntities = function(simulator) {
       blk.sim.Player,
       blk.sim.PlayerState));
 
-  // PLAYER_CONTROLLER
+  // FPS_CONTROLLER
   simulator.registerEntityFactory(new gf.sim.EntityFactory(
-      blk.sim.controllers.PlayerController.ID,
-      blk.sim.controllers.PlayerController,
-      blk.sim.controllers.PlayerControllerState));
+      blk.sim.controllers.FpsController.ID,
+      gf.CLIENT ?
+          blk.sim.controllers.ClientFpsController :
+          blk.sim.controllers.FpsController,
+      blk.sim.controllers.FpsControllerState));
 
   // ACTOR
   simulator.registerEntityFactory(new gf.sim.EntityFactory(

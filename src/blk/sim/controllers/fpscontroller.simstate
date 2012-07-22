@@ -1,5 +1,5 @@
 {
-  "name": "blk.sim.controllers.PlayerControllerState",
+  "name": "blk.sim.controllers.FpsControllerState",
   "super": "blk.sim.ControllerState",
   "vars": [
   ]

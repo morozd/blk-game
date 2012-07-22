@@ -266,7 +266,7 @@ gf.sim.SpatialEntity
     blk.sim.Projectile
       blk.sim.tools.RocketProjectile
 blk.sim.Controller
-  blk.sim.controllers.PlayerController
+  blk.sim.controllers.FpsController
 
 
 how does controller entity set pos/orientation on parent so pred/interp

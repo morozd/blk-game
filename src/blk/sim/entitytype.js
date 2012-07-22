@@ -33,8 +33,8 @@ blk.sim.EntityType = {
   CAMERA: 1,
   /** {@see blk.sim.Player} */
   PLAYER: 2,
-  /** {@see blk.sim.controllers.PlayerController} */
-  PLAYER_CONTROLLER: 3,
+  /** {@see blk.sim.controllers.FpsController} */
+  FPS_CONTROLLER: 3,
   /** {@see blk.sim.Actor} */
   ACTOR: 4,
   /** {@see blk.sim.tools.PickaxeTool} */

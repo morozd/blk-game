@@ -24,7 +24,7 @@ goog.require('blk.sim');
 goog.require('blk.sim.Actor');
 goog.require('blk.sim.Camera');
 goog.require('blk.sim.EntityType');
-goog.require('blk.sim.controllers.PlayerController');
+goog.require('blk.sim.controllers.FpsController');
 goog.require('gf');
 goog.require('gf.sim');
 goog.require('gf.sim.Entity');
@@ -67,7 +67,7 @@ blk.sim.Player = function(
   /**
    * Player controller logic.
    * @private
-   * @type {blk.sim.controllers.PlayerController}
+   * @type {blk.sim.controllers.FpsController}
    */
   this.controller_ = null;
 
@@ -119,7 +119,7 @@ blk.sim.Player.prototype.getActor = function() {
 
 
 /**
- * @return {!blk.sim.controllers.PlayerController} Player controller.
+ * @return {!blk.sim.controllers.FpsController} Player controller.
  */
 blk.sim.Player.prototype.getController = function() {
   goog.asserts.assert(this.controller_);
@@ -150,6 +150,7 @@ if (gf.SERVER) {
     goog.asserts.assert(!this.user_);
     this.user_ = user;
     state.setUserId(user.sessionId);
+    this.setOwner(user);
 
     // Parent to the world
     this.setParent(world);
@@ -165,10 +166,11 @@ if (gf.SERVER) {
     state.setActorId(this.actor_.getId());
 
     // Create player controller
-    this.controller_ = /** @type {!blk.sim.controllers.PlayerController} */ (
+    this.controller_ = /** @type {!blk.sim.controllers.FpsController} */ (
         simulator.createEntity(
-            blk.sim.controllers.PlayerController.ID,
+            blk.sim.controllers.FpsController.ID,
             gf.sim.EntityFlag.UPDATED_FREQUENTLY));
+    this.controller_.setOwner(user);
     this.controller_.setParent(this.actor_);
     state.setControllerId(this.controller_.getId());
 
@@ -179,6 +181,7 @@ if (gf.SERVER) {
             gf.sim.EntityFlag.UPDATED_FREQUENTLY |
             gf.sim.EntityFlag.PREDICTED |
             gf.sim.EntityFlag.INTERPOLATED));
+    this.camera_.setOwner(user);
     this.camera_.setParent(this.actor_);
     this.camera_.setup(user, world);
     state.setCameraId(this.camera_.getId());
@@ -223,7 +226,8 @@ if (gf.CLIENT) {
 
       this.user_ = simulator.getUser(state.getUserId());
       this.actor_ = state.getActorIdEntity();
-      this.controller_ = /** @type {!blk.sim.controllers.PlayerController} */ (
+      this.controller_ =
+          /** @type {!blk.sim.controllers.FpsController} */ (
           state.getControllerIdEntity());
       this.camera_ = state.getCameraIdEntity();
     }
