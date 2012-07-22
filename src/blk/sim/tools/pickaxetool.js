@@ -24,7 +24,6 @@ goog.require('blk.sim');
 goog.require('blk.sim.EntityType');
 goog.require('blk.sim.Tool');
 goog.require('gf.sim');
-goog.require('gf.sim.EntityState');
 
 
 
@@ -53,30 +52,3 @@ goog.inherits(blk.sim.tools.PickaxeTool, blk.sim.Tool);
  */
 blk.sim.tools.PickaxeTool.ID = gf.sim.createTypeId(
     blk.sim.BLK_MODULE_ID, blk.sim.EntityType.PICKAXE_TOOL);
-
-
-
-/**
- * Pickaxe entity state.
- * @constructor
- * @extends {blk.sim.ToolState}
- * @param {!gf.sim.Entity} entity Entity that this object stores state for.
-* @param {!gf.sim.VariableTable=} opt_variableTable A subclass's variable
- *     table, if subclassed.
- */
-blk.sim.tools.PickaxeToolState = function(entity, opt_variableTable) {
-  var variableTable = opt_variableTable || gf.sim.EntityState.getVariableTable(
-      blk.sim.tools.PickaxeToolState.declareVariables);
-  goog.base(this, entity, variableTable);
-};
-goog.inherits(blk.sim.tools.PickaxeToolState,
-    blk.sim.ToolState);
-
-
-/**
- * @override
- */
-blk.sim.tools.PickaxeToolState.declareVariables = function(
-    variableList) {
-  blk.sim.ToolState.declareVariables(variableList);
-};

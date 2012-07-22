@@ -1,0 +1,30 @@
+{
+  "name": "blk.sim.PlayerState",
+  "super": "gf.sim.EntityState",
+  "vars": [
+    {
+      "name": "userId",
+      "type": "String",
+      "flags": [
+      ]
+    },
+    {
+      "name": "actorId",
+      "type": "EntityID",
+      "flags": [
+      ]
+    },
+    {
+      "name": "controllerId",
+      "type": "EntityID",
+      "flags": [
+      ]
+    },
+    {
+      "name": "cameraId",
+      "type": "EntityID",
+      "flags": [
+      ]
+    }
+  ]
+}

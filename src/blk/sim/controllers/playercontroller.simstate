@@ -1,0 +1,6 @@
+{
+  "name": "blk.sim.controllers.PlayerControllerState",
+  "super": "blk.sim.ControllerState",
+  "vars": [
+  ]
+}

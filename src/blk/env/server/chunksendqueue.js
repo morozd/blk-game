@@ -24,6 +24,7 @@ goog.require('blk.env.Chunk');
 goog.require('blk.env.MapObserver');
 goog.require('blk.io.ChunkSerializer');
 goog.require('blk.net.packets.ChunkData');
+goog.require('gf');
 goog.require('gf.net.PacketWriter');
 goog.require('goog.Disposable');
 goog.require('goog.array');

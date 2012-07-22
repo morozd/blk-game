@@ -25,10 +25,8 @@ goog.require('blk.sim.EntityType');
 goog.require('gf');
 goog.require('gf.log');
 goog.require('gf.sim');
-goog.require('gf.sim.EntityState');
 goog.require('gf.sim.SceneEntity');
 goog.require('gf.sim.SchedulingPriority');
-goog.require('gf.sim.Variable');
 goog.require('gf.sim.search.ListDatabase');
 goog.require('goog.asserts');
 
@@ -140,84 +138,10 @@ if (gf.CLIENT) {
 }
 
 
-
-/**
- * Map entity state.
- * @constructor
- * @extends {gf.sim.SceneEntityState}
- * @param {!gf.sim.Entity} entity Entity that this object stores state for.
- * @param {!gf.sim.VariableTable=} opt_variableTable A subclass's variable
- *     table, if subclassed.
- */
-blk.sim.WorldState = function(entity, opt_variableTable) {
-  var variableTable = opt_variableTable || gf.sim.EntityState.getVariableTable(
-      blk.sim.WorldState.declareVariables);
-  goog.base(this, entity, variableTable);
-
-  // TODO(benvanik): add vars:
-  // - day cycle duration
-  // - sky color
-  // - ambient light color
-  // - sun light color
-  // - fog color
-  // - fog params?
-
-  /**
-   * @private
-   * @type {number}
-   */
-  this.testVar_ = 0;
-
-  /**
-   * @private
-   * @type {number}
-   */
-  this.testVarOrdinal_ = variableTable.getOrdinal(
-      blk.sim.WorldState.tags_.testVar);
-};
-goog.inherits(blk.sim.WorldState,
-    gf.sim.SceneEntityState);
-
-
-/**
- * @private
- * @type {!Object.<number>}
- */
-blk.sim.WorldState.tags_ = {
-  testVar: gf.sim.Variable.getUniqueTag()
-};
-
-
-/**
- * Gets test var.
- * @return {number} Current value.
- */
-blk.sim.WorldState.prototype.getTestVar = function() {
-  return this.testVar_;
-};
-
-
-/**
- * Sets test var.
- * @param {number} value New value.
- */
-blk.sim.WorldState.prototype.setTestVar = function(value) {
-  gf.log.write('setTestVar(' + value + ')');
-  if (this.testVar_ != value) {
-    this.testVar_ = value;
-    this.setVariableDirty(this.testVarOrdinal_);
-  }
-};
-
-
-/**
- * @override
- */
-blk.sim.WorldState.declareVariables = function(variableList) {
-  gf.sim.SceneEntityState.declareVariables(variableList);
-  variableList.push(new gf.sim.Variable.Float(
-      blk.sim.WorldState.tags_.testVar,
-      0,
-      blk.sim.WorldState.prototype.getTestVar,
-      blk.sim.WorldState.prototype.setTestVar));
-};
+// TODO(benvanik): add state vars:
+// - day cycle duration
+// - sky color
+// - ambient light color
+// - sun light color
+// - fog color
+// - fog params?

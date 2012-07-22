@@ -1,0 +1,6 @@
+{
+  "name": "blk.sim.ToolState",
+  "super": "blk.sim.ModelState",
+  "vars": [
+  ]
+}

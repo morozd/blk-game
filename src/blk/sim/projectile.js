@@ -39,27 +39,3 @@ blk.sim.Projectile = function(
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
 goog.inherits(blk.sim.Projectile, blk.sim.Model);
-
-
-
-/**
- * Projectile entity state.
- * @constructor
- * @extends {blk.sim.ModelState}
- * @param {!gf.sim.Entity} entity Entity that this object stores state for.
- * @param {!gf.sim.VariableTable} variableTable A subclass's variable table.
- */
-blk.sim.ProjectileState = function(entity, variableTable) {
-  goog.base(this, entity, variableTable);
-};
-goog.inherits(blk.sim.ProjectileState,
-    blk.sim.ModelState);
-
-
-/**
- * @override
- */
-blk.sim.ProjectileState.declareVariables = function(
-    variableList) {
-  blk.sim.ModelState.declareVariables(variableList);
-};

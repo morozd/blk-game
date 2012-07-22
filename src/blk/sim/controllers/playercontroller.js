@@ -25,7 +25,6 @@ goog.require('blk.sim.Controller');
 goog.require('blk.sim.EntityType');
 goog.require('gf');
 goog.require('gf.sim');
-goog.require('gf.sim.EntityState');
 
 
 
@@ -72,31 +71,3 @@ if (gf.CLIENT) {
     return true;
   };
 }
-
-
-
-/**
- * Controller entity state.
- * @constructor
- * @extends {blk.sim.ControllerState}
- * @param {!gf.sim.Entity} entity Entity that this object stores state for.
- * @param {!gf.sim.VariableTable=} opt_variableTable A subclass's variable
- *     table, if subclassed.
- */
-blk.sim.controllers.PlayerControllerState = function(
-    entity, opt_variableTable) {
-  var variableTable = opt_variableTable || gf.sim.EntityState.getVariableTable(
-      blk.sim.controllers.PlayerControllerState.declareVariables);
-  goog.base(this, entity, variableTable);
-};
-goog.inherits(blk.sim.controllers.PlayerControllerState,
-    blk.sim.ControllerState);
-
-
-/**
- * @override
- */
-blk.sim.controllers.PlayerControllerState.declareVariables = function(
-    variableList) {
-  blk.sim.ControllerState.declareVariables(variableList);
-};

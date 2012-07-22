@@ -22,7 +22,6 @@ goog.provide('blk.sim.Controller');
 
 goog.require('gf');
 goog.require('gf.sim.Entity');
-goog.require('gf.sim.EntityState');
 
 
 
@@ -62,27 +61,3 @@ if (gf.CLIENT) {
    */
   blk.sim.Controller.prototype.processInput = goog.abstractMethod;
 }
-
-
-
-/**
- * Controller entity state.
- * @constructor
- * @extends {gf.sim.EntityState}
- * @param {!gf.sim.Entity} entity Entity that this object stores state for.
- * @param {!gf.sim.VariableTable} variableTable A subclass's variable table.
- */
-blk.sim.ControllerState = function(entity, variableTable) {
-  goog.base(this, entity, variableTable);
-};
-goog.inherits(blk.sim.ControllerState,
-    gf.sim.EntityState);
-
-
-/**
- * @override
- */
-blk.sim.ControllerState.declareVariables = function(
-    variableList) {
-  gf.sim.EntityState.declareVariables(variableList);
-};

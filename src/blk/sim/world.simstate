@@ -1,0 +1,12 @@
+{
+  "name": "blk.sim.WorldState",
+  "super": "gf.sim.SceneEntityState",
+  "vars": [
+    {
+      "name": "testVar",
+      "type": "Float",
+      "flags": [
+      ]
+    }
+  ]
+}

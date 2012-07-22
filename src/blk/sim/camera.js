@@ -26,9 +26,12 @@ goog.require('blk.sim');
 goog.require('blk.sim.EntityType');
 goog.require('gf');
 goog.require('gf.sim');
-goog.require('gf.sim.EntityState');
 goog.require('gf.sim.SchedulingPriority');
 goog.require('gf.sim.SpatialEntity');
+goog.require('goog.asserts');
+goog.require('goog.vec.Mat4');
+goog.require('goog.vec.Quaternion');
+goog.require('goog.vec.Vec3');
 
 
 
@@ -204,32 +207,8 @@ blk.sim.Camera.prototype.calculateViewport = function(viewport) {
     goog.vec.Mat4.translate(vm,
         -position[0], -position[1], -position[2]);
 
-    // Update viewport matrices/etc now that the controller logic has been applied
+    // Update viewport matrices/etc now that the controller logic has been
+    // applied
     viewport.calculate();
   }
-};
-
-
-
-/**
- * Camera entity state.
- * @constructor
- * @extends {gf.sim.SpatialEntityState}
- * @param {!gf.sim.Entity} entity Entity that this object stores state for.
- * @param {gf.sim.VariableTable=} opt_variableTable A subclass's variable table.
- */
-blk.sim.CameraState = function(entity, opt_variableTable) {
-  var variableTable = opt_variableTable || gf.sim.EntityState.getVariableTable(
-      blk.sim.CameraState.declareVariables);
-  goog.base(this, entity, variableTable);
-};
-goog.inherits(blk.sim.CameraState,
-    gf.sim.SpatialEntityState);
-
-
-/**
- * @override
- */
-blk.sim.CameraState.declareVariables = function(variableList) {
-  gf.sim.SpatialEntityState.declareVariables(variableList);
 };

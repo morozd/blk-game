@@ -1,0 +1,26 @@
+{
+  "name": "blk.sim.ModelState",
+  "super": "gf.sim.SpatialEntityState",
+  "vars": [
+    {
+      "name": "modelName",
+      "type": "String",
+      "flags": [
+      ]
+    },
+    {
+      "name": "modelColor",
+      "type": "Color",
+      "flags": [
+        "UPDATED_FREQUENTLY",
+        "INTERPOLATED"
+      ]
+    },
+    {
+      "name": "attachPoint",
+      "type": "Integer",
+      "flags": [
+      ]
+    }
+  ]
+}

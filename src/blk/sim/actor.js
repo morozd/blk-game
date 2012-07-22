@@ -24,9 +24,6 @@ goog.require('blk.sim');
 goog.require('blk.sim.EntityType');
 goog.require('blk.sim.Model');
 goog.require('gf.sim');
-goog.require('gf.sim.EntityState');
-goog.require('goog.vec.Mat4');
-goog.require('goog.vec.Quaternion');
 
 
 
@@ -58,28 +55,3 @@ goog.inherits(blk.sim.Actor, blk.sim.Model);
  */
 blk.sim.Actor.ID = gf.sim.createTypeId(
     blk.sim.BLK_MODULE_ID, blk.sim.EntityType.ACTOR);
-
-
-/**
- * Actor entity state.
- * @constructor
- * @extends {blk.sim.ModelState}
- * @param {!gf.sim.Entity} entity Entity that this object stores state for.
- * @param {gf.sim.VariableTable=} opt_variableTable A subclass's variable table.
- */
-blk.sim.ActorState = function(entity, opt_variableTable) {
-  var variableTable = opt_variableTable || gf.sim.EntityState.getVariableTable(
-      blk.sim.ActorState.declareVariables);
-  goog.base(this, entity, variableTable);
-};
-goog.inherits(blk.sim.ActorState,
-    blk.sim.ModelState);
-
-
-/**
- * @override
- */
-blk.sim.ActorState.declareVariables = function(
-    variableList) {
-  blk.sim.ModelState.declareVariables(variableList);
-};

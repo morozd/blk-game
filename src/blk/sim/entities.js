@@ -21,11 +21,17 @@
 goog.provide('blk.sim.entities');
 
 goog.require('blk.sim.Actor');
+goog.require('blk.sim.ActorState');
 goog.require('blk.sim.Camera');
+goog.require('blk.sim.CameraState');
 goog.require('blk.sim.Player');
+goog.require('blk.sim.PlayerState');
 goog.require('blk.sim.World');
+goog.require('blk.sim.WorldState');
 goog.require('blk.sim.controllers.PlayerController');
+goog.require('blk.sim.controllers.PlayerControllerState');
 goog.require('blk.sim.tools.PickaxeTool');
+goog.require('blk.sim.tools.PickaxeToolState');
 goog.require('gf.sim.EntityFactory');
 
 

@@ -48,27 +48,3 @@ blk.sim.Tool = function(
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
 goog.inherits(blk.sim.Tool, blk.sim.Model);
-
-
-
-/**
- * Tool entity state.
- * @constructor
- * @extends {blk.sim.ModelState}
- * @param {!gf.sim.Entity} entity Entity that this object stores state for.
- * @param {!gf.sim.VariableTable} variableTable A subclass's variable table.
- */
-blk.sim.ToolState = function(entity, variableTable) {
-  goog.base(this, entity, variableTable);
-};
-goog.inherits(blk.sim.ToolState,
-    blk.sim.ModelState);
-
-
-/**
- * @override
- */
-blk.sim.ToolState.declareVariables = function(
-    variableList) {
-  blk.sim.ModelState.declareVariables(variableList);
-};

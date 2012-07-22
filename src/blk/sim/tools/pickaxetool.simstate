@@ -1,0 +1,6 @@
+{
+  "name": "blk.sim.tools.PickaxeToolState",
+  "super": "blk.sim.ToolState",
+  "vars": [
+  ]
+}

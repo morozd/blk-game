@@ -1,0 +1,6 @@
+{
+  "name": "blk.sim.CameraState",
+  "super": "gf.sim.SpatialEntityState",
+  "vars": [
+  ]
+}
