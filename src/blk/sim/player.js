@@ -222,12 +222,9 @@ if (gf.CLIENT) {
       var state = /** @type {!blk.sim.PlayerState} */ (this.getState());
 
       this.user_ = simulator.getUser(state.getUserId());
-      this.actor_ = /** @type {!blk.sim.Actor} */ (
-          simulator.getEntity(state.getActorId()));
-      this.controller_ = /** @type {!blk.sim.controllers.PlayerController} */ (
-          simulator.getEntity(state.getControllerId()));
-      this.camera_ = /** @type {!blk.sim.Camera} */ (
-          simulator.getEntity(state.getCameraId()));
+      this.actor_ = state.getActorIdEntity();
+      this.controller_ = state.getControllerIdEntity();
+      this.camera_ = state.getCameraIdEntity();
     }
   };
 }

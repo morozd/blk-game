@@ -11,18 +11,21 @@
     {
       "name": "actorId",
       "type": "EntityID",
+      "entity_type": "blk.sim.Actor",
       "flags": [
       ]
     },
     {
       "name": "controllerId",
       "type": "EntityID",
+      "entity_type": "blk.sim.Controller",
       "flags": [
       ]
     },
     {
       "name": "cameraId",
       "type": "EntityID",
+      "entity_type": "blk.sim.Camera",
       "flags": [
       ]
     }
