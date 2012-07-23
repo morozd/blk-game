@@ -59,21 +59,74 @@ blk.sim.commands.PlayerMoveCommand = function(commandFactory) {
   goog.base(this, commandFactory);
 
   /**
-   * Viewport rotation quaternion at the time the command was generated.
-   * @type {!goog.vec.Quaternion.Float32}
-   */
-  this.viewRotation = goog.vec.Quaternion.createFloat32();
-
-  /**
    * Bitmask indicating translation movement.
    * Zero or more bits set from {@see blk.sim.commands.PlayerMoveTranslation}.
    * Expected to be <= 8 bits.
    * @type {number}
    */
   this.translation = 0;
+
+  /**
+   * Quantized yaw angle.
+   * @private
+   * @type {number}
+   */
+  this.yaw_ = 0;
+
+  /**
+   * Quantized pitch angle.
+   * @private
+   * @type {number}
+   */
+  this.pitch_ = 0;
+
+  /**
+   * Quantized roll angle.
+   * @private
+   * @type {number}
+   */
+  this.roll_ = 0;
 };
-goog.inherits(blk.sim.commands.PlayerMoveCommand,
-    gf.sim.PredictedCommand);
+goog.inherits(blk.sim.commands.PlayerMoveCommand, gf.sim.PredictedCommand);
+
+
+/**
+ * Sets the euler angles of view rotation.
+ * @param {number} yaw Yaw angle, in radians.
+ * @param {number} pitch Pitch angle, in radians.
+ * @param {number} roll Roll angle, in radians.
+ */
+blk.sim.commands.PlayerMoveCommand.prototype.setAngles = function(
+    yaw, pitch, roll) {
+  // Quantize to [-32767,32767] by converting to degrees
+  // TODO(benvanik): even fewer bits?
+  this.yaw_ = (((yaw * 180 / Math.PI) % 360) / 360 * 32767) | 0;
+  this.pitch_ = (((pitch * 180 / Math.PI) % 360) / 360 * 32767) | 0;
+  this.roll_ = (((roll * 180 / Math.PI) % 360) / 360 * 32767) | 0;
+};
+
+
+/**
+ * Constant to multiply angles by unquantize.
+ * @private
+ * @const
+ * @type {number}
+ */
+blk.sim.commands.PlayerMoveCommand.UNQUANT_CONST_ =
+    1 / 32767 * 360 * Math.PI / 180;
+
+
+/**
+ * Calculates a quaternion for the view rotation based.
+ * @param {!goog.vec.Quaternion.Float32} result Result quaternion.
+ */
+blk.sim.commands.PlayerMoveCommand.prototype.getQuaternion = function(result) {
+  // Unquantize
+  gf.vec.Quaternion.makeEulerZYX(result,
+      this.yaw_ * blk.sim.commands.PlayerMoveCommand.UNQUANT_CONST_,
+      this.pitch_ * blk.sim.commands.PlayerMoveCommand.UNQUANT_CONST_,
+      this.roll_ * blk.sim.commands.PlayerMoveCommand.UNQUANT_CONST_);
+};
 
 
 /**
@@ -82,8 +135,10 @@ goog.inherits(blk.sim.commands.PlayerMoveCommand,
 blk.sim.commands.PlayerMoveCommand.prototype.read = function(reader) {
   goog.base(this, 'read', reader);
 
-  reader.readVec4(this.viewRotation);
   this.translation = reader.readUint8();
+  this.yaw_ = reader.readInt16();
+  this.pitch_ = reader.readInt16();
+  this.roll_ = reader.readInt16();
 };
 
 
@@ -93,8 +148,10 @@ blk.sim.commands.PlayerMoveCommand.prototype.read = function(reader) {
 blk.sim.commands.PlayerMoveCommand.prototype.write = function(writer) {
   goog.base(this, 'write', writer);
 
-  writer.writeVec4(this.viewRotation);
   writer.writeUint8(this.translation);
+  writer.writeInt16(this.yaw_);
+  writer.writeInt16(this.pitch_);
+  writer.writeInt16(this.roll_);
 };
 
 

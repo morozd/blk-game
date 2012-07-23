@@ -78,11 +78,22 @@ blk.sim.controllers.FpsController.prototype.executeCommand = function(
         target.getState());
 
     // Set view rotation directly
-    targetState.setRotation(command.viewRotation);
+    var q = blk.sim.controllers.FpsController.tmpQuat_;
+    command.getQuaternion(q);
+    targetState.setRotation(q);
 
     // TODO(benvanik): apply translation
   }
 };
+
+
+/**
+ * Scratch quaternion.
+ * @private
+ * @type {!goog.vec.Quaternion.Float32}
+ */
+blk.sim.controllers.FpsController.tmpQuat_ =
+    goog.vec.Quaternion.createFloat32();
 
 
 
@@ -242,9 +253,8 @@ blk.sim.controllers.ClientFpsController.prototype.processMovement_ =
         this.createCommand(blk.sim.commands.PlayerMoveCommand.ID));
     cmd.time = frame.time;
     cmd.timeDelta = frame.timeDelta;
-    gf.vec.Quaternion.makeEulerZYX(cmd.viewRotation,
-        this.yaw_, this.pitch_, this.roll_);
     cmd.translation = translation;
+    cmd.setAngles(this.yaw_, this.pitch_, this.roll_);
     this.simulator.sendCommand(cmd);
   }
 };

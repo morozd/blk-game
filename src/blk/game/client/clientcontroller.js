@@ -522,9 +522,12 @@ blk.game.client.ClientController.prototype.drawWorld = function(frame) {
  */
 blk.game.client.ClientController.prototype.drawOverlays =
     function(frame, inputData) {
+  var simInfo = 'Sim: ' + this.simulator_.statistics.getDebugInfo();
+  this.simulator_.statistics.update(frame.time);
   var mapStats = this.map_.getStatisticsString();
   var extraInfo = this.getDebugInfo();
-  this.console_.render(frame, this.screenViewport_, mapStats, extraInfo);
+  this.console_.render(
+      frame, this.screenViewport_, simInfo, mapStats, extraInfo);
 };
 
 
