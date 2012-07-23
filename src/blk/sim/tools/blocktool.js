@@ -18,47 +18,46 @@
  * @author benvanik@google.com (Ben Vanik)
  */
 
-goog.provide('blk.sim.Controller');
+goog.provide('blk.sim.tools.BlockTool');
 
-goog.require('gf');
-goog.require('gf.sim.Entity');
+goog.require('blk.sim');
+goog.require('blk.sim.EntityType');
+goog.require('blk.sim.Tool');
+goog.require('gf.sim');
 
 
 
 /**
- * Abstract actor controller entity.
- * Can be parented to an actor and assigned as a controller.
+ * Block tool entity.
+ * A block placement tool.
  *
  * @constructor
- * @extends {gf.sim.Entity}
+ * @extends {blk.sim.Tool}
  * @param {!gf.sim.Simulator} simulator Owning simulator.
  * @param {!gf.sim.EntityFactory} entityFactory Entity factory.
  * @param {number} entityId Entity ID.
  * @param {number} entityFlags Bitmask of {@see gf.sim.EntityFlag} values.
  */
-blk.sim.Controller = function(
+blk.sim.tools.BlockTool = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
-goog.inherits(blk.sim.Controller, gf.sim.Entity);
+goog.inherits(blk.sim.tools.BlockTool, blk.sim.Tool);
 
 
 /**
- * Gets the target actor of the controller, if any.
- * @return {blk.sim.Actor} Target actor.
+ * Entity ID.
+ * @const
+ * @type {number}
  */
-blk.sim.Controller.prototype.getTarget = function() {
-  return /** @type {blk.sim.Actor} */ (this.getParent());
+blk.sim.tools.BlockTool.ID = gf.sim.createTypeId(
+    blk.sim.BLK_MODULE_ID, blk.sim.EntityType.BLOCK_TOOL);
+
+
+/**
+ * Sets the block type this tool represents.
+ * @param {!blk.env.Block} value Block type.
+ */
+blk.sim.tools.BlockTool.prototype.setBlockType = function(value) {
+  //
 };
-
-
-if (gf.CLIENT) {
-  /**
-   * Processes the input control for a single frame.
-   * @param {!gf.RenderFrame} frame Current frame.
-   * @param {!gf.input.Data} inputData Current input data.
-   * @param {!gf.vec.Viewport} viewport Previous frames viewport.
-   * @return {boolean} True if input is valid, false if input has failed.
-   */
-  blk.sim.Controller.prototype.processInput = goog.abstractMethod;
-}

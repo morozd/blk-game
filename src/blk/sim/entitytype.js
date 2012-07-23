@@ -37,6 +37,10 @@ blk.sim.EntityType = {
   FPS_CONTROLLER: 3,
   /** {@see blk.sim.Actor} */
   ACTOR: 4,
+  /** {@see blk.sim.Inventory} */
+  INVENTORY: 5,
   /** {@see blk.sim.tools.PickaxeTool} */
-  PICKAXE_TOOL: 5
+  PICKAXE_TOOL: 6,
+  /** {@see blk.sim.tools.BlockTool} */
+  BLOCK_TOOL: 7
 };

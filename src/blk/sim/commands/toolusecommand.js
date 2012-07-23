@@ -25,6 +25,7 @@ goog.require('blk.sim');
 goog.require('blk.sim.commands.CommandType');
 goog.require('gf.sim');
 goog.require('gf.sim.PredictedCommand');
+goog.require('goog.vec.Vec3');
 
 
 /**
@@ -65,9 +66,49 @@ blk.sim.commands.ToolUseCommand = function(commandFactory) {
    * @type {number}
    */
   this.actions = 0;
+
+  /**
+   * Ray origin point.
+   * @type {!goog.vec.Vec3.Float32}
+   */
+  this.rayOrigin = goog.vec.Vec3.createFloat32();
+
+  /**
+   * Ray direction.
+   * @type {!goog.vec.Vec3.Float32}
+   */
+  this.rayDirection = goog.vec.Vec3.createFloat32();
 };
 goog.inherits(blk.sim.commands.ToolUseCommand,
     gf.sim.PredictedCommand);
+
+
+/**
+ * Gets the ray value.
+ * @param {!gf.vec.Ray.Type} result Output result ray.
+ */
+blk.sim.commands.ToolUseCommand.prototype.getRay = function(result) {
+  result[0] = this.rayOrigin[0];
+  result[1] = this.rayOrigin[1];
+  result[2] = this.rayOrigin[2];
+  result[3] = this.rayDirection[0];
+  result[4] = this.rayDirection[1];
+  result[5] = this.rayDirection[2];
+};
+
+
+/**
+ * Sets the ray value.
+ * @param {!gf.vec.Ray.Type} value Ray value.
+ */
+blk.sim.commands.ToolUseCommand.prototype.setRay = function(value) {
+  this.rayOrigin[0] = value[0];
+  this.rayOrigin[1] = value[1];
+  this.rayOrigin[2] = value[2];
+  this.rayDirection[0] = value[3];
+  this.rayDirection[1] = value[4];
+  this.rayDirection[2] = value[5];
+};
 
 
 /**
@@ -77,6 +118,8 @@ blk.sim.commands.ToolUseCommand.prototype.read = function(reader, timeBase) {
   goog.base(this, 'read', reader, timeBase);
 
   this.actions = reader.readUint8();
+  reader.readVec3(this.rayOrigin);
+  reader.readVec3(this.rayDirection);
 };
 
 
@@ -87,6 +130,8 @@ blk.sim.commands.ToolUseCommand.prototype.write = function(writer, timeBase) {
   goog.base(this, 'write', writer, timeBase);
 
   writer.writeUint8(this.actions);
+  writer.writeVec3(this.rayOrigin);
+  writer.writeVec3(this.rayDirection);
 };
 
 

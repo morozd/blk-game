@@ -20,15 +20,18 @@
 
 goog.provide('blk.sim.Player');
 
+goog.require('blk.env.blocks.BlockID');
 goog.require('blk.sim');
 goog.require('blk.sim.Actor');
 goog.require('blk.sim.Camera');
 goog.require('blk.sim.EntityType');
+goog.require('blk.sim.Inventory');
 goog.require('blk.sim.controllers.FpsController');
+goog.require('blk.sim.tools.BlockTool');
+goog.require('blk.sim.tools.PickaxeTool');
 goog.require('gf');
 goog.require('gf.sim');
 goog.require('gf.sim.Entity');
-goog.require('gf.sim.EntityDirtyFlag');
 goog.require('gf.sim.EntityFlag');
 goog.require('goog.asserts');
 goog.require('goog.vec.Vec3');
@@ -49,34 +52,6 @@ goog.require('goog.vec.Vec3');
 blk.sim.Player = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
-
-  /**
-   * User.
-   * @private
-   * @type {gf.net.User}
-   */
-  this.user_ = null;
-
-  /**
-   * Actor representing the player in the world.
-   * @private
-   * @type {blk.sim.Actor}
-   */
-  this.actor_ = null;
-
-  /**
-   * Player controller logic.
-   * @private
-   * @type {blk.sim.controllers.FpsController}
-   */
-  this.controller_ = null;
-
-  /**
-   * Player camera.
-   * @private
-   * @type {blk.sim.Camera}
-   */
-  this.camera_ = null;
 };
 goog.inherits(blk.sim.Player, gf.sim.Entity);
 
@@ -104,8 +79,10 @@ blk.sim.Player.prototype.getWorld = function() {
  * @return {!gf.net.User} User this player represents.
  */
 blk.sim.Player.prototype.getUser = function() {
-  goog.asserts.assert(this.user_);
-  return this.user_;
+  var state = /** @type {!blk.sim.PlayerState} */ (this.getState());
+  var value = state.getUserIdUser();
+  goog.asserts.assert(value);
+  return value;
 };
 
 
@@ -113,8 +90,10 @@ blk.sim.Player.prototype.getUser = function() {
  * @return {!blk.sim.Actor} Player actor.
  */
 blk.sim.Player.prototype.getActor = function() {
-  goog.asserts.assert(this.actor_);
-  return this.actor_;
+  var state = /** @type {!blk.sim.PlayerState} */ (this.getState());
+  var value = state.getActorIdEntity();
+  goog.asserts.assert(value);
+  return value;
 };
 
 
@@ -122,17 +101,33 @@ blk.sim.Player.prototype.getActor = function() {
  * @return {!blk.sim.controllers.FpsController} Player controller.
  */
 blk.sim.Player.prototype.getController = function() {
-  goog.asserts.assert(this.controller_);
-  return this.controller_;
+  var state = /** @type {!blk.sim.PlayerState} */ (this.getState());
+  var value = /** @type {!blk.sim.controllers.FpsController} */ (
+      state.getControllerIdEntity());
+  goog.asserts.assert(value);
+  return value;
 };
 
 
 /**
- * @return {!blk.sim.Camera} Player camera.
+ * @return {!blk.sim.Inventory} Player camera.
  */
 blk.sim.Player.prototype.getCamera = function() {
-  goog.asserts.assert(this.camera_);
-  return this.camera_;
+  var state = /** @type {!blk.sim.PlayerState} */ (this.getState());
+  var value = state.getCameraIdEntity();
+  goog.asserts.assert(value);
+  return value;
+};
+
+
+/**
+ * @return {!blk.sim.Inventory} Player camera.
+ */
+blk.sim.Player.prototype.getInventory = function() {
+  var state = /** @type {!blk.sim.PlayerState} */ (this.getState());
+  var value = state.getInventoryIdEntity();
+  goog.asserts.assert(value);
+  return value;
 };
 
 
@@ -147,46 +142,79 @@ if (gf.SERVER) {
     var simulator = this.getSimulator();
     var state = /** @type {!blk.sim.PlayerState} */ (this.getState());
 
-    goog.asserts.assert(!this.user_);
-    this.user_ = user;
-    state.setUserId(user.sessionId);
+    // Set owner so that permissions allow the owner to issue commands
     this.setOwner(user);
+    state.setUserId(user.sessionId);
 
     // Parent to the world
+    var map = world.getMap();
     this.setParent(world);
 
     // Create actor
-    this.actor_ = /** @type {!blk.sim.Actor} */ (
+    var actor = /** @type {!blk.sim.Actor} */ (
         simulator.createEntity(
             blk.sim.Actor.ID,
             gf.sim.EntityFlag.UPDATED_FREQUENTLY |
             gf.sim.EntityFlag.PREDICTED |
             gf.sim.EntityFlag.INTERPOLATED |
             gf.sim.EntityFlag.LATENCY_COMPENSATED));
-    state.setActorId(this.actor_.getId());
+    state.setActorId(actor.getId());
 
     // Create player controller
-    this.controller_ = /** @type {!blk.sim.controllers.FpsController} */ (
+    var controller = /** @type {!blk.sim.controllers.FpsController} */ (
         simulator.createEntity(
             blk.sim.controllers.FpsController.ID,
             gf.sim.EntityFlag.UPDATED_FREQUENTLY));
-    this.controller_.setOwner(user);
-    this.controller_.setParent(this.actor_);
-    state.setControllerId(this.controller_.getId());
+    controller.setOwner(user);
+    controller.setParent(actor);
+    state.setControllerId(controller.getId());
 
     // Create camera
-    this.camera_ = /** @type {!blk.sim.Camera} */ (
+    var camera = /** @type {!blk.sim.Camera} */ (
         simulator.createEntity(
             blk.sim.Camera.ID,
             gf.sim.EntityFlag.UPDATED_FREQUENTLY |
             gf.sim.EntityFlag.PREDICTED |
             gf.sim.EntityFlag.INTERPOLATED));
-    this.camera_.setOwner(user);
-    this.camera_.setParent(this.actor_);
-    this.camera_.setup(user, world);
-    state.setCameraId(this.camera_.getId());
+    camera.setOwner(user);
+    camera.setParent(actor);
+    camera.setup(user, world);
+    state.setCameraId(camera.getId());
 
-    // TODO(benvanik): create inventory system
+    // Create inventory
+    var inventory = /** @type {!blk.sim.Inventory} */ (
+        simulator.createEntity(
+            blk.sim.Inventory.ID,
+            0));
+    inventory.setOwner(user);
+    inventory.setParent(actor);
+    state.setInventoryId(inventory.getId());
+
+    // Add a pickaxe to the inventory
+    var pickaxeTool = /** @type {!blk.sim.tools.PickaxeTool} */ (
+        simulator.createEntity(
+            blk.sim.tools.PickaxeTool.ID,
+            0));
+    pickaxeTool.setOwner(user);
+    pickaxeTool.setParent(inventory);
+
+    // Add a few blocks to the inventory
+    var blockTypes = [
+      map.blockSet.getBlockWithId(blk.env.blocks.BlockID.DIRT),
+      map.blockSet.getBlockWithId(blk.env.blocks.BlockID.STONE),
+      map.blockSet.getBlockWithId(blk.env.blocks.BlockID.BRICK),
+      map.blockSet.getBlockWithId(blk.env.blocks.BlockID.WOOD),
+      map.blockSet.getBlockWithId(blk.env.blocks.BlockID.GLASS)
+    ];
+    for (var n = 0; n < blockTypes.length; n++) {
+      var blockTool = /** @type {!blk.sim.tools.BlockTool} */ (
+          simulator.createEntity(
+              blk.sim.tools.BlockTool.ID,
+              0));
+      blockTool.setOwner(user);
+      blockTool.setParent(inventory);
+      blockTool.setBlockType(blockTypes[n]);
+    }
   };
 
 
@@ -195,12 +223,13 @@ if (gf.SERVER) {
    */
   blk.sim.Player.prototype.spawn = function() {
     // Add the actor to the world
-    this.actor_.setParent(this.getParent());
+    var actor = this.getActor();
+    actor.setParent(this.getParent());
 
     // Pick a spawn point
     // TODO(benvanik): be smart, take as input, etc
     var spawnPosition = goog.vec.Vec3.createFloat32FromValues(0, 80, 0);
-    this.actor_.getState().setPosition(spawnPosition);
+    actor.getState().setPosition(spawnPosition);
   };
 
 
@@ -224,12 +253,8 @@ if (gf.CLIENT) {
       var simulator = this.getSimulator();
       var state = /** @type {!blk.sim.PlayerState} */ (this.getState());
 
+      // TODO(benvanik): find a way to avoid this -- UserID var type?
       this.user_ = simulator.getUser(state.getUserId());
-      this.actor_ = state.getActorIdEntity();
-      this.controller_ =
-          /** @type {!blk.sim.controllers.FpsController} */ (
-          state.getControllerIdEntity());
-      this.camera_ = state.getCameraIdEntity();
     }
-  };
+  }
 }

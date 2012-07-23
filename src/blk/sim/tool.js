@@ -21,6 +21,8 @@
 goog.provide('blk.sim.Tool');
 
 goog.require('blk.sim.Model');
+goog.require('blk.sim.commands.ToolUseCommand');
+goog.require('gf.log');
 
 
 
@@ -48,3 +50,41 @@ blk.sim.Tool = function(
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
 goog.inherits(blk.sim.Tool, blk.sim.Model);
+
+
+/**
+ * @override
+ */
+blk.sim.Tool.prototype.parentChanged = function(oldParent, newParent) {
+  goog.base(this, 'parentChanged', oldParent, newParent);
+
+  // Parent changed - added/removed from inventory, in/out of hand, etc
+};
+
+
+/**
+ * @override
+ */
+blk.sim.Tool.prototype.executeCommand = function(command) {
+  goog.base(this, 'executeCommand', command);
+
+  // Execute use commands
+  if (command instanceof blk.sim.commands.ToolUseCommand) {
+    this.use(command);
+  }
+};
+
+
+/**
+ * Uses the tool.
+ * @protected
+ * @param {!blk.sim.commands.ToolUseCommand} command Command.
+ */
+blk.sim.Tool.prototype.use = function(command) {
+  // TODO(benvanik): tool flags (melee-able, use-from-inventory, etc)
+  // TODO(benvanik): handle basic repeat logic (instaneous, held-down, etc)
+  // TODO(benvanik): handle prediction logic (hasPredicted)
+  if (!command.hasPredicted) {
+    gf.log.write('used tool');
+  }
+};

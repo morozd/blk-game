@@ -24,6 +24,8 @@ goog.require('blk.sim.Actor');
 goog.require('blk.sim.ActorState');
 goog.require('blk.sim.Camera');
 goog.require('blk.sim.CameraState');
+goog.require('blk.sim.Inventory');
+goog.require('blk.sim.InventoryState');
 goog.require('blk.sim.Player');
 goog.require('blk.sim.PlayerState');
 goog.require('blk.sim.World');
@@ -31,6 +33,8 @@ goog.require('blk.sim.WorldState');
 goog.require('blk.sim.controllers.ClientFpsController');
 goog.require('blk.sim.controllers.FpsController');
 goog.require('blk.sim.controllers.FpsControllerState');
+goog.require('blk.sim.tools.BlockTool');
+goog.require('blk.sim.tools.BlockToolState');
 goog.require('blk.sim.tools.PickaxeTool');
 goog.require('blk.sim.tools.PickaxeToolState');
 goog.require('gf');
@@ -74,9 +78,21 @@ blk.sim.entities.registerEntities = function(simulator) {
       blk.sim.Actor,
       blk.sim.ActorState));
 
+  // INVENTORY
+  simulator.registerEntityFactory(new gf.sim.EntityFactory(
+      blk.sim.Inventory.ID,
+      blk.sim.Inventory,
+      blk.sim.InventoryState));
+
   // PICKAXE_TOOL
   simulator.registerEntityFactory(new gf.sim.EntityFactory(
       blk.sim.tools.PickaxeTool.ID,
       blk.sim.tools.PickaxeTool,
       blk.sim.tools.PickaxeToolState));
+
+  // BLOCK_TOOL
+  simulator.registerEntityFactory(new gf.sim.EntityFactory(
+      blk.sim.tools.BlockTool.ID,
+      blk.sim.tools.BlockTool,
+      blk.sim.tools.BlockToolState));
 };

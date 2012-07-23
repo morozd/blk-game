@@ -287,5 +287,12 @@ setupMap()
 getMap()
 
 
-
-rename entity2 -> entity
+- tool use
+    - tool:
+        - melee | use
+    - block tool:
+        - blockType
+        - use(): place block
+- interpolation
+    - spawn random, interp rotation
+- move (physics system?)

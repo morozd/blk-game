@@ -26,6 +26,8 @@ goog.require('blk.sim.Controller');
 goog.require('blk.sim.EntityType');
 goog.require('blk.sim.commands.PlayerMoveCommand');
 goog.require('blk.sim.commands.PlayerMoveTranslation');
+goog.require('blk.sim.commands.ToolUseAction');
+goog.require('blk.sim.commands.ToolUseCommand');
 goog.require('gf.input.MouseButton');
 goog.require('gf.sim');
 goog.require('goog.events.KeyCodes');
@@ -83,6 +85,12 @@ blk.sim.controllers.FpsController.prototype.executeCommand = function(
     targetState.setRotation(q);
 
     // TODO(benvanik): apply translation
+  } else if (command instanceof blk.sim.commands.ToolUseCommand) {
+    // TODO(benvanik): get held item
+    // TODO(benvanik): execute command on held item
+    if (!command.hasPredicted) {
+      gf.log.write('tool use command');
+    }
   }
 };
 
@@ -158,6 +166,20 @@ blk.sim.controllers.ClientFpsController = function(
    */
   this.roll_ = 0;
 
+  /**
+   * Accumulated mouse movement delta.
+   * @private
+   * @type {number}
+   */
+  this.dragDelta_ = 0;
+
+  /**
+   * Last time an action was repeated.
+   * @private
+   * @type {number}
+   */
+  this.repeatTime_ = 0;
+
   // TODO(benvanik): make mode, move to state vars
   /**
    * Whether the camera is free-floating and should have 6-degrees of freedom.
@@ -210,7 +232,7 @@ blk.sim.controllers.ClientFpsController.MAX_PITCH_ = 85 * Math.PI / 180;
  * @override
  */
 blk.sim.controllers.ClientFpsController.prototype.processInput = function(
-    frame, inputData) {
+    frame, inputData, viewport) {
   var state = /** @type {!blk.sim.controllers.FpsControllerState} */ (
       this.getState());
   var target = this.getTarget();
@@ -219,7 +241,7 @@ blk.sim.controllers.ClientFpsController.prototype.processInput = function(
   }
 
   this.processMovement_(frame, inputData, target);
-  this.processActions_(frame, inputData, target);
+  this.processActions_(frame, inputData, target, viewport);
 
   return true;
 };
@@ -266,16 +288,121 @@ blk.sim.controllers.ClientFpsController.prototype.processMovement_ =
 
 
 /**
+ * Number of pixels the mouse must move to cancel discrete input actions.
+ * @private
+ * @const
+ * @type {number}
+ */
+blk.sim.controllers.ClientFpsController.DRAG_HYSTERESIS_ = 4;
+
+
+// TODO(benvanik): move to var
+/**
+ * Seconds between action repeats when buttons are held.
+ * @private
+ * @const
+ * @type {number}
+ */
+blk.sim.controllers.ClientFpsController.ACTION_REPEAT_INTERVAL_ = 250 / 1000;
+
+
+/**
  * Processes actions and generates instances of
  * {@see blk.sim.commands.ToolUseCommand} and others if needed.
  * @private
  * @param {!gf.RenderFrame} frame Render frame.
  * @param {!gf.input.Data} inputData Input data.
  * @param {!blk.sim.Actor} target Target actor entity.
+ * @param {!gf.vec.Viewport} viewport Target actor viewport.
  */
 blk.sim.controllers.ClientFpsController.prototype.processActions_ =
-    function(frame, inputData, target) {
-  //
+    function(frame, inputData, target, viewport) {
+  var keyboardData = inputData.keyboard;
+  var mouseData = inputData.mouse;
+
+  var dragHysteresis = blk.sim.controllers.ClientFpsController.DRAG_HYSTERESIS_;
+  var repeatInterval =
+      blk.sim.controllers.ClientFpsController.ACTION_REPEAT_INTERVAL_;
+
+  var useButton = keyboardData.didKeyGoDown(goog.events.KeyCodes.E);
+  var useAltButton = false;
+
+  if (!mouseData.isLocked) {
+    // Drag mode
+    if (mouseData.buttonsUp & gf.input.MouseButton.LEFT) {
+      if (this.dragDelta_ < dragHysteresis) {
+        useButton = true;
+      }
+    }
+    useAltButton = mouseData.buttonsUp & gf.input.MouseButton.RIGHT;
+    if (keyboardData.ctrlKey &&
+        mouseData.buttonsUp & gf.input.MouseButton.LEFT) {
+      useAltButton = true;
+      this.dragDelta_ = Number.MAX_VALUE;
+    }
+    if (mouseData.buttons) {
+      this.dragDelta_ += Math.abs(mouseData.dx) + Math.abs(mouseData.dy);
+    } else {
+      this.dragDelta_ = 0;
+    }
+  } else {
+    // Lock mode
+    if (mouseData.buttonsDown & gf.input.MouseButton.LEFT) {
+      this.repeatTime_ = frame.time;
+      useButton |= true;
+    } else if (mouseData.buttons & gf.input.MouseButton.LEFT) {
+      var dt = frame.time - this.repeatTime_;
+      if (dt > repeatInterval) {
+        useButton = true;
+        this.repeatTime_ = frame.time;
+      }
+    } else if (mouseData.buttonsDown & gf.input.MouseButton.RIGHT) {
+      this.repeatTime_ = frame.time;
+      useAltButton |= true;
+    } else if (mouseData.buttons & gf.input.MouseButton.RIGHT) {
+      var dt = frame.time - this.repeatTime_;
+      if (dt > repeatInterval) {
+        useAltButton = true;
+        this.repeatTime_ = frame.time;
+      }
+    }
+  }
+  // If ctrl is held, turn uses into alts
+  if (useButton && keyboardData.ctrlKey) {
+    useButton = false;
+    useAltButton = true;
+  }
+
+  var actions = 0;
+  if (useButton) {
+    actions |= blk.sim.commands.ToolUseAction.NORMAL;
+  }
+  if (useAltButton) {
+    actions |= blk.sim.commands.ToolUseAction.ALTERNATE;
+  }
+
+  // Command should be generated
+  if (actions) {
+    // Get crosshair position
+    var mx = mouseData.clientX;
+    var my = mouseData.clientY;
+    if (mouseData.isLocked) {
+      mx = viewport.width / 2;
+      my = viewport.height / 2;
+    }
+
+    // Compute use ray - this should be done client side to ensure we get
+    // the exact point
+    var ray = viewport.getRay(mx, my);
+
+    // Create command
+    var cmd = /** @type {!blk.sim.commands.ToolUseCommand} */ (
+        this.createCommand(blk.sim.commands.ToolUseCommand.ID));
+    cmd.setTime(frame.time);
+    cmd.actions = actions;
+    cmd.setRay(ray);
+    this.simulator.sendCommand(cmd);
+  }
 };
 
 

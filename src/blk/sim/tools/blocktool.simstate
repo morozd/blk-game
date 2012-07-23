@@ -1,0 +1,12 @@
+{
+  "name": "blk.sim.tools.BlockToolState",
+  "super": "blk.sim.ToolState",
+  "vars": [
+    {
+      "name": "blockType",
+      "type": "Integer",
+      "flags": [
+      ]
+    }
+  ]
+}

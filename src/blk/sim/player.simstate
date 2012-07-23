@@ -4,7 +4,7 @@
   "vars": [
     {
       "name": "userId",
-      "type": "String",
+      "type": "UserID",
       "flags": [
       ]
     },
@@ -26,6 +26,13 @@
       "name": "cameraId",
       "type": "EntityID",
       "entity_type": "blk.sim.Camera",
+      "flags": [
+      ]
+    },
+    {
+      "name": "inventoryId",
+      "type": "EntityID",
+      "entity_type": "blk.sim.Inventory",
       "flags": [
       ]
     }

@@ -18,7 +18,7 @@
  * @author benvanik@google.com (Ben Vanik)
  */
 
-goog.provide('blk.sim.Controller');
+goog.provide('blk.sim.Inventory');
 
 goog.require('gf');
 goog.require('gf.sim.Entity');
@@ -36,19 +36,58 @@ goog.require('gf.sim.Entity');
  * @param {number} entityId Entity ID.
  * @param {number} entityFlags Bitmask of {@see gf.sim.EntityFlag} values.
  */
-blk.sim.Controller = function(
+blk.sim.Inventory = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 };
-goog.inherits(blk.sim.Controller, gf.sim.Entity);
+goog.inherits(blk.sim.Inventory, gf.sim.Entity);
+
+
+/**
+ * Entity ID.
+ * @const
+ * @type {number}
+ */
+blk.sim.Inventory.ID = gf.sim.createTypeId(
+    blk.sim.BLK_MODULE_ID, blk.sim.EntityType.INVENTORY);
 
 
 /**
  * Gets the target actor of the controller, if any.
  * @return {blk.sim.Actor} Target actor.
  */
-blk.sim.Controller.prototype.getTarget = function() {
+blk.sim.Inventory.prototype.getTarget = function() {
   return /** @type {blk.sim.Actor} */ (this.getParent());
+};
+
+
+/**
+ * @override
+ */
+blk.sim.Inventory.prototype.childAdded = function(entity) {
+  goog.base(this, 'childAdded', entity);
+
+  // Item was added to the inventory
+};
+
+
+/**
+ * @override
+ */
+blk.sim.Inventory.prototype.childRemoved = function(entity) {
+  goog.base(this, 'childRemoved', entity);
+
+  // Item was removed from the inventory
+};
+
+
+/**
+ * @override
+ */
+blk.sim.Inventory.prototype.executeCommand = function(command) {
+  goog.base(this, 'executeCommand', command);
+
+  // TODO(benvanik): inventory commands
 };
 
 
@@ -57,8 +96,7 @@ if (gf.CLIENT) {
    * Processes the input control for a single frame.
    * @param {!gf.RenderFrame} frame Current frame.
    * @param {!gf.input.Data} inputData Current input data.
-   * @param {!gf.vec.Viewport} viewport Previous frames viewport.
    * @return {boolean} True if input is valid, false if input has failed.
    */
-  blk.sim.Controller.prototype.processInput = goog.abstractMethod;
+  blk.sim.Inventory.prototype.processInput = goog.abstractMethod;
 }

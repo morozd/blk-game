@@ -254,12 +254,18 @@ blk.modes.fps.client.FpsClientController.prototype.processInput =
   //   }
   // }
 
+  // Always use the previous frames viewport for input processing
+  // There's a very small chance it is incorrect (first frame rendered), but
+  // by using the viewport that represents what the player clicked on it can
+  // help reduce inconsistencies when moving fast
+  var viewport = this.playerViewport_;
+
   // Process controller input
   // TODO(benvanik): cleanup
   var localPlayer = this.getLocalPlayer();
   if (localPlayer) {
     var controller = localPlayer.getController();
-    if (!controller.processInput(frame, inputData)) {
+    if (!controller.processInput(frame, inputData, viewport)) {
       // Failed for some reason - likely prediction errors
       this.handleError('Input backup');
       return true;
