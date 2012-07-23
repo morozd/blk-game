@@ -73,8 +73,8 @@ goog.inherits(blk.sim.commands.ToolUseCommand,
 /**
  * @override
  */
-blk.sim.commands.ToolUseCommand.prototype.read = function(reader) {
-  goog.base(this, 'read', reader);
+blk.sim.commands.ToolUseCommand.prototype.read = function(reader, timeBase) {
+  goog.base(this, 'read', reader, timeBase);
 
   this.actions = reader.readUint8();
 };
@@ -83,8 +83,8 @@ blk.sim.commands.ToolUseCommand.prototype.read = function(reader) {
 /**
  * @override
  */
-blk.sim.commands.ToolUseCommand.prototype.write = function(writer) {
-  goog.base(this, 'write', writer);
+blk.sim.commands.ToolUseCommand.prototype.write = function(writer, timeBase) {
+  goog.base(this, 'write', writer, timeBase);
 
   writer.writeUint8(this.actions);
 };
@@ -97,3 +97,11 @@ blk.sim.commands.ToolUseCommand.prototype.write = function(writer) {
  */
 blk.sim.commands.ToolUseCommand.ID = gf.sim.createTypeId(
     blk.sim.BLK_MODULE_ID, blk.sim.commands.CommandType.TOOL_USE);
+
+
+/**
+ * Command flags.
+ * @const
+ * @type {number}
+ */
+blk.sim.commands.ToolUseCommand.FLAGS = gf.sim.PredictedCommand.FLAGS;

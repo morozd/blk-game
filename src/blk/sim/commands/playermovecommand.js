@@ -25,7 +25,7 @@ goog.require('blk.sim');
 goog.require('blk.sim.commands.CommandType');
 goog.require('gf.sim');
 goog.require('gf.sim.PredictedCommand');
-goog.require('goog.vec.Quaternion');
+goog.require('gf.vec.Quaternion');
 
 
 /**
@@ -132,26 +132,27 @@ blk.sim.commands.PlayerMoveCommand.prototype.getQuaternion = function(result) {
 /**
  * @override
  */
-blk.sim.commands.PlayerMoveCommand.prototype.read = function(reader) {
-  goog.base(this, 'read', reader);
+blk.sim.commands.PlayerMoveCommand.prototype.read = function(reader, timeBase) {
+  goog.base(this, 'read', reader, timeBase);
 
   this.translation = reader.readUint8();
   this.yaw_ = reader.readInt16();
   this.pitch_ = reader.readInt16();
-  this.roll_ = reader.readInt16();
+  //this.roll_ = reader.readInt16();
 };
 
 
 /**
  * @override
  */
-blk.sim.commands.PlayerMoveCommand.prototype.write = function(writer) {
-  goog.base(this, 'write', writer);
+blk.sim.commands.PlayerMoveCommand.prototype.write = function(
+    writer, timeBase) {
+  goog.base(this, 'write', writer, timeBase);
 
   writer.writeUint8(this.translation);
   writer.writeInt16(this.yaw_);
   writer.writeInt16(this.pitch_);
-  writer.writeInt16(this.roll_);
+  //writer.writeInt16(this.roll_);
 };
 
 
@@ -162,3 +163,11 @@ blk.sim.commands.PlayerMoveCommand.prototype.write = function(writer) {
  */
 blk.sim.commands.PlayerMoveCommand.ID = gf.sim.createTypeId(
     blk.sim.BLK_MODULE_ID, blk.sim.commands.CommandType.PLAYER_MOVE);
+
+
+/**
+ * Command flags.
+ * @const
+ * @type {number}
+ */
+blk.sim.commands.PlayerMoveCommand.FLAGS = gf.sim.PredictedCommand.FLAGS;

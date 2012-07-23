@@ -33,10 +33,12 @@ blk.sim.commands.registerCommands = function(simulator) {
   // PLAYER_MOVE
   simulator.registerCommandFactory(new gf.sim.CommandFactory(
       blk.sim.commands.PlayerMoveCommand.ID,
-      blk.sim.commands.PlayerMoveCommand));
+      blk.sim.commands.PlayerMoveCommand,
+      blk.sim.commands.PlayerMoveCommand.FLAGS));
 
   // TOOL_USE
   simulator.registerCommandFactory(new gf.sim.CommandFactory(
       blk.sim.commands.ToolUseCommand.ID,
-      blk.sim.commands.ToolUseCommand));
+      blk.sim.commands.ToolUseCommand,
+      blk.sim.commands.ToolUseCommand.FLAGS));
 };

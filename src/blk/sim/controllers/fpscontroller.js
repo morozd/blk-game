@@ -28,8 +28,8 @@ goog.require('blk.sim.commands.PlayerMoveCommand');
 goog.require('blk.sim.commands.PlayerMoveTranslation');
 goog.require('gf.input.MouseButton');
 goog.require('gf.sim');
-goog.require('gf.vec.Quaternion');
 goog.require('goog.events.KeyCodes');
+goog.require('goog.vec.Quaternion');
 
 
 
@@ -235,6 +235,12 @@ blk.sim.controllers.ClientFpsController.prototype.processInput = function(
  */
 blk.sim.controllers.ClientFpsController.prototype.processMovement_ =
     function(frame, inputData, target) {
+  // TODO(benvanik): to reduce network traffic this needs to be reworked such
+  // that this function is only capturing state. Each client update tick the
+  // state should then be flushed, ensuring that only 20hz of input is ever
+  // sent (so 20 commands/sec max).
+  // Right now it very easy to flood the network with player move commands :(
+
   // Sample inputs
   var translation = this.sampleMove_(frame, inputData);
   var lookChanged = this.sampleLook_(frame, inputData);
@@ -251,8 +257,7 @@ blk.sim.controllers.ClientFpsController.prototype.processMovement_ =
   if (didChange) {
     var cmd = /** @type {!blk.sim.commands.PlayerMoveCommand} */ (
         this.createCommand(blk.sim.commands.PlayerMoveCommand.ID));
-    cmd.time = frame.time;
-    cmd.timeDelta = frame.timeDelta;
+    cmd.setTime(frame.time);
     cmd.translation = translation;
     cmd.setAngles(this.yaw_, this.pitch_, this.roll_);
     this.simulator.sendCommand(cmd);
