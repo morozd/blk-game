@@ -21,7 +21,6 @@
 goog.provide('blk.sim.commands');
 
 goog.require('blk.sim.commands.PlayerMoveCommand');
-goog.require('blk.sim.commands.ToolUseCommand');
 goog.require('gf.sim.CommandFactory');
 
 
@@ -35,10 +34,4 @@ blk.sim.commands.registerCommands = function(simulator) {
       blk.sim.commands.PlayerMoveCommand.ID,
       blk.sim.commands.PlayerMoveCommand,
       blk.sim.commands.PlayerMoveCommand.FLAGS));
-
-  // TOOL_USE
-  simulator.registerCommandFactory(new gf.sim.CommandFactory(
-      blk.sim.commands.ToolUseCommand.ID,
-      blk.sim.commands.ToolUseCommand,
-      blk.sim.commands.ToolUseCommand.FLAGS));
 };

@@ -32,6 +32,7 @@ goog.require('blk.sim.tools.PickaxeTool');
 goog.require('gf');
 goog.require('gf.sim');
 goog.require('gf.sim.Entity');
+goog.require('gf.sim.EntityDirtyFlag');
 goog.require('gf.sim.EntityFlag');
 goog.require('goog.asserts');
 goog.require('goog.vec.Vec3');
@@ -110,7 +111,7 @@ blk.sim.Player.prototype.getController = function() {
 
 
 /**
- * @return {!blk.sim.Inventory} Player camera.
+ * @return {!blk.sim.Camera} Player camera.
  */
 blk.sim.Player.prototype.getCamera = function() {
   var state = /** @type {!blk.sim.PlayerState} */ (this.getState());
@@ -238,7 +239,8 @@ if (gf.SERVER) {
    */
   blk.sim.Player.prototype.despawn = function() {
     // Remove the actor from the world
-    this.actor_.setParent(null);
+    var actor = this.getActor();
+    actor.setParent(null);
   };
 }
 
@@ -256,5 +258,5 @@ if (gf.CLIENT) {
       // TODO(benvanik): find a way to avoid this -- UserID var type?
       this.user_ = simulator.getUser(state.getUserId());
     }
-  }
+  };
 }

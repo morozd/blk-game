@@ -21,7 +21,6 @@
 goog.provide('blk.sim.Tool');
 
 goog.require('blk.sim.Model');
-goog.require('blk.sim.commands.ToolUseCommand');
 goog.require('gf.log');
 
 
@@ -63,22 +62,9 @@ blk.sim.Tool.prototype.parentChanged = function(oldParent, newParent) {
 
 
 /**
- * @override
- */
-blk.sim.Tool.prototype.executeCommand = function(command) {
-  goog.base(this, 'executeCommand', command);
-
-  // Execute use commands
-  if (command instanceof blk.sim.commands.ToolUseCommand) {
-    this.use(command);
-  }
-};
-
-
-/**
  * Uses the tool.
  * @protected
- * @param {!blk.sim.commands.ToolUseCommand} command Command.
+ * @param {!blk.sim.commands.PlayerMoveCommand} command Command.
  */
 blk.sim.Tool.prototype.use = function(command) {
   // TODO(benvanik): tool flags (melee-able, use-from-inventory, etc)

@@ -20,7 +20,10 @@
 
 goog.provide('blk.sim.Inventory');
 
+goog.require('blk.sim');
+goog.require('blk.sim.EntityType');
 goog.require('gf');
+goog.require('gf.sim');
 goog.require('gf.sim.Entity');
 
 

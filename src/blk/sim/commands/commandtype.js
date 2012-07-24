@@ -28,7 +28,5 @@ goog.provide('blk.sim.commands.CommandType');
  */
 blk.sim.commands.CommandType = {
   /** {@see blk.sim.commands.PlayerMoveCommand} */
-  PLAYER_MOVE: 0,
-  /** {@see blk.sim.commands.ToolUseCommand} */
-  TOOL_USE: 1
+  PLAYER_MOVE: 0
 };

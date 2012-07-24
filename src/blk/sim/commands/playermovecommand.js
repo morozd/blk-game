@@ -18,6 +18,7 @@
  * @author benvanik@google.com (Ben Vanik)
  */
 
+goog.provide('blk.sim.commands.PlayerMoveAction');
 goog.provide('blk.sim.commands.PlayerMoveCommand');
 goog.provide('blk.sim.commands.PlayerMoveTranslation');
 
@@ -45,6 +46,56 @@ blk.sim.commands.PlayerMoveTranslation = {
 };
 
 
+// TODO(benvanik): find a nice way to avoid the up/down bits
+// This is easy to do on the server (as commands are executed only once) but
+// a bit trickier on the client with prediction
+// When more actions are added and this exceeds 8 bits, figure it out :)
+/**
+ * Bitmask values used to indicate the kind of action a player is toggling.
+ * Expected to be <= 8 bits.
+ * @enum {number}
+ */
+blk.sim.commands.PlayerMoveAction = {
+  /**
+   * Signal bit indicating that any of the actions should be performed at a
+   * given offset in the viewport instead of at the center.
+   * When this bit is present the screenX/screenY values will be set to [0-1]
+   * values indicating where on the screen the action was performed at.
+   */
+  PERFORM_AT_POINT: 1 << 0,
+
+  /**
+   * Normal usage mode, held.
+   */
+  USE_NORMAL: 1 << 1,
+
+  /**
+   * Normal usage mode, latch down.
+   */
+  USE_NORMAL_DOWN: 1 << 2,
+
+  /**
+   * Normal usage mode, latch up.
+   */
+  USE_NORMAL_UP: 1 << 3,
+
+  /**
+   * Alternate usage mode, held.
+   */
+  USE_ALTERNATE: 1 << 4,
+
+  /**
+   * Alternate usage mode, latch down.
+   */
+  USE_ALTERNATE_DOWN: 1 << 5,
+
+  /**
+   * Alternate usage mode, latch up.
+   */
+  USE_ALTERNATE_UP: 1 << 6
+};
+
+
 
 /**
  * Simulation command for player movement.
@@ -65,6 +116,28 @@ blk.sim.commands.PlayerMoveCommand = function(commandFactory) {
    * @type {number}
    */
   this.translation = 0;
+
+  /**
+   * Bitmask indicating actions.
+   * Zero or more bits set from {@see blk.sim.commands.PlayerMoveAction}.
+   * Expected to be <= 8 bits.
+   * @type {number}
+   */
+  this.actions = 0;
+
+  /**
+   * Quantized screen X.
+   * From [0-1] to [0-0xFFFF] to fit in a uint16.
+   * @type {number}
+   */
+  this.screenX_ = 0;
+
+  /**
+   * Quantized screen Y.
+   * From [0-1] to [0-0xFFFF] to fit in a uint16.
+   * @type {number}
+   */
+  this.screenY_ = 0;
 
   /**
    * Quantized yaw angle.
@@ -88,6 +161,38 @@ blk.sim.commands.PlayerMoveCommand = function(commandFactory) {
   this.roll_ = 0;
 };
 goog.inherits(blk.sim.commands.PlayerMoveCommand, gf.sim.PredictedCommand);
+
+
+/**
+ * @return {number} [0-1] screen coordinate on X, if
+ *     {@see blk.sim.commands.PlayerMoveAction#PERFORM_AT_POINT} is set.
+ */
+blk.sim.commands.PlayerMoveCommand.prototype.getScreenX = function() {
+  return this.screenX_ / 0xFFFF;
+};
+
+
+/**
+ * @return {number} [0-1] screen coordinate on Y, if
+ *     {@see blk.sim.commands.PlayerMoveAction#PERFORM_AT_POINT} is set.
+ */
+blk.sim.commands.PlayerMoveCommand.prototype.getScreenY = function() {
+  return this.screenY_ / 0xFFFF;
+};
+
+
+/**
+ * Sets the screen coordinates for a command and mark it with the
+ * {@see blk.sim.commands.PlayerMoveAction#PERFORM_AT_POINT} bit.
+ * @param {number} screenX Screen X in [0-1].
+ * @param {number} screenY Screen Y in [0-1].
+ */
+blk.sim.commands.PlayerMoveCommand.prototype.setScreenCoordinates = function(
+    screenX, screenY) {
+  this.actions |= blk.sim.commands.PlayerMoveAction.PERFORM_AT_POINT;
+  this.screenX_ = (screenX * 0xFFFF) | 0;
+  this.screenY_ = (screenY * 0xFFFF) | 0;
+};
 
 
 /**
@@ -136,6 +241,11 @@ blk.sim.commands.PlayerMoveCommand.prototype.read = function(reader, timeBase) {
   goog.base(this, 'read', reader, timeBase);
 
   this.translation = reader.readUint8();
+  this.actions = reader.readUint8();
+  if (this.actions & blk.sim.commands.PlayerMoveAction.PERFORM_AT_POINT) {
+    this.screenX_ = reader.readUint16();
+    this.screenY_ = reader.readUint16();
+  }
   this.yaw_ = reader.readInt16();
   this.pitch_ = reader.readInt16();
   //this.roll_ = reader.readInt16();
@@ -150,6 +260,11 @@ blk.sim.commands.PlayerMoveCommand.prototype.write = function(
   goog.base(this, 'write', writer, timeBase);
 
   writer.writeUint8(this.translation);
+  writer.writeUint8(this.actions);
+  if (this.actions & blk.sim.commands.PlayerMoveAction.PERFORM_AT_POINT) {
+    writer.writeUint16(this.screenX_);
+    writer.writeUint16(this.screenY_);
+  }
   writer.writeInt16(this.yaw_);
   writer.writeInt16(this.pitch_);
   //writer.writeInt16(this.roll_);
