@@ -23,9 +23,7 @@ goog.provide('blk.sim.controllers.FpsController');
 goog.require('blk.sim');
 goog.require('blk.sim.Controller');
 goog.require('blk.sim.EntityType');
-goog.require('blk.sim.commands.PlayerMoveAction');
 goog.require('blk.sim.commands.PlayerMoveCommand');
-goog.require('gf.log');
 goog.require('gf.sim');
 goog.require('goog.vec.Quaternion');
 
@@ -82,15 +80,12 @@ blk.sim.controllers.FpsController.prototype.executeCommand = function(
 
     // TODO(benvanik): apply translation
 
-    // TODO(benvanik): get held item
-    // TODO(benvanik): execute command on held item
+    // Execute the actions on the currently held tool
     var actions = command.actions;
-    if (!command.hasPredicted && actions) {
-      if (actions & blk.sim.commands.PlayerMoveAction.PERFORM_AT_POINT) {
-        gf.log.write('actions at ' + command.getScreenX() + ',' +
-            command.getScreenY() + ': ' + actions, command.sequence);
-      } else {
-        gf.log.write('actions:', actions);
+    if (command.actions) {
+      var heldTool = target.getHeldTool();
+      if (heldTool) {
+        heldTool.use(command);
       }
     }
   }

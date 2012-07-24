@@ -21,6 +21,7 @@
 goog.provide('blk.sim.Tool');
 
 goog.require('blk.sim.Model');
+goog.require('blk.sim.commands.PlayerMoveAction');
 goog.require('gf.log');
 
 
@@ -70,7 +71,13 @@ blk.sim.Tool.prototype.use = function(command) {
   // TODO(benvanik): tool flags (melee-able, use-from-inventory, etc)
   // TODO(benvanik): handle basic repeat logic (instaneous, held-down, etc)
   // TODO(benvanik): handle prediction logic (hasPredicted)
-  if (!command.hasPredicted) {
-    gf.log.write('used tool');
+  var actions = command.actions;
+  if (!command.hasPredicted && actions) {
+    if (actions & blk.sim.commands.PlayerMoveAction.PERFORM_AT_POINT) {
+      gf.log.write('actions at ' + command.getScreenX() + ',' +
+          command.getScreenY() + ': ' + actions, command.sequence);
+    } else {
+      gf.log.write('actions:', actions);
+    }
   }
 };

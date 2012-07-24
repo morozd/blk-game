@@ -41,9 +41,6 @@ goog.require('gf.sim');
 blk.sim.Actor = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
-
-  // TODO(benvanik): add vars:
-  // - controller entity ID
 };
 goog.inherits(blk.sim.Actor, blk.sim.Model);
 
@@ -55,3 +52,23 @@ goog.inherits(blk.sim.Actor, blk.sim.Model);
  */
 blk.sim.Actor.ID = gf.sim.createTypeId(
     blk.sim.BLK_MODULE_ID, blk.sim.EntityType.ACTOR);
+
+
+/**
+ * Gets the currently held tool.
+ * @return {blk.sim.Tool} Tool held, if any.
+ */
+blk.sim.Actor.prototype.getHeldTool = function() {
+  var state = /** @type {!blk.sim.ActorState} */ (this.getState());
+  return state.getHeldToolIdEntity();
+};
+
+
+/**
+ * Sets the tool held by the actor.
+ * @param {blk.sim.Tool} value New tool, if any.
+ */
+blk.sim.Actor.prototype.setHeldTool = function(value) {
+  var state = /** @type {!blk.sim.ActorState} */ (this.getState());
+  state.setHeldToolId(value ? value.getId() : gf.sim.NO_ENTITY_ID);
+};

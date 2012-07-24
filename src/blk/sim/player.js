@@ -215,6 +215,13 @@ if (gf.SERVER) {
       blockTool.setOwner(user);
       blockTool.setParent(inventory);
       blockTool.setBlockType(blockTypes[n]);
+      // TODO(benvanik): count?
+
+      if (n == 0) {
+        // TODO(benvanik): make this part of the inventory task
+        blockTool.setParent(actor);
+        actor.setHeldTool(blockTool);
+      }
     }
   };
 
