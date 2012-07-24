@@ -169,6 +169,7 @@ if (gf.SERVER) {
             gf.sim.EntityFlag.UPDATED_FREQUENTLY));
     controller.setOwner(user);
     controller.setParent(actor);
+    controller.setPlayer(this);
     state.setControllerId(controller.getId());
 
     // Create camera

@@ -309,9 +309,11 @@ getMap()
 - Actor::getWorld
 - Tool::getWorld
 
+- need a way to get a chunk view on client or server
+    - tools, physics, etc
+- make chunk views efficient, each controller gets one
+    - controller command, pass view down to tools
+
 - interpolation
     - spawn random, interp rotation
 - move (physics system?)
-
-
-rename *Id -> *, add +Id for id, +Entity for entity

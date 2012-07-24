@@ -2,5 +2,12 @@
   "name": "blk.sim.controllers.FpsControllerState",
   "super": "blk.sim.ControllerState",
   "vars": [
+    {
+      "name": "playerId",
+      "type": "EntityID",
+      "entity_type": "blk.sim.Player",
+      "flags": [
+      ]
+    }
   ]
 }

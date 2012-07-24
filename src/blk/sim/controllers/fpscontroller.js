@@ -67,6 +67,31 @@ blk.sim.controllers.FpsController.ID = gf.sim.createTypeId(
     blk.sim.BLK_MODULE_ID, blk.sim.EntityType.FPS_CONTROLLER);
 
 
+// TODO(benvanik): move to PlayerController base?
+/**
+ * Gets the player that owns this controller.
+ * @return {!blk.sim.Player} Player this controller is owned by.
+ */
+blk.sim.controllers.FpsController.prototype.getPlayer = function() {
+  var state = /** @type {!blk.sim.controllers.FpsControllerState} */ (
+      this.getState());
+  var value = state.getPlayerIdEntity();
+  goog.asserts.assert(value);
+  return value;
+};
+
+
+/**
+ * Sets the player that owns this controller.
+ * @param {!blk.sim.Player} value Player that owns this controller.
+ */
+blk.sim.controllers.FpsController.prototype.setPlayer = function(value) {
+  var state = /** @type {!blk.sim.controllers.FpsControllerState} */ (
+      this.getState());
+  state.setPlayerId(value.getId());
+};
+
+
 /**
  * @override
  */
@@ -83,6 +108,10 @@ blk.sim.controllers.FpsController.prototype.executeCommand = function(
     var targetState = /** @type {!gf.sim.SpatialEntityState} */ (
         target.getState());
 
+    var player = this.getPlayer();
+    var camera = player.getCamera();
+    var chunkView = camera.getView();
+
     // Set view rotation directly
     var q = blk.sim.controllers.FpsController.tmpQuat_;
     command.getQuaternion(q);
@@ -90,17 +119,18 @@ blk.sim.controllers.FpsController.prototype.executeCommand = function(
 
     // TODO(benvanik): apply translation
 
+    // Calculate viewport for use with tool logic
+    // TODO(benvanik): calculate elsewhere? cache longer?
+    var viewport = this.viewport_;
+    camera.calculateViewport(viewport);
+    viewport.calculate();
+
     // Execute the actions on the currently held tool
     var actions = command.actions;
     if (command.actions) {
       var heldTool = target.getHeldTool();
       if (heldTool) {
-        // TODO(benvanik): calculate elsewhere? cache longer?
-        var viewport = this.viewport_;
-        target.calculateViewport(viewport);
-        viewport.calculate();
-
-        heldTool.use(command, viewport, target);
+        heldTool.use(command, viewport, chunkView, target);
       }
     }
   }

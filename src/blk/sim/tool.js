@@ -65,9 +65,10 @@ blk.sim.Tool.prototype.parentChanged = function(oldParent, newParent) {
  * Uses the tool.
  * @param {!blk.sim.commands.PlayerMoveCommand} command Command.
  * @param {!gf.vec.Viewport} viewport Viewport of the user.
+ * @param {!blk.env.ChunkView} chunkView Chunk view the tool acts in.
  * @param {blk.sim.Actor} user Using actor, if any.
  */
-blk.sim.Tool.prototype.use = function(command, viewport, user) {
+blk.sim.Tool.prototype.use = function(command, viewport, chunkView, user) {
   // TODO(benvanik): handle prediction logic (hasPredicted)
   if (command.hasPredicted) {
     // For now we ignore - in the future we'll want to predict properly
@@ -87,10 +88,10 @@ blk.sim.Tool.prototype.use = function(command, viewport, user) {
   }
 
   if (actions & blk.sim.commands.PlayerMoveAction.USE_NORMAL_DOWN) {
-    this.performAction(command.getTime(), viewport, user, sx, sy, 0);
+    this.performAction(command.getTime(), viewport, chunkView, user, sx, sy, 0);
   }
   if (actions & blk.sim.commands.PlayerMoveAction.USE_ALTERNATIVE_DOWN) {
-    this.performAction(command.getTime(), viewport, user, sx, sy, 1);
+    this.performAction(command.getTime(), viewport, chunkView, user, sx, sy, 1);
   }
 };
 
