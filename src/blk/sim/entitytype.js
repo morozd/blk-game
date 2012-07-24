@@ -27,20 +27,22 @@ goog.provide('blk.sim.EntityType');
  * @enum {number}
  */
 blk.sim.EntityType = {
+  /** {@see blk.sim.Root} */
+  ROOT: 0,
   /** {@see blk.sim.World} */
-  WORLD: 0,
+  WORLD: 1,
   /** {@see blk.sim.Camera} */
-  CAMERA: 1,
+  CAMERA: 2,
   /** {@see blk.sim.Player} */
-  PLAYER: 2,
+  PLAYER: 3,
   /** {@see blk.sim.controllers.FpsController} */
-  FPS_CONTROLLER: 3,
+  FPS_CONTROLLER: 4,
   /** {@see blk.sim.Actor} */
-  ACTOR: 4,
+  ACTOR: 5,
   /** {@see blk.sim.Inventory} */
-  INVENTORY: 5,
+  INVENTORY: 6,
   /** {@see blk.sim.tools.PickaxeTool} */
-  PICKAXE_TOOL: 6,
+  PICKAXE_TOOL: 7,
   /** {@see blk.sim.tools.BlockTool} */
-  BLOCK_TOOL: 7
+  BLOCK_TOOL: 8
 };

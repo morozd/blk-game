@@ -23,6 +23,7 @@ goog.provide('blk.sim.tools.BlockTool');
 goog.require('blk.sim');
 goog.require('blk.sim.EntityType');
 goog.require('blk.sim.Tool');
+goog.require('gf.log');
 goog.require('gf.sim');
 
 
@@ -60,4 +61,34 @@ blk.sim.tools.BlockTool.ID = gf.sim.createTypeId(
  */
 blk.sim.tools.BlockTool.prototype.setBlockType = function(value) {
   //
+};
+
+
+/**
+ * @override
+ */
+blk.sim.tools.BlockTool.prototype.performAction = function(
+    time, viewport, user, screenX, screenY, action) {
+  // Get the chunk view for the actor using this tool
+  // TODO(benvanik): something more reliable/cleaner
+  var view;
+  if (gf.CLIENT) {
+    view = blk.sim.getLocalChunkView(this);
+  } else {
+    // TODO(benvanik): get view for owner of user? something?
+    gf.log.write('I am server, I am dumb');
+  }
+  if (!view) {
+    return;
+  }
+
+  var ray = viewport.getRay(screenX, screenY);
+  var maxDistance = 100;
+  var intersection = view.intersectBlock(ray, maxDistance);
+  if (intersection && intersection.distance <= maxDistance) {
+    gf.log.write('clicked block',
+        intersection.blockX, intersection.blockY, intersection.blockZ);
+  } else {
+    gf.log.write('missed block');
+  }
 };

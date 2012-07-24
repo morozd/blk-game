@@ -27,6 +27,7 @@ goog.require('blk.io.ChunkSerializer');
 goog.require('blk.net.packets.ChunkData');
 goog.require('blk.net.packets.ReadyPlayer');
 goog.require('blk.sim.Player');
+goog.require('blk.sim.Root');
 goog.require('blk.sim.commands');
 goog.require('blk.sim.entities');
 goog.require('blk.ui.Console');
@@ -145,6 +146,14 @@ blk.game.client.ClientController = function(game, session) {
   this.game.getAudioManager().loadSoundBank(this.blockSoundBank_);
 
   /**
+   * Root entity.
+   * Initialized when the entity is replicated.
+   * @private
+   * @type {blk.sim.Root}
+   */
+  this.root_ = null;
+
+  /**
    * Player listing.
    * @private
    * @type {!Array.<!blk.sim.Player>}
@@ -186,6 +195,14 @@ blk.game.client.ClientController.prototype.getSimulator = function() {
  */
 blk.game.client.ClientController.prototype.getMap = function() {
   return this.map_;
+};
+
+
+/**
+ * @return {!blk.sim.Root} Root entity.
+ */
+blk.game.client.ClientController.prototype.getRoot = function() {
+  return this.root_;
 };
 
 
@@ -612,7 +629,10 @@ blk.game.client.ClientController.prototype.playPointSound =
  * @override
  */
 blk.game.client.ClientController.prototype.entityAdded = function(entity) {
-  if (entity instanceof blk.sim.Player) {
+  if (entity instanceof blk.sim.Root) {
+    // Grab root
+    this.root_ = entity;
+  } else if (entity instanceof blk.sim.Player) {
     var player = /** @type {!blk.sim.Player} */ (entity);
 
     // Add to roster
@@ -620,8 +640,12 @@ blk.game.client.ClientController.prototype.entityAdded = function(entity) {
     user.data = player;
     this.players_.push(player);
 
+    // Track local player
     if (user == this.session.getLocalUser()) {
       this.localPlayer_ = player;
+
+      goog.asserts.assert(this.root_);
+      this.root_.setLocalPlayer(player);
     }
 
     this.handlePlayersChanged();

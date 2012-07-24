@@ -22,7 +22,6 @@ goog.provide('blk.sim.Tool');
 
 goog.require('blk.sim.Model');
 goog.require('blk.sim.commands.PlayerMoveAction');
-goog.require('gf.log');
 
 
 
@@ -64,20 +63,46 @@ blk.sim.Tool.prototype.parentChanged = function(oldParent, newParent) {
 
 /**
  * Uses the tool.
- * @protected
  * @param {!blk.sim.commands.PlayerMoveCommand} command Command.
+ * @param {!gf.vec.Viewport} viewport Viewport of the user.
+ * @param {blk.sim.Actor} user Using actor, if any.
  */
-blk.sim.Tool.prototype.use = function(command) {
+blk.sim.Tool.prototype.use = function(command, viewport, user) {
+  // TODO(benvanik): handle prediction logic (hasPredicted)
+  if (command.hasPredicted) {
+    // For now we ignore - in the future we'll want to predict properly
+    return;
+  }
+
   // TODO(benvanik): tool flags (melee-able, use-from-inventory, etc)
   // TODO(benvanik): handle basic repeat logic (instaneous, held-down, etc)
-  // TODO(benvanik): handle prediction logic (hasPredicted)
+
   var actions = command.actions;
-  if (!command.hasPredicted && actions) {
-    if (actions & blk.sim.commands.PlayerMoveAction.PERFORM_AT_POINT) {
-      gf.log.write('actions at ' + command.getScreenX() + ',' +
-          command.getScreenY() + ': ' + actions, command.sequence);
-    } else {
-      gf.log.write('actions:', actions);
-    }
+
+  var sx = 0.5;
+  var sy = 0.5;
+  if (actions & blk.sim.commands.PlayerMoveAction.PERFORM_AT_POINT) {
+    sx = command.getScreenX();
+    sy = command.getScreenY();
+  }
+
+  if (actions & blk.sim.commands.PlayerMoveAction.USE_NORMAL_DOWN) {
+    this.performAction(command.getTime(), viewport, user, sx, sy, 0);
+  }
+  if (actions & blk.sim.commands.PlayerMoveAction.USE_ALTERNATIVE_DOWN) {
+    this.performAction(command.getTime(), viewport, user, sx, sy, 1);
   }
 };
+
+
+/**
+ * Performs an action.
+ * @protected
+ * @param {number} time Time the action occurred.
+ * @param {!gf.vec.Viewport} viewport Viewport of the user.
+ * @param {blk.sim.Actor} user Using actor, if any.
+ * @param {number} screenX Screen X, in [0-1].
+ * @param {number} screenY Screen Y, in [0-1].
+ * @param {number} action Action index.
+ */
+blk.sim.Tool.prototype.performAction = goog.nullFunction;

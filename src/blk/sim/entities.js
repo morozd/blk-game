@@ -28,6 +28,8 @@ goog.require('blk.sim.Inventory');
 goog.require('blk.sim.InventoryState');
 goog.require('blk.sim.Player');
 goog.require('blk.sim.PlayerState');
+goog.require('blk.sim.Root');
+goog.require('blk.sim.RootState');
 goog.require('blk.sim.World');
 goog.require('blk.sim.WorldState');
 goog.require('blk.sim.controllers.ClientFpsController');
@@ -46,6 +48,12 @@ goog.require('gf.sim.EntityFactory');
  * @param {!gf.sim.Simulator} simulator Simulator.
  */
 blk.sim.entities.registerEntities = function(simulator) {
+  // ROOT
+  simulator.registerEntityFactory(new gf.sim.EntityFactory(
+      blk.sim.Root.ID,
+      blk.sim.Root,
+      blk.sim.RootState));
+
   // WORLD
   simulator.registerEntityFactory(new gf.sim.EntityFactory(
       blk.sim.World.ID,

@@ -290,9 +290,28 @@ getMap()
 - tool use
     - tool:
         - melee | use
+        - toolFlags:
+            - REPEATABLE
+            -
+        - repeatInterval
     - block tool:
         - blockType
         - use(): place block
+
+
+- Simulator::get|setRootEntity
+    - blk.sim.Root:
+        - world
+        - players
+        - client:
+            - local player? (cached on entityAdded?)
+            - getCamera
+- Actor::getWorld
+- Tool::getWorld
+
 - interpolation
     - spawn random, interp rotation
 - move (physics system?)
+
+
+rename *Id -> *, add +Id for id, +Entity for entity

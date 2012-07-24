@@ -25,6 +25,8 @@ goog.require('blk.sim.Controller');
 goog.require('blk.sim.EntityType');
 goog.require('blk.sim.commands.PlayerMoveCommand');
 goog.require('gf.sim');
+goog.require('gf.vec.Viewport');
+goog.require('goog.math.Size');
 goog.require('goog.vec.Quaternion');
 
 
@@ -43,6 +45,14 @@ goog.require('goog.vec.Quaternion');
 blk.sim.controllers.FpsController = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
+
+  /**
+   * Cached scratch viewport.
+   * @private
+   * @type {!gf.vec.Viewport}
+   */
+  this.viewport_ = new gf.vec.Viewport();
+  this.viewport_.reset(new goog.math.Size(1, 1));
 };
 goog.inherits(blk.sim.controllers.FpsController,
     blk.sim.Controller);
@@ -85,7 +95,12 @@ blk.sim.controllers.FpsController.prototype.executeCommand = function(
     if (command.actions) {
       var heldTool = target.getHeldTool();
       if (heldTool) {
-        heldTool.use(command);
+        // TODO(benvanik): calculate elsewhere? cache longer?
+        var viewport = this.viewport_;
+        target.calculateViewport(viewport);
+        viewport.calculate();
+
+        heldTool.use(command, viewport, target);
       }
     }
   }

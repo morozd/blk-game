@@ -20,11 +20,13 @@
 
 goog.provide('blk.sim');
 
+goog.require('gf');
 // Extra requires to shut up type warnings
 /** @suppress {extraRequire} */
 goog.require('gf.sim.ClientSimulator');
 /** @suppress {extraRequire} */
 goog.require('gf.sim.ServerSimulator');
+goog.require('goog.asserts');
 
 
 /**
@@ -34,3 +36,70 @@ goog.require('gf.sim.ServerSimulator');
  * @type {number}
  */
 blk.sim.BLK_MODULE_ID = 1;
+
+
+/**
+ * Gets the root entity.
+ * @param {!gf.sim.Entity} entity Entity in the simulation.
+ * @return {!blk.sim.Root} The root entity.
+ */
+blk.sim.getRoot = function(entity) {
+  var value = /** @type {blk.sim.Root} */ (entity.simulator.getRootEntity());
+  goog.asserts.assert(value);
+  return value;
+};
+
+
+/**
+ * Gets the world entity.
+ * @param {!gf.sim.Entity} entity Entity in the simulation.
+ * @return {!blk.sim.World} The world entity.
+ */
+blk.sim.getWorld = function(entity) {
+  var root = blk.sim.getRoot(entity);
+  return root.getWorld();
+};
+
+
+/**
+ * Gets the BLK map.
+ * @param {!gf.sim.Entity} entity Entity in the simulation.
+ * @return {!blk.env.Map} The map.
+ */
+blk.sim.getMap = function(entity) {
+  var world = blk.sim.getWorld(entity);
+  return world.getMap();
+};
+
+
+if (gf.CLIENT) {
+  /**
+   * Gets the local player.
+   * @param {!gf.sim.Entity} entity Entity in the simulation.
+   * @return {!blk.sim.Player} The local player entity.
+   */
+  blk.sim.getLocalPlayer = function(entity) {
+    var root = blk.sim.getRoot(entity);
+    return root.getLocalPlayer();
+  };
+
+  /**
+   * Gets the local player camera.
+   * @param {!gf.sim.Entity} entity Entity in the simulation.
+   * @return {!blk.sim.Camera} The camera entity.
+   */
+  blk.sim.getLocalCamera = function(entity) {
+    var player = blk.sim.getLocalPlayer(entity);
+    return player.getCamera();
+  };
+
+  /**
+   * Gets the local player chunk view.
+   * @param {!gf.sim.Entity} entity Entity in the simulation.
+   * @return {!blk.env.ChunkView} The local chunk view.
+   */
+  blk.sim.getLocalChunkView = function(entity) {
+    var camera = blk.sim.getLocalCamera(entity);
+    return camera.getView();
+  };
+}

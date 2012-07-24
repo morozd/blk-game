@@ -137,9 +137,8 @@ if (gf.SERVER) {
    * Sets up the player entity for the given user.
    * Can only be called once and must be called immediately after creation.
    * @param {!gf.net.User} user User the player represents.
-   * @param {!blk.sim.World} world World the player exists in.
    */
-  blk.sim.Player.prototype.setup = function(user, world) {
+  blk.sim.Player.prototype.setup = function(user) {
     var simulator = this.getSimulator();
     var state = /** @type {!blk.sim.PlayerState} */ (this.getState());
 
@@ -148,6 +147,8 @@ if (gf.SERVER) {
     state.setUserId(user.sessionId);
 
     // Parent to the world
+    var root = blk.sim.getRoot(this);
+    var world = root.getWorld();
     var map = world.getMap();
     this.setParent(world);
 
@@ -179,7 +180,7 @@ if (gf.SERVER) {
             gf.sim.EntityFlag.INTERPOLATED));
     camera.setOwner(user);
     camera.setParent(actor);
-    camera.setup(user, world);
+    camera.setup(user);
     state.setCameraId(camera.getId());
 
     // Create inventory

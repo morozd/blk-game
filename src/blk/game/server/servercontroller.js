@@ -24,6 +24,7 @@ goog.require('blk.env.MapParameters');
 goog.require('blk.env.server.ServerMap');
 goog.require('blk.game.server.SimulationObserver');
 goog.require('blk.net.packets.ReadyPlayer');
+goog.require('blk.sim.Root');
 goog.require('blk.sim.commands');
 goog.require('blk.sim.entities');
 goog.require('gf.log');
@@ -98,6 +99,13 @@ blk.game.server.ServerController = function(game, session, mapStore) {
   blk.sim.entities.registerEntities(this.simulator_);
 
   /**
+   * Root entity.
+   * @private
+   * @type {blk.sim.Root}
+   */
+  this.root_ = null;
+
+  /**
    * Player listing.
    * @private
    * @type {!Array.<!blk.sim.Player>}
@@ -121,6 +129,14 @@ blk.game.server.ServerController.prototype.getSimulator = function() {
  */
 blk.game.server.ServerController.prototype.getMap = function() {
   return this.map_;
+};
+
+
+/**
+ * @return {!blk.sim.Root} Root entity.
+ */
+blk.game.server.ServerController.prototype.getRoot = function() {
+  return this.root_;
 };
 
 
@@ -181,6 +197,15 @@ blk.game.server.ServerController.prototype.load = function() {
   var deferred = new goog.async.Deferred();
 
   // TODO(benvanik): wait on initial map load?
+
+  var simulator = this.getSimulator();
+
+  // Root sim entity
+  this.root_ = /** @type {!blk.sim.Root} */ (
+      this.simulator_.createEntity(
+          blk.sim.Root.ID,
+          0));
+  simulator.setRootEntity(this.root_);
 
   // Create initial simulation state
   this.setupSimulation();

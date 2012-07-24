@@ -55,6 +55,7 @@ goog.inherits(blk.modes.fps.server.FpsServerController,
 blk.modes.fps.server.FpsServerController.prototype.setupSimulation =
     function() {
   var simulator = this.getSimulator();
+  var root = this.getRoot();
 
   // Create the world
   this.world_ = /** @type {!blk.sim.World} */ (
@@ -65,6 +66,9 @@ blk.modes.fps.server.FpsServerController.prototype.setupSimulation =
   // Setup world
   // This binds the map and the world together
   this.world_.setMap(this.getMap());
+
+  // Set the world
+  root.setWorld(this.world_);
 };
 
 
@@ -83,7 +87,7 @@ blk.modes.fps.server.FpsServerController.prototype.createPlayer =
           0));
 
   // Setup and add to world
-  player.setup(user, this.world_);
+  player.setup(user);
 
   // Spawn the player
   player.spawn();

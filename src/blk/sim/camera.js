@@ -157,13 +157,12 @@ if (gf.SERVER) {
   /**
    * Sets up the camera for the given user.
    * @param {!gf.net.User} user User the camera is owned by.
-   * @param {!blk.sim.World} world World camera exists in.
    */
-  blk.sim.Camera.prototype.setup = function(user, world) {
+  blk.sim.Camera.prototype.setup = function(user) {
     var simulator = this.getSimulator();
     var state = /** @type {!blk.sim.CameraState} */ (this.getState());
 
-    var map = world.getMap();
+    var map = blk.sim.getMap(this);
     this.setMap(map);
 
     // Setup send queue

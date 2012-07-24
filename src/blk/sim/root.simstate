@@ -1,0 +1,13 @@
+{
+  "name": "blk.sim.RootState",
+  "super": "gf.sim.EntityState",
+  "vars": [
+    {
+      "name": "worldId",
+      "type": "EntityID",
+      "entity_type": "blk.sim.World",
+      "flags": [
+      ]
+    }
+  ]
+}
