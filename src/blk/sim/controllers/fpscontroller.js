@@ -26,6 +26,7 @@ goog.require('blk.sim.EntityType');
 goog.require('blk.sim.commands.PlayerMoveCommand');
 goog.require('gf.sim');
 goog.require('gf.vec.Viewport');
+goog.require('goog.asserts');
 goog.require('goog.math.Size');
 goog.require('goog.vec.Quaternion');
 

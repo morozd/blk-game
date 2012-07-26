@@ -101,6 +101,7 @@ blk.sim.Tool.prototype.use = function(command, viewport, chunkView, user) {
  * @protected
  * @param {number} time Time the action occurred.
  * @param {!gf.vec.Viewport} viewport Viewport of the user.
+ * @param {!blk.env.ChunkView} chunkView Chunk view.
  * @param {blk.sim.Actor} user Using actor, if any.
  * @param {number} screenX Screen X, in [0-1].
  * @param {number} screenY Screen Y, in [0-1].

@@ -21,6 +21,7 @@
 goog.provide('blk.sim.commands');
 
 goog.require('blk.sim.commands.PlayerMoveCommand');
+goog.require('blk.sim.commands.SetBlockCommand');
 goog.require('gf.sim.CommandFactory');
 
 
@@ -34,4 +35,10 @@ blk.sim.commands.registerCommands = function(simulator) {
       blk.sim.commands.PlayerMoveCommand.ID,
       blk.sim.commands.PlayerMoveCommand,
       blk.sim.commands.PlayerMoveCommand.FLAGS));
+
+  // SET_BLOCK
+  simulator.registerCommandFactory(new gf.sim.CommandFactory(
+      blk.sim.commands.SetBlockCommand.ID,
+      blk.sim.commands.SetBlockCommand,
+      blk.sim.commands.SetBlockCommand.FLAGS));
 };
