@@ -27,7 +27,6 @@ goog.require('blk.sim.commands.PlayerMoveCommand');
 goog.require('gf.sim');
 goog.require('gf.vec.Viewport');
 goog.require('goog.asserts');
-goog.require('goog.math.Size');
 goog.require('goog.vec.Quaternion');
 
 
@@ -53,7 +52,7 @@ blk.sim.controllers.FpsController = function(
    * @type {!gf.vec.Viewport}
    */
   this.viewport_ = new gf.vec.Viewport();
-  this.viewport_.reset(new goog.math.Size(1, 1));
+  this.viewport_.reset(1, 1);
 };
 goog.inherits(blk.sim.controllers.FpsController,
     blk.sim.Controller);
@@ -123,8 +122,12 @@ blk.sim.controllers.FpsController.prototype.executeCommand = function(
     // Calculate viewport for use with tool logic
     // TODO(benvanik): calculate elsewhere? cache longer?
     var viewport = this.viewport_;
+    var drawDistance = camera.getView().getDrawDistance();
+    if (viewport.far != drawDistance) {
+      viewport.far = drawDistance;
+      viewport.reset(1, 1);
+    }
     camera.calculateViewport(viewport);
-    viewport.calculate();
 
     // Execute the actions on the currently held tool
     var actions = command.actions;

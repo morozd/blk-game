@@ -311,15 +311,16 @@ blk.modes.fps.client.FpsClientController.prototype.drawWorld =
   // Initialize viewport
   var viewport = this.playerViewport_;
   var display = this.game.getDisplay();
+  var displaySize = display.getSize();
   var localPlayer = this.getLocalPlayer();
   if (localPlayer) {
     var camera = localPlayer.getCamera();
     viewport.far = camera.getView().getDrawDistance();
-    viewport.reset(display.getSize());
+    viewport.reset(displaySize.width, displaySize.height);
     camera.calculateViewport(viewport);
   } else {
     viewport.far = 100;
-    viewport.reset(display.getSize());
+    viewport.reset(displaySize.width, displaySize.height);
     // ?
   }
 

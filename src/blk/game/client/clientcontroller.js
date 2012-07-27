@@ -449,7 +449,8 @@ blk.game.client.ClientController.prototype.render = function(frame) {
 
   // Reset screen viewport
   var display = this.game.getDisplay();
-  this.screenViewport_.reset(display.getSize());
+  var displaySize = display.getSize();
+  this.screenViewport_.reset(displaySize.width, displaySize.height);
 
   // Grab latest input data as early in the frame as possible
   this.inputData_.poll();
