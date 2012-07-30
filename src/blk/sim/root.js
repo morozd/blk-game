@@ -93,7 +93,7 @@ blk.sim.Root.prototype.setWorld = function(value) {
 if (gf.CLIENT) {
   /**
    * Gets the local player.
-   * @param {!blk.sim.Player} Local player.
+   * @return {!blk.sim.Player} Local player.
    */
   blk.sim.Root.prototype.getLocalPlayer = function() {
     goog.asserts.assert(this.localPlayer_);

@@ -21,6 +21,7 @@
 goog.provide('blk.sim.commands');
 
 goog.require('blk.sim.commands.PlayerMoveCommand');
+goog.require('blk.sim.commands.SetAspectRatioCommand');
 goog.require('blk.sim.commands.SetBlockCommand');
 goog.require('gf.sim.CommandFactory');
 
@@ -30,6 +31,12 @@ goog.require('gf.sim.CommandFactory');
  * @param {!gf.sim.Simulator} simulator Simulator.
  */
 blk.sim.commands.registerCommands = function(simulator) {
+  // SET_ASPECT_RATIO
+  simulator.registerCommandFactory(new gf.sim.CommandFactory(
+      blk.sim.commands.SetAspectRatioCommand.ID,
+      blk.sim.commands.SetAspectRatioCommand,
+      blk.sim.commands.SetAspectRatioCommand.FLAGS));
+
   // PLAYER_MOVE
   simulator.registerCommandFactory(new gf.sim.CommandFactory(
       blk.sim.commands.PlayerMoveCommand.ID,

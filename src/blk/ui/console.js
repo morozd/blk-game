@@ -283,7 +283,7 @@ blk.ui.Console.prototype.update = function(frame) {
  * Renders the console.
  * @param {!gf.RenderFrame} frame Current render frame.
  * @param {!gf.vec.Viewport} viewport Current viewport.
- * @param {...string} var_args Header strings.
+ * @param {...(string|null)} var_args Header strings.
  */
 blk.ui.Console.prototype.render = function(frame, viewport, var_args) {
   var font = this.renderState_.font;

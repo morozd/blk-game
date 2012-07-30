@@ -465,7 +465,7 @@ blk.env.client.ViewManager.prototype.render = function(frame, viewport) {
     this.idleDeferreds_.length = 0;
   }
 
-  var viewportFar = viewport.far - 16;
+  var viewportFar = viewport.getFar() - 16;
   var fogNear = viewportFar * 0.5;
   var fogFar = viewportFar * 0.85;
   renderState.lightingInfo.update(

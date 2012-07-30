@@ -202,6 +202,7 @@ blk.game.client.ClientController.prototype.getMap = function() {
  * @return {!blk.sim.Root} Root entity.
  */
 blk.game.client.ClientController.prototype.getRoot = function() {
+  goog.asserts.assert(this.root_);
   return this.root_;
 };
 
@@ -449,8 +450,7 @@ blk.game.client.ClientController.prototype.render = function(frame) {
 
   // Reset screen viewport
   var display = this.game.getDisplay();
-  var displaySize = display.getSize();
-  this.screenViewport_.reset(displaySize.width, displaySize.height);
+  this.screenViewport_.setSize(display.getSize());
 
   // Grab latest input data as early in the frame as possible
   this.inputData_.poll();
@@ -554,7 +554,9 @@ blk.game.client.ClientController.prototype.drawOverlays =
  * @protected
  * @return {string?} Extra debugging information for the console.
  */
-blk.game.client.ClientController.prototype.getDebugInfo = goog.nullFunction;
+blk.game.client.ClientController.prototype.getDebugInfo = function() {
+  return null;
+};
 
 
 /**

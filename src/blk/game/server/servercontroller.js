@@ -136,6 +136,7 @@ blk.game.server.ServerController.prototype.getMap = function() {
  * @return {!blk.sim.Root} Root entity.
  */
 blk.game.server.ServerController.prototype.getRoot = function() {
+  goog.asserts.assert(this.root_);
   return this.root_;
 };
 

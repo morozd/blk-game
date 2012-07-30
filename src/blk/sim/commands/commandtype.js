@@ -27,8 +27,10 @@ goog.provide('blk.sim.commands.CommandType');
  * @enum {number}
  */
 blk.sim.commands.CommandType = {
+  /** {@see blk.sim.commands.SetAspectRatioCommand} */
+  SET_ASPECT_RATIO: 0,
   /** {@see blk.sim.commands.PlayerMoveCommand} */
-  PLAYER_MOVE: 0,
+  PLAYER_MOVE: 1,
   /** {@see blk.sim.commands.SetBlockCommand} */
-  SET_BLOCK: 1
+  SET_BLOCK: 2
 };

@@ -18,7 +18,7 @@
  * @author benvanik@google.com (Ben Vanik)
  */
 
-goog.provide('blk.sim.commands.SetBlockCommand');
+goog.provide('blk.sim.commands.SetAspectRatioCommand');
 
 goog.require('blk.sim');
 goog.require('blk.sim.commands.CommandType');
@@ -28,68 +28,44 @@ goog.require('gf.sim.Command');
 
 
 /**
- * Sets a block in the world.
- * Sent from the server to clients to indicate block changes.
+ * Sets the aspect ratio of a camera.
+ * Sent from the client to the server when the aspect ratio changes.
  *
  * @constructor
  * @extends {gf.sim.Command}
  * @param {!gf.sim.CommandFactory} commandFactory Command factory.
  */
-blk.sim.commands.SetBlockCommand = function(commandFactory) {
+blk.sim.commands.SetAspectRatioCommand = function(commandFactory) {
   goog.base(this, commandFactory);
 
   /**
-   * Block X in world coordinates.
+   * Aspect ratio.
    * @type {number}
    */
-  this.x = 0;
-
-  /**
-   * Block Y in world coordinates.
-   * @type {number}
-   */
-  this.y = 0;
-
-  /**
-   * Block Z in world coordinates.
-   * @type {number}
-   */
-  this.z = 0;
-
-  /**
-   * New block data value.
-   * This is a uint16 to match the slot in the {@see blk.env.Chunk}.
-   * @type {number}
-   */
-  this.data = 0;
+  this.aspectRatio = 0;
 };
-goog.inherits(blk.sim.commands.SetBlockCommand, gf.sim.Command);
+goog.inherits(blk.sim.commands.SetAspectRatioCommand, gf.sim.Command);
 
 
 /**
  * @override
  */
-blk.sim.commands.SetBlockCommand.prototype.read = function(reader, timeBase) {
+blk.sim.commands.SetAspectRatioCommand.prototype.read = function(
+    reader, timeBase) {
   goog.base(this, 'read', reader, timeBase);
 
-  this.x = reader.readVarInt();
-  this.y = reader.readVarInt();
-  this.z = reader.readVarInt();
-  this.data = reader.readUint16();
+  this.aspectRatio = reader.readFloat32();
 };
 
 
 /**
  * @override
  */
-blk.sim.commands.SetBlockCommand.prototype.write = function(
+blk.sim.commands.SetAspectRatioCommand.prototype.write = function(
     writer, timeBase) {
   goog.base(this, 'write', writer, timeBase);
 
-  writer.writeVarInt(this.x);
-  writer.writeVarInt(this.y);
-  writer.writeVarInt(this.z);
-  writer.writeUint16(this.data);
+  writer.writeFloat32(this.aspectRatio);
 };
 
 
@@ -98,8 +74,8 @@ blk.sim.commands.SetBlockCommand.prototype.write = function(
  * @const
  * @type {number}
  */
-blk.sim.commands.SetBlockCommand.ID = gf.sim.createTypeId(
-    blk.sim.BLK_MODULE_ID, blk.sim.commands.CommandType.SET_BLOCK);
+blk.sim.commands.SetAspectRatioCommand.ID = gf.sim.createTypeId(
+    blk.sim.BLK_MODULE_ID, blk.sim.commands.CommandType.SET_ASPECT_RATIO);
 
 
 /**
@@ -107,4 +83,4 @@ blk.sim.commands.SetBlockCommand.ID = gf.sim.createTypeId(
  * @const
  * @type {number}
  */
-blk.sim.commands.SetBlockCommand.FLAGS = 0;
+blk.sim.commands.SetAspectRatioCommand.FLAGS = 0;

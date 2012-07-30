@@ -25,6 +25,7 @@ goog.require('blk.sim.EntityType');
 goog.require('blk.sim.Tool');
 goog.require('gf.log');
 goog.require('gf.sim');
+goog.require('goog.asserts');
 
 
 
@@ -42,6 +43,8 @@ goog.require('gf.sim');
 blk.sim.tools.BlockTool = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
+
+  // TODO(benvanik): cache block type
 };
 goog.inherits(blk.sim.tools.BlockTool, blk.sim.Tool);
 
@@ -56,11 +59,27 @@ blk.sim.tools.BlockTool.ID = gf.sim.createTypeId(
 
 
 /**
- * Sets the block type this tool represents.
+ * Gets the block type this tool creates.
+ * @return {!blk.env.Block} Block type.
+ */
+blk.sim.tools.BlockTool.prototype.getBlockType = function() {
+  // TODO(benvanik): make a million times faster - good god
+  var state = /** @type {!blk.sim.tools.BlockToolState} */ (this.getState());
+  var value = state.getBlockType();
+  var map = blk.sim.getMap(this);
+  var block = map.blockSet.getBlockWithId(value);
+  goog.asserts.assert(block);
+  return block;
+};
+
+
+/**
+ * Sets the block type this tool creates.
  * @param {!blk.env.Block} value Block type.
  */
 blk.sim.tools.BlockTool.prototype.setBlockType = function(value) {
-  //
+  var state = /** @type {!blk.sim.tools.BlockToolState} */ (this.getState());
+  state.setBlockType(value.id);
 };
 
 
@@ -68,14 +87,78 @@ blk.sim.tools.BlockTool.prototype.setBlockType = function(value) {
  * @override
  */
 blk.sim.tools.BlockTool.prototype.performAction = function(
-    time, viewport, chunkView, user, screenX, screenY, action) {
-  var ray = viewport.getRay(screenX, screenY);
+    time, viewport, chunkView, user, screenX, screenY, ray, action) {
   var maxDistance = 100;
   var intersection = chunkView.intersectBlock(ray, maxDistance);
   if (intersection && intersection.distance <= maxDistance) {
     gf.log.write('clicked block',
         intersection.blockX, intersection.blockY, intersection.blockZ);
-  } else {
-    gf.log.write('missed block');
+    if (action == 0) {
+      this.addBlock_(intersection);
+    } else if (action == 1) {
+      this.setBlock_(
+          intersection.blockX,
+          intersection.blockY,
+          intersection.blockZ,
+          null);
+    }
   }
+};
+
+
+/**
+ * Adds a block based on the given intersection.
+ * @private
+ * @param {!blk.env.BlockIntersection} intersection Intersection.
+ */
+blk.sim.tools.BlockTool.prototype.addBlock_ = function(intersection) {
+  var wx = intersection.blockX;
+  var wy = intersection.blockY;
+  var wz = intersection.blockZ;
+
+  // Determine the face intersected and add the block there
+  var dx = 0;
+  var dy = 0;
+  var dz = 0;
+  var ipt = intersection.point;
+  if (ipt[0] == wx) {
+    dx--;
+  } else if (ipt[0] == wx + 1) {
+    dx++;
+  }
+  if (ipt[1] == wy) {
+    dy--;
+  } else if (ipt[1] == wy + 1) {
+    dy++;
+  }
+  if (ipt[2] == wz) {
+    dz--;
+  } else if (ipt[2] == wz + 1) {
+    dz++;
+  }
+  var nx = wx + dx;
+  var ny = wy + dy;
+  var nz = wz + dz;
+
+  this.setBlock_(nx, ny, nz, this.getBlockType());
+};
+
+
+/**
+ * Sets the block at the given coordinates.
+ * @private
+ * @param {number} x Block X.
+ * @param {number} y Block Y.
+ * @param {number} z Block Z.
+ * @param {blk.env.Block} block Block type, or null to remove.
+ */
+blk.sim.tools.BlockTool.prototype.setBlock_ = function(x, y, z, block) {
+  var data = block ? block.id << 8 : 0;
+
+  // Change the block in the map
+  var map = blk.sim.getMap(this);
+  var changed = map.setBlock(x, y, z, data);
+
+  // TODO(benvanik): broadcast to clients (except sender)
+  gf.log.write('would set block data to ', data);
 };

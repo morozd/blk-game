@@ -264,6 +264,9 @@ blk.modes.fps.client.FpsClientController.prototype.processInput =
   // TODO(benvanik): cleanup
   var localPlayer = this.getLocalPlayer();
   if (localPlayer) {
+    var camera = localPlayer.getCamera();
+    camera.prepareFrame(viewport);
+
     var controller = localPlayer.getController();
     if (!controller.processInput(frame, inputData, viewport)) {
       // Failed for some reason - likely prediction errors
@@ -311,16 +314,15 @@ blk.modes.fps.client.FpsClientController.prototype.drawWorld =
   // Initialize viewport
   var viewport = this.playerViewport_;
   var display = this.game.getDisplay();
-  var displaySize = display.getSize();
   var localPlayer = this.getLocalPlayer();
   if (localPlayer) {
     var camera = localPlayer.getCamera();
-    viewport.far = camera.getView().getDrawDistance();
-    viewport.reset(displaySize.width, displaySize.height);
+    viewport.setFar(camera.getView().getDrawDistance());
+    viewport.setSize(display.getSize());
     camera.calculateViewport(viewport);
   } else {
-    viewport.far = 100;
-    viewport.reset(displaySize.width, displaySize.height);
+    viewport.setFar(100);
+    viewport.setSize(display.getSize());
     // ?
   }
 

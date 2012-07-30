@@ -22,6 +22,7 @@ goog.provide('blk.sim.Tool');
 
 goog.require('blk.sim.Model');
 goog.require('blk.sim.commands.PlayerMoveAction');
+goog.require('gf.vec.Ray');
 
 
 
@@ -87,11 +88,16 @@ blk.sim.Tool.prototype.use = function(command, viewport, chunkView, user) {
     sy = command.getScreenY();
   }
 
+  var ray = blk.sim.Tool.tmpRay_;
+  viewport.getRay(sx, sy, ray);
+
   if (actions & blk.sim.commands.PlayerMoveAction.USE_NORMAL_DOWN) {
-    this.performAction(command.getTime(), viewport, chunkView, user, sx, sy, 0);
+    this.performAction(
+        command.getTime(), viewport, chunkView, user, sx, sy, ray, 0);
   }
-  if (actions & blk.sim.commands.PlayerMoveAction.USE_ALTERNATIVE_DOWN) {
-    this.performAction(command.getTime(), viewport, chunkView, user, sx, sy, 1);
+  if (actions & blk.sim.commands.PlayerMoveAction.USE_ALTERNATE_DOWN) {
+    this.performAction(
+        command.getTime(), viewport, chunkView, user, sx, sy, ray, 1);
   }
 };
 
@@ -105,6 +111,15 @@ blk.sim.Tool.prototype.use = function(command, viewport, chunkView, user) {
  * @param {blk.sim.Actor} user Using actor, if any.
  * @param {number} screenX Screen X, in [0-1].
  * @param {number} screenY Screen Y, in [0-1].
+ * @param {!gf.vec.Ray.Type} ray Ray along the user click.
  * @param {number} action Action index.
  */
 blk.sim.Tool.prototype.performAction = goog.nullFunction;
+
+
+/**
+ * Scratch ray.
+ * @private
+ * @type {!gf.vec.Ray.Type}
+ */
+blk.sim.Tool.tmpRay_ = gf.vec.Ray.create();
