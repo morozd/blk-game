@@ -33,12 +33,13 @@ goog.require('goog.vec.Vec4');
  *
  * @constructor
  * @extends {gf.graphics.Resource}
- * @param {!blk.env.client.ViewManager} viewManager Parent map renderer.
+ * @param {!blk.env.client.ViewRenderer} viewRenderer Parent map renderer.
  * @param {!blk.graphics.RenderState} renderState Render state manager.
  * @param {!blk.env.Chunk} chunk Chunk to render.
  * @param {number} by Block offset Y in chunk.
  */
-blk.env.client.SegmentRenderer = function(viewManager, renderState, chunk, by) {
+blk.env.client.SegmentRenderer = function(
+    viewRenderer, renderState, chunk, by) {
   goog.base(this, renderState.graphicsContext);
 
   /**
@@ -49,9 +50,9 @@ blk.env.client.SegmentRenderer = function(viewManager, renderState, chunk, by) {
 
   /**
    * Parent view renderer.
-   * @type {!blk.env.client.ViewManager}
+   * @type {!blk.env.client.ViewRenderer}
    */
-  this.viewManager = viewManager;
+  this.viewRenderer = viewRenderer;
 
   /**
    * Render state manager.
@@ -273,7 +274,7 @@ blk.env.client.SegmentRenderer.prototype.restore = function() {
   }
 
   // Invalidate the chunk and re-add to the build queue
-  this.viewManager.invalidateSegment(
+  this.viewRenderer.invalidateSegment(
       this.chunk.x, this.chunk.y + this.by, this.chunk.z,
       blk.env.UpdatePriority.LOAD);
 };
@@ -347,13 +348,13 @@ blk.env.client.SegmentRenderer.prototype.build = function() {
 
   /** @type {!Array.<blk.env.Chunk>} */
   var neighborChunks = new Array(4);
-  neighborChunks[0] = this.viewManager.view.getChunk(
+  neighborChunks[0] = this.viewRenderer.view.getChunk(
       this.chunk.x - blk.env.Chunk.SIZE_XZ, this.chunk.y, this.chunk.z);
-  neighborChunks[1] = this.viewManager.view.getChunk(
+  neighborChunks[1] = this.viewRenderer.view.getChunk(
       this.chunk.x + blk.env.Chunk.SIZE_XZ, this.chunk.y, this.chunk.z);
-  neighborChunks[2] = this.viewManager.view.getChunk(
+  neighborChunks[2] = this.viewRenderer.view.getChunk(
       this.chunk.x, this.chunk.y, this.chunk.z - blk.env.Chunk.SIZE_XZ);
-  neighborChunks[3] = this.viewManager.view.getChunk(
+  neighborChunks[3] = this.viewRenderer.view.getChunk(
       this.chunk.x, this.chunk.y, this.chunk.z + blk.env.Chunk.SIZE_XZ);
 
   // Slow path that checks each side of the cube by first caching the neighbor

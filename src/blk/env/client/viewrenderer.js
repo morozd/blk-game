@@ -15,7 +15,7 @@
  */
 
 goog.provide('blk.env.client.ChunkRenderData');
-goog.provide('blk.env.client.ViewManager');
+goog.provide('blk.env.client.ViewRenderer');
 
 goog.require('blk.env.Chunk');
 goog.require('blk.env.MapObserver');
@@ -50,7 +50,7 @@ blk.env.client.ChunkRenderData;
  * @param {!blk.env.Map} map Map to render.
  * @param {!blk.env.ChunkView} view Active view.
  */
-blk.env.client.ViewManager = function(renderState, map, view) {
+blk.env.client.ViewRenderer = function(renderState, map, view) {
   goog.base(this);
 
   /**
@@ -172,13 +172,13 @@ blk.env.client.ViewManager = function(renderState, map, view) {
   // Tie to view
   this.view.addObserver(this);
 };
-goog.inherits(blk.env.client.ViewManager, goog.Disposable);
+goog.inherits(blk.env.client.ViewRenderer, goog.Disposable);
 
 
 /**
  * @override
  */
-blk.env.client.ViewManager.prototype.disposeInternal = function() {
+blk.env.client.ViewRenderer.prototype.disposeInternal = function() {
   this.view.removeObserver(this);
   goog.base(this, 'disposeInternal');
 };
@@ -188,7 +188,7 @@ blk.env.client.ViewManager.prototype.disposeInternal = function() {
  * Toggles the debug visuals.
  * @param {boolean} value New value.
  */
-blk.env.client.ViewManager.prototype.setDebugVisuals = function(value) {
+blk.env.client.ViewRenderer.prototype.setDebugVisuals = function(value) {
   if (this.debugVisuals == value) {
     return;
   }
@@ -203,7 +203,7 @@ blk.env.client.ViewManager.prototype.setDebugVisuals = function(value) {
  * Get a statistics string to display.
  * @return {string} A string to display on the screen.
  */
-blk.env.client.ViewManager.prototype.getStatisticsString = function() {
+blk.env.client.ViewRenderer.prototype.getStatisticsString = function() {
   var str = 'Render: ';
   str += this.segmentCache_.getCount() + ' cached (';
   str += Math.floor(this.segmentCache_.getSize() / 1000) + 'K), ';
@@ -216,7 +216,7 @@ blk.env.client.ViewManager.prototype.getStatisticsString = function() {
 /**
  * @override
  */
-blk.env.client.ViewManager.prototype.chunkLoaded = function(chunk) {
+blk.env.client.ViewRenderer.prototype.chunkLoaded = function(chunk) {
   this.ensureChunkRenderData_(chunk, blk.env.UpdatePriority.LOAD);
 };
 
@@ -224,7 +224,7 @@ blk.env.client.ViewManager.prototype.chunkLoaded = function(chunk) {
 /**
  * @override
  */
-blk.env.client.ViewManager.prototype.chunkEnteredView = function(chunk) {
+blk.env.client.ViewRenderer.prototype.chunkEnteredView = function(chunk) {
   this.ensureChunkRenderData_(chunk, blk.env.UpdatePriority.LOAD);
 };
 
@@ -232,7 +232,7 @@ blk.env.client.ViewManager.prototype.chunkEnteredView = function(chunk) {
 /**
  * @override
  */
-blk.env.client.ViewManager.prototype.chunkLeftView = function(chunk) {
+blk.env.client.ViewRenderer.prototype.chunkLeftView = function(chunk) {
   this.dropChunkRenderData_(chunk);
 };
 
@@ -244,7 +244,7 @@ blk.env.client.ViewManager.prototype.chunkLeftView = function(chunk) {
  * @param {boolean=} opt_dontCreate Don't create if not present.
  * @return {blk.env.client.ChunkRenderData} Chunk render data.
  */
-blk.env.client.ViewManager.prototype.getChunkRenderData_ = function(chunk,
+blk.env.client.ViewRenderer.prototype.getChunkRenderData_ = function(chunk,
     opt_dontCreate) {
   var renderData = /** @type {blk.env.client.ChunkRenderData} */ (
       chunk.renderData);
@@ -263,7 +263,7 @@ blk.env.client.ViewManager.prototype.getChunkRenderData_ = function(chunk,
  * @private
  * @param {!blk.env.Chunk} chunk Chunk.
  */
-blk.env.client.ViewManager.prototype.dropChunkRenderData_ = function(chunk) {
+blk.env.client.ViewRenderer.prototype.dropChunkRenderData_ = function(chunk) {
   var renderData = this.getChunkRenderData_(chunk, false);
   if (renderData) {
     for (var sy = 0; sy < renderData.segments.length; sy++) {
@@ -287,7 +287,7 @@ blk.env.client.ViewManager.prototype.dropChunkRenderData_ = function(chunk) {
  * @param {!blk.env.Chunk} chunk Chunk.
  * @param {blk.env.UpdatePriority} priority Load priority.
  */
-blk.env.client.ViewManager.prototype.ensureChunkRenderData_ = function(chunk,
+blk.env.client.ViewRenderer.prototype.ensureChunkRenderData_ = function(chunk,
     priority) {
   if (!chunk.hasLoaded()) {
     return;
@@ -313,7 +313,7 @@ blk.env.client.ViewManager.prototype.ensureChunkRenderData_ = function(chunk,
 /**
  * @override
  */
-blk.env.client.ViewManager.prototype.invalidateBlock =
+blk.env.client.ViewRenderer.prototype.invalidateBlock =
     function(x, y, z, priority) {
   this.invalidateBlockRegion(x, y, z, x, y, z, priority);
 };
@@ -322,7 +322,7 @@ blk.env.client.ViewManager.prototype.invalidateBlock =
 /**
  * @override
  */
-blk.env.client.ViewManager.prototype.invalidateBlockRegion =
+blk.env.client.ViewRenderer.prototype.invalidateBlockRegion =
     function(minX, minY, minZ, maxX, maxY, maxZ, priority) {
   // Adjust for neighbors
   minX--;
@@ -358,7 +358,7 @@ blk.env.client.ViewManager.prototype.invalidateBlockRegion =
  * @param {number} z Segment Z, in world coordinates.
  * @param {blk.env.UpdatePriority} priority Update priority.
  */
-blk.env.client.ViewManager.prototype.invalidateSegment = function(x, y, z,
+blk.env.client.ViewRenderer.prototype.invalidateSegment = function(x, y, z,
     priority) {
   // TODO(benvanik): simple one chunk cache slot? most of these come in large
   // batches it seems
@@ -398,7 +398,7 @@ blk.env.client.ViewManager.prototype.invalidateSegment = function(x, y, z,
  * @param {!gf.RenderFrame} frame Render frame.
  * @param {!gf.vec.Viewport} viewport Current viewport.
  */
-blk.env.client.ViewManager.prototype.buildChunks_ = function(frame, viewport) {
+blk.env.client.ViewRenderer.prototype.buildChunks_ = function(frame, viewport) {
   // Run the build queue logic
   var totalSizeDelta = this.buildQueue_.update(frame, viewport);
 
@@ -412,7 +412,7 @@ blk.env.client.ViewManager.prototype.buildChunks_ = function(frame, viewport) {
  * @return {!goog.async.Deferred} Deferred fulfilled when the build queue is
  *     idle.
  */
-blk.env.client.ViewManager.prototype.waitForBuildIdle = function() {
+blk.env.client.ViewRenderer.prototype.waitForBuildIdle = function() {
   var deferred = new goog.async.Deferred();
   this.idleDeferreds_.push(deferred);
   return deferred;
@@ -422,7 +422,7 @@ blk.env.client.ViewManager.prototype.waitForBuildIdle = function() {
 /**
  * Rebuild all chunks.
  */
-blk.env.client.ViewManager.prototype.rebuildAll = function() {
+blk.env.client.ViewRenderer.prototype.rebuildAll = function() {
   this.segmentCache_.resetSize();
   this.segmentCache_.forEach(function(segment) {
     segment.discard();
@@ -436,7 +436,7 @@ blk.env.client.ViewManager.prototype.rebuildAll = function() {
  * @param {!gf.RenderFrame} frame Render frame.
  * @param {!gf.vec.Viewport} viewport Current viewport.
  */
-blk.env.client.ViewManager.prototype.render = function(frame, viewport) {
+blk.env.client.ViewRenderer.prototype.render = function(frame, viewport) {
   var graphicsContext = this.graphicsContext;
   var renderState = this.renderState;
   var map = this.map;
@@ -512,7 +512,7 @@ blk.env.client.ViewManager.prototype.render = function(frame, viewport) {
  * @private
  * @param {!blk.env.Chunk} chunk Chunk.
  */
-blk.env.client.ViewManager.prototype.handleVisibleChunk_ = function(chunk) {
+blk.env.client.ViewRenderer.prototype.handleVisibleChunk_ = function(chunk) {
   this.visibleChunkList_[this.lastVisibleChunkCount_++] = chunk;
 
   var renderData = this.getChunkRenderData_(chunk);

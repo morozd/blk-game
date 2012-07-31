@@ -21,7 +21,7 @@
 goog.provide('blk.modes.fps.client.FpsClientController');
 
 goog.require('blk.assets.audio.Music');
-goog.require('blk.env.client.ViewManager');
+goog.require('blk.env.client.ViewRenderer');
 goog.require('blk.game.client.ClientController');
 goog.require('blk.sim.Camera');
 goog.require('blk.sim.World');
@@ -116,9 +116,9 @@ blk.modes.fps.client.FpsClientController = function(game, session) {
   /**
    * Map view renderer.
    * @private
-   * @type {blk.env.client.ViewManager}
+   * @type {blk.env.client.ViewRenderer}
    */
-  this.viewManager_ = null;
+  this.viewRenderer_ = null;
 };
 goog.inherits(blk.modes.fps.client.FpsClientController,
     blk.game.client.ClientController);
@@ -141,9 +141,9 @@ blk.modes.fps.client.FpsClientController.prototype.entityAdded =
       entity.setMap(this.getMap());
 
       // Setup view manager
-      this.viewManager_ = new blk.env.client.ViewManager(
+      this.viewRenderer_ = new blk.env.client.ViewRenderer(
           this.game.getRenderState(), this.getMap(), entity.getView());
-      this.registerDisposable(this.viewManager_);
+      this.registerDisposable(this.viewRenderer_);
     }
   }
 };
@@ -329,8 +329,8 @@ blk.modes.fps.client.FpsClientController.prototype.drawWorld =
   }
 
   // Render map
-  if (this.viewManager_) {
-    this.viewManager_.render(frame, viewport);
+  if (this.viewRenderer_) {
+    this.viewRenderer_.render(frame, viewport);
   }
 
   // Render the simulation
@@ -357,7 +357,7 @@ blk.modes.fps.client.FpsClientController.prototype.drawOverlays =
  * @override
  */
 blk.modes.fps.client.FpsClientController.prototype.getDebugInfo = function() {
-  return this.viewManager_ ? this.viewManager_.getStatisticsString() : null;
+  return this.viewRenderer_ ? this.viewRenderer_.getStatisticsString() : null;
 };
 
 
