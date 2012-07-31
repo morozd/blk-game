@@ -683,7 +683,7 @@ blk.game.client.ClientGame.prototype.connectToLocalHost_ =
     function(uri, authToken, userInfo, deferred) {
   // Request quota
   // TODO(benvanik): pull from somewhere?
-  var quotaSize = 1024 * 1024 * 1024;
+  var quotaSize = 4 * 1024 * 1024 * 1024;
   gf.io.requestQuota(
       gf.io.FileSystemType.PERSISTENT, quotaSize).addCallbacks(
       function(grantedBytes) {
