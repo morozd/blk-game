@@ -662,7 +662,6 @@ blk.game.client.ClientController.prototype.entityAdded = function(entity) {
     }
 
     this.handlePlayersChanged();
-    gf.log.write('got player entity');
   }
 };
 

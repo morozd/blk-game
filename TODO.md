@@ -287,22 +287,12 @@ setupMap()
 getMap()
 
 
-- tool use
-    - tool:
-        - melee | use
-        - toolFlags:
-            - REPEATABLE
-            -
-        - repeatInterval
-    - block tool:
-        - blockType
-        - use(): place block
-        - local (!hasPredicted):
-            - set block
-            - play sound
-        - server:
-            - set block
-            - broadcast on world SetBlockCommand
+- tools:
+    - toolFlags:
+        - REPEATABLE
+    - repeatInterval
+    - maxUsageDistance
+    - preview?
 
 - make chunk views efficient, each controller gets one (AI too)
     - controller command, pass view down to tools
