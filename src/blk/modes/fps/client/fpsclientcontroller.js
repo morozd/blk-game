@@ -137,12 +137,14 @@ blk.modes.fps.client.FpsClientController.prototype.entityAdded =
     this.world_ = entity;
     this.world_.setMap(this.getMap());
   } else if (entity instanceof blk.sim.Camera) {
-    entity.setMap(this.getMap());
+    if (entity.getOwner() == this.session.getLocalUser()) {
+      entity.setMap(this.getMap());
 
-    // Setup view manager
-    this.viewManager_ = new blk.env.client.ViewManager(
-        this.game.getRenderState(), this.getMap(), entity.getView());
-    this.registerDisposable(this.viewManager_);
+      // Setup view manager
+      this.viewManager_ = new blk.env.client.ViewManager(
+          this.game.getRenderState(), this.getMap(), entity.getView());
+      this.registerDisposable(this.viewManager_);
+    }
   }
 };
 

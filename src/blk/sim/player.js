@@ -166,7 +166,8 @@ if (gf.SERVER) {
     var controller = /** @type {!blk.sim.controllers.FpsController} */ (
         simulator.createEntity(
             blk.sim.controllers.FpsController.ID,
-            gf.sim.EntityFlag.UPDATED_FREQUENTLY));
+            gf.sim.EntityFlag.UPDATED_FREQUENTLY |
+            gf.sim.EntityFlag.OWNER_ONLY));
     controller.setOwner(user);
     controller.setParent(actor);
     controller.setPlayer(this);
@@ -178,7 +179,8 @@ if (gf.SERVER) {
             blk.sim.Camera.ID,
             gf.sim.EntityFlag.UPDATED_FREQUENTLY |
             gf.sim.EntityFlag.PREDICTED |
-            gf.sim.EntityFlag.INTERPOLATED));
+            gf.sim.EntityFlag.INTERPOLATED |
+            gf.sim.EntityFlag.OWNER_ONLY));
     camera.setOwner(user);
     camera.setParent(actor);
     camera.setup(user);
