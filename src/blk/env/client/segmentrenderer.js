@@ -19,7 +19,7 @@ goog.provide('blk.env.client.SegmentRenderer');
 goog.require('blk.env.Chunk');
 goog.require('blk.env.MaterialFlags');
 goog.require('blk.env.UpdatePriority');
-goog.require('blk.env.client.BaseRenderer');
+goog.require('gf.graphics.Resource');
 goog.require('goog.vec.Mat4');
 goog.require('goog.vec.Vec3');
 goog.require('goog.vec.Vec4');
@@ -32,14 +32,14 @@ goog.require('goog.vec.Vec4');
  * of them. Many segments fit together to make a single chunk.
  *
  * @constructor
- * @extends {blk.env.client.BaseRenderer}
+ * @extends {gf.graphics.Resource}
  * @param {!blk.env.client.ViewManager} viewManager Parent map renderer.
  * @param {!blk.graphics.RenderState} renderState Render state manager.
  * @param {!blk.env.Chunk} chunk Chunk to render.
  * @param {number} by Block offset Y in chunk.
  */
 blk.env.client.SegmentRenderer = function(viewManager, renderState, chunk, by) {
-  goog.base(this, renderState);
+  goog.base(this, renderState.graphicsContext);
 
   /**
    * Unique ID that can be used for caching.
@@ -52,6 +52,12 @@ blk.env.client.SegmentRenderer = function(viewManager, renderState, chunk, by) {
    * @type {!blk.env.client.ViewManager}
    */
   this.viewManager = viewManager;
+
+  /**
+   * Render state manager.
+   * @type {!blk.graphics.RenderState}
+   */
+  this.renderState = renderState;
 
   /**
    * Chunk to render.
@@ -83,6 +89,12 @@ blk.env.client.SegmentRenderer = function(viewManager, renderState, chunk, by) {
       chunk.x + blk.env.client.SegmentRenderer.SIZE / 2,
       chunk.y + by + blk.env.client.SegmentRenderer.SIZE / 2,
       chunk.z + blk.env.client.SegmentRenderer.SIZE / 2);
+
+  /**
+   * Bounding box.
+   * @type {!gf.vec.BoundingBox}
+   */
+  this.boundingBox = gf.vec.BoundingBox.create();
 
   /**
    * Rough bounding sphere for the segment.
@@ -129,11 +141,10 @@ blk.env.client.SegmentRenderer = function(viewManager, renderState, chunk, by) {
   this.faceBufferElementCount_ = 0;
 
   /**
-   * Bytes used by the face buffer.
-   * @private
+   * Estimated number of bytes used by the renderer.
    * @type {number}
    */
-  this.faceBufferSize_ = 0;
+  this.estimatedSize = 0;
 
   /**
    * Whether the renderer is in the viewport.
@@ -142,6 +153,12 @@ blk.env.client.SegmentRenderer = function(viewManager, renderState, chunk, by) {
    * @type {boolean}
    */
   this.inViewport = false;
+
+  /**
+   * The last frame number that the renderer was visible in the viewport.
+   * @type {number}
+   */
+  this.lastFrameInViewport = 0;
 
   /**
    * Computed distance to the viewport.
@@ -162,14 +179,30 @@ blk.env.client.SegmentRenderer = function(viewManager, renderState, chunk, by) {
    * @type {blk.env.UpdatePriority}
    */
   this.queuePriority = blk.env.UpdatePriority.LOAD;
+
+  /**
+   * Whether to enable debug visuals.
+   * @private
+   * @type {boolean}
+   */
+  this.debugVisuals_ = false;
+
+  /**
+   * Debug line buffer. Only initialzed in debug mode.
+   * @protected
+   * @type {blk.graphics.LineBuffer}
+   */
+  this.debugLineBuffer = null;
 };
-goog.inherits(blk.env.client.SegmentRenderer, blk.env.client.BaseRenderer);
+goog.inherits(blk.env.client.SegmentRenderer, gf.graphics.Resource);
 
 
 /**
  * @override
  */
 blk.env.client.SegmentRenderer.prototype.disposeInternal = function() {
+  this.setDebugVisuals(false);
+
   goog.base(this, 'disposeInternal');
 };
 
@@ -217,8 +250,12 @@ blk.env.client.SegmentRenderer.prototype.discard = function() {
   gl.deleteBuffer(this.faceBuffer_);
   this.faceBuffer_ = null;
   this.faceBufferElementCount_ = 0;
-  this.faceBufferSize_ = 0;
   this.estimatedSize = 0;
+
+  if (this.debugLineBuffer) {
+    goog.dispose(this.debugLineBuffer);
+    this.debugLineBuffer = null;
+  }
 
   goog.base(this, 'discard');
 };
@@ -228,12 +265,17 @@ blk.env.client.SegmentRenderer.prototype.discard = function() {
  * @override
  */
 blk.env.client.SegmentRenderer.prototype.restore = function() {
+  goog.base(this, 'restore');
+
+  if (this.debugVisuals_) {
+    this.setDebugVisuals(false);
+    this.setDebugVisuals(true);
+  }
+
   // Invalidate the chunk and re-add to the build queue
   this.viewManager.invalidateSegment(
       this.chunk.x, this.chunk.y + this.by, this.chunk.z,
       blk.env.UpdatePriority.LOAD);
-
-  goog.base(this, 'restore');
 };
 
 
@@ -344,10 +386,9 @@ blk.env.client.SegmentRenderer.prototype.build = function() {
   var results = this.blockBuilder_.finish(this.faceBuffer_);
   this.faceBuffer_ = results.buffer;
   this.faceBufferElementCount_ = results.elementCount;
-  var oldSize = this.faceBufferSize_;
-  this.faceBufferSize_ = results.bytesUsed;
-  this.estimatedSize = this.faceBufferSize_;
-  return this.faceBufferSize_ - oldSize;
+  var oldSize = this.estimatedSize;
+  this.estimatedSize = results.bytesUsed;
+  return this.estimatedSize - oldSize;
 };
 
 
@@ -431,9 +472,33 @@ blk.env.client.SegmentRenderer.prototype.addFaces_ = function(
 
 
 /**
- * @override
+ * Toggles the debug visuals.
+ * @param {boolean} value New value.
  */
-blk.env.client.SegmentRenderer.prototype.addDebugVisuals =
+blk.env.client.SegmentRenderer.prototype.setDebugVisuals = function(value) {
+  if (this.debugVisuals_ == value) {
+    return;
+  }
+  this.debugVisuals_ = value;
+  if (value) {
+    // Create
+    this.debugLineBuffer = new blk.graphics.LineBuffer(
+        this.graphicsContext);
+    this.addDebugVisuals_(this.debugLineBuffer);
+  } else {
+    // Drop
+    goog.dispose(this.debugLineBuffer);
+    this.debugLineBuffer = null;
+  }
+};
+
+
+/**
+ * Adds debug visuals to the line buffer.
+ * @private
+ * @param {!blk.graphics.LineBuffer} buffer Line buffer.
+ */
+blk.env.client.SegmentRenderer.prototype.addDebugVisuals_ =
     function(buffer) {
   buffer.addCube(
       goog.vec.Vec3.createFloat32FromValues(0, 0, 0),
@@ -449,12 +514,14 @@ blk.env.client.SegmentRenderer.prototype.addDebugVisuals =
  * @return {boolean} True if there is any renderable data in this segment.
  */
 blk.env.client.SegmentRenderer.prototype.hasData = function() {
-  return this.queuedForBuild || this.faceBufferSize_ > 0;
+  return this.queuedForBuild || this.estimatedSize > 0;
 };
 
 
 /**
- * @override
+ * Renders the segment.
+ * @param {!gf.RenderFrame} frame Current render frame.
+ * @param {!gf.vec.Viewport} viewport Current viewport.
  */
 blk.env.client.SegmentRenderer.prototype.render =
     function(frame, viewport) {
@@ -466,7 +533,9 @@ blk.env.client.SegmentRenderer.prototype.render =
 
 
 /**
- * @override
+ * Renders debug visuals.
+ * @param {!gf.RenderFrame} frame Current render frame.
+ * @param {!gf.vec.Viewport} viewport Current viewport.
  */
 blk.env.client.SegmentRenderer.prototype.renderDebug =
     function(frame, viewport) {

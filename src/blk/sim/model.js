@@ -40,7 +40,6 @@ blk.sim.Model = function(
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 
   // TODO(benvanik): add locals:
-  // - viewport
   // - render model
   // - render state
   // - attachments (track child add/remove)

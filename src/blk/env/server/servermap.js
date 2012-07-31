@@ -19,7 +19,7 @@ goog.provide('blk.env.server.ServerMap');
 goog.require('blk.env.Map');
 goog.require('blk.env.gen.ImprovedGenerator');
 goog.require('blk.env.server.ChunkProvider');
-goog.require('blk.env.server.Scheduler');
+goog.require('blk.env.server.ChunkScheduler');
 goog.require('goog.async.DeferredList');
 
 
@@ -57,9 +57,9 @@ blk.env.server.ServerMap = function(mapParams, mapStore) {
   /**
    * Update scheduler.
    * @private
-   * @type {!blk.env.server.Scheduler}
+   * @type {!blk.env.server.ChunkScheduler}
    */
-  this.scheduler_ = new blk.env.server.Scheduler();
+  this.scheduler_ = new blk.env.server.ChunkScheduler();
   this.registerDisposable(this.scheduler_);
 
   /**

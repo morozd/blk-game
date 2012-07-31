@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-goog.provide('blk.env.server.Scheduler');
+goog.provide('blk.env.server.ChunkScheduler');
 
 goog.require('goog.Disposable');
 
 
 
 /**
- * Update scheduling system.
+ * Chunk update scheduling system.
  * Handles future chunk updates and scheduling.
  *
  * @constructor
  * @extends {goog.Disposable}
  */
-blk.env.server.Scheduler = function() {
+blk.env.server.ChunkScheduler = function() {
   goog.base(this);
 };
-goog.inherits(blk.env.server.Scheduler, goog.Disposable);
+goog.inherits(blk.env.server.ChunkScheduler, goog.Disposable);
 
 
 /**
  * Updates the scheduler and runs any required logic.
  * @param {!gf.UpdateFrame} frame Current update frame.
  */
-blk.env.server.Scheduler.prototype.update = function(frame) {
+blk.env.server.ChunkScheduler.prototype.update = function(frame) {
 };

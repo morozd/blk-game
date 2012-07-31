@@ -301,3 +301,11 @@ getMap()
     - spawn random, interp rotation
 - move (physics system?)
     - Actor -> blk.sim.PhysicsEntity <- SpatialEntity
+
+
+- render actors
+    - models/etc
+        - model table, by name
+        - ModelRenderer
+            - gf.graphics.Mesh/etc, for now: cubes
+            - optional title adorner
