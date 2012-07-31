@@ -565,9 +565,18 @@ blk.game.client.ClientGame.prototype.showHelpPopup = function() {
  */
 blk.game.client.ClientGame.prototype.showErrorPopup = function(
     location, message, opt_arg) {
-  blk.ui.screens.StatusScreen.showError(
+  var deferred = blk.ui.screens.StatusScreen.showError(
       this.screenManager_, this.display_.getDomElement(),
       location, message, opt_arg || null);
+  deferred.addCallback(
+      /**
+       * @param {string} buttonId Button ID.
+       */
+      function(buttonId) {
+        if (buttonId == 'reload') {
+          window.location.reload();
+        }
+      });
 };
 
 
@@ -635,9 +644,18 @@ blk.game.client.ClientGame.prototype.connectToHost = function(address) {
 
         // Show error dialog
         // TODO(benvanik): allow this to loop back around to the main screen?
-        blk.ui.screens.StatusScreen.showConnectionFailed(
+        var failedDeferred = blk.ui.screens.StatusScreen.showConnectionFailed(
             this.screenManager_, this.display_.getDomElement(),
             arg);
+        failedDeferred.addCallback(
+            /**
+             * @param {string} buttonId Button ID.
+             */
+            function(buttonId) {
+              if (buttonId == 'reload') {
+                window.location.reload();
+              }
+            });
       }, this);
 };
 
@@ -649,7 +667,7 @@ blk.game.client.ClientGame.prototype.connectToHost = function(address) {
  * @const
  * @type {boolean}
  */
-blk.game.client.ClientGame.ENABLE_SHARED_WORKERS_ = false;
+blk.game.client.ClientGame.ENABLE_SHARED_WORKERS_ = true;
 
 
 /**
@@ -702,8 +720,8 @@ blk.game.client.ClientGame.prototype.connectToLocalHost_ =
  */
 blk.game.client.ClientGame.prototype.launchLocalServer_ =
     function(uri, authToken, userInfo, deferred) {
-  goog.asserts.assert(!!goog.global.Worker);
-  if (!goog.global.Worker) {
+  goog.asserts.assert(!!goog.global['Worker']);
+  if (!goog.global['Worker']) {
     deferred.errback('Workers not supported');
     return;
   }

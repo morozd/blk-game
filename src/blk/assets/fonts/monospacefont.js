@@ -51,7 +51,6 @@ blk.assets.fonts.MonospaceFont = function(runtime, assetManager, context) {
       imageInfo);
   atlas.setupUniformSlots(8, 8);
   atlas.setFilteringMode(goog.webgl.NEAREST, goog.webgl.NEAREST);
-  atlas.load();
 
   // Really prepare the font
   goog.base(this, context, atlas, 8,

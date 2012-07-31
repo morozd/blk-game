@@ -34,6 +34,7 @@ goog.require('gf.net.chat.ServerChatService');
 goog.require('gf.sim.ServerSimulator');
 goog.require('goog.Disposable');
 goog.require('goog.array');
+goog.require('goog.asserts');
 goog.require('goog.async.Deferred');
 
 

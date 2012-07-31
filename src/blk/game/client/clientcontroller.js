@@ -21,9 +21,9 @@
 goog.provide('blk.game.client.ClientController');
 
 goog.require('blk.assets.audio.BlockSounds');
-goog.require('blk.game.SoundBanks');
 goog.require('blk.env');
 goog.require('blk.env.client.ClientMap');
+goog.require('blk.game.SoundBanks');
 goog.require('blk.io.ChunkSerializer');
 goog.require('blk.net.packets.ChunkData');
 goog.require('blk.net.packets.ReadyPlayer');

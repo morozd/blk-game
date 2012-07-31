@@ -21,7 +21,6 @@
 goog.provide('blk.game.SoundBanks');
 
 
-
 /**
  * Names for each sound bank in the core set.
  * Sound bank names are global in the client and fail gracefully if not found.
