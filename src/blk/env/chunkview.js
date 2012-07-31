@@ -237,11 +237,10 @@ blk.env.ChunkView.prototype.initialize = function(viewPosition) {
 
 /**
  * Updates the view and its contents.
- * @param {!gf.UpdateFrame} frame Current update frame.
  * @param {!goog.vec.Vec3.Float32} viewPosition Eye position, in
  *     world coordinates.
  */
-blk.env.ChunkView.prototype.update = function(frame, viewPosition) {
+blk.env.ChunkView.prototype.update = function(viewPosition) {
   goog.asserts.assert(this.hasInitialized_);
 
   // Update position, possibly rotating the chunk cube

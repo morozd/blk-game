@@ -151,6 +151,8 @@ blk.sim.Camera.prototype.setMap = function(map) {
   if (gf.CLIENT) {
     this.view_.initialize(goog.vec.Vec3.createFloat32());
   }
+
+  this.scheduleUpdate(gf.sim.SchedulingPriority.LOW, gf.sim.NEXT_TICK);
 };
 
 
@@ -160,6 +162,31 @@ blk.sim.Camera.prototype.setMap = function(map) {
 blk.sim.Camera.prototype.getView = function() {
   goog.asserts.assert(this.view_);
   return this.view_;
+};
+
+
+/**
+ * @override
+ */
+blk.sim.Camera.prototype.update = function(time, timeDelta) {
+  // Get center point
+  var sphere = blk.sim.Camera.tmpSphere_;
+  var parent = this.getParent();
+  if (parent instanceof gf.sim.SpatialEntity) {
+    parent.getBoundingSphere(sphere);
+  } else {
+    this.getBoundingSphere(sphere);
+  }
+
+  // Update chunk view, which may queue chunks
+  this.view_.update(sphere);
+
+  // Process any server work (sending chunsk/etc)
+  if (gf.SERVER) {
+    this.sendQueue_.process(time, sphere);
+  }
+
+  this.scheduleUpdate(gf.sim.SchedulingPriority.LOW, gf.sim.NEXT_TICK);
 };
 
 
@@ -196,25 +223,6 @@ if (gf.SERVER) {
     // TODO(benvanik): only after spawn? on reparent? etc
     var spawnPosition = goog.vec.Vec3.createFloat32FromValues(0, 80, 0);
     this.view_.initialize(spawnPosition);
-
-    this.scheduleUpdate(gf.sim.SchedulingPriority.LOW, gf.sim.NEXT_TICK);
-  };
-
-  /**
-   * @override
-   */
-  blk.sim.Camera.prototype.update = function(time, timeDelta) {
-    // Get center point
-    var sphere = blk.sim.Camera.tmpSphere_;
-    var parent = this.getParent();
-    if (parent instanceof gf.sim.SpatialEntity) {
-      parent.getBoundingSphere(sphere);
-    } else {
-      this.getBoundingSphere(sphere);
-    }
-
-    this.sendQueue_.process(time, sphere);
-    this.scheduleUpdate(gf.sim.SchedulingPriority.LOW, gf.sim.NEXT_TICK);
   };
 }
 

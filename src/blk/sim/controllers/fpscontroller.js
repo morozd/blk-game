@@ -118,6 +118,7 @@ blk.sim.controllers.FpsController.prototype.executeCommand = function(
     targetState.setRotation(q);
 
     // TODO(benvanik): apply translation
+    this.tempPhysics_(command, targetState);
 
     // Calculate viewport for use with tool logic
     // TODO(benvanik): calculate elsewhere? cache longer?
@@ -138,6 +139,50 @@ blk.sim.controllers.FpsController.prototype.executeCommand = function(
       }
     }
   }
+};
+
+
+/**
+ * Temporary physics hackiness.
+ * @private
+ * @param {!blk.sim.commands.PlayerMoveCommand} command Command.
+ * @param {!gf.sim.SpatialEntityState} targetState Target actor state.
+ */
+blk.sim.controllers.FpsController.prototype.tempPhysics_ = function(
+    command, targetState) {
+  var dt = 1;
+
+  var oldPosition = targetState.getPosition();
+  var newPosition = goog.vec.Vec3.createFloat32();
+  newPosition[0] = oldPosition[0];
+  newPosition[1] = oldPosition[1];
+  newPosition[2] = oldPosition[2];
+
+  var dx = 0, dy = 0, dz = 0;
+  if (command.translation & blk.sim.commands.PlayerMoveTranslation.POS_X) {
+    dx = 1;
+  }
+  if (command.translation & blk.sim.commands.PlayerMoveTranslation.NEG_X) {
+    dx = -1;
+  }
+  if (command.translation & blk.sim.commands.PlayerMoveTranslation.POS_Y) {
+    dy = 1;
+  }
+  if (command.translation & blk.sim.commands.PlayerMoveTranslation.NEG_Y) {
+    dy = -1;
+  }
+  if (command.translation & blk.sim.commands.PlayerMoveTranslation.POS_Z) {
+    dz = 1;
+  }
+  if (command.translation & blk.sim.commands.PlayerMoveTranslation.NEG_Z) {
+    dz = -1;
+  }
+
+  newPosition[0] += dx * dt;
+  newPosition[1] += dy * dt;
+  newPosition[2] += dz * dt;
+
+  targetState.setPosition(newPosition);
 };
 
 
