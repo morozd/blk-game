@@ -21,6 +21,7 @@
 goog.provide('blk.game.client.ClientController');
 
 goog.require('blk.assets.audio.BlockSounds');
+goog.require('blk.game.SoundBanks');
 goog.require('blk.env');
 goog.require('blk.env.client.ClientMap');
 goog.require('blk.io.ChunkSerializer');
@@ -135,15 +136,14 @@ blk.game.client.ClientController = function(game, session) {
   this.registerDisposable(this.console_);
   //this.addWidget(this.console_);
 
-  // TODO(benvanik): move this someplace else - feels wrong here
   /**
-   * Block sound effects.
+   * Map of sound banks by bank name.
+   * These are all banks exclusively loaded by the controller.
+   * Subclasses can register their own for playback with {@see #loadSoundBank}.
    * @private
-   * @type {!gf.audio.SoundBank}
+   * @type {!Object.<!gf.audio.SoundBank>}
    */
-  this.blockSoundBank_ = blk.assets.audio.BlockSounds.create(
-      this.game.getAssetManager(), this.game.getAudioManager().context);
-  this.game.getAudioManager().loadSoundBank(this.blockSoundBank_);
+  this.soundBanks_ = {};
 
   /**
    * Root entity.
@@ -179,6 +179,21 @@ blk.game.client.ClientController = function(game, session) {
   }
 };
 goog.inherits(blk.game.client.ClientController, goog.Disposable);
+
+
+/**
+ * @override
+ */
+blk.game.client.ClientController.prototype.disposeInternal = function() {
+  // Unload all soundbanks
+  var audioManager = this.game.getAudioManager();
+  for (var bankName in this.soundBanks_) {
+    var bank = this.soundBanks_[bankName];
+    audioManager.unloadSoundBank(bank);
+  }
+
+  goog.base(this, 'disposeInternal');
+};
 
 
 /**
@@ -291,6 +306,13 @@ blk.game.client.ClientController.prototype.addWidget = function(widget) {
  */
 blk.game.client.ClientController.prototype.load = function() {
   var deferred = new goog.async.Deferred();
+
+  // Game sound banks
+  this.loadSoundBank(
+      blk.game.SoundBanks.BLOCKS,
+      blk.assets.audio.BlockSounds.create(
+          this.game.getAssetManager(), this.game.getAudioManager().context));
+
   // TODO(benvanik): wait on initial asset load?
   deferred.callback(null);
   return deferred;
@@ -571,21 +593,46 @@ blk.game.client.ClientController.prototype.endDrawing = function(frame) {
 
 
 /**
+ * Registers a sound bank by name and loads it.
+ * @param {string} bankName Bank name.
+ * @param {!gf.audio.SoundBank} bank Sound bank.
+ */
+blk.game.client.ClientController.prototype.loadSoundBank = function(
+    bankName, bank) {
+  goog.asserts.assert(!this.soundBanks_[bankName]);
+  this.soundBanks_[bankName] = bank;
+
+  var audioManager = this.game.getAudioManager();
+  audioManager.loadSoundBank(bank);
+};
+
+
+/**
  * Plays the given audio cue at the position if it is within range.
- * @param {!gf.audio.SoundBank} soundBank Sound bank to play the cue from.
+ * @param {string} bankName Sound bank to play the cue from.
  * @param {string} cue Sound cue.
  * @param {!goog.vec.Vec3.Float32} position World position to play the sound at.
  */
 blk.game.client.ClientController.prototype.playPointSound =
-    function(soundBank, cue, position) {
+    function(bankName, cue, position) {
+  if (this.game.settings.soundFxMuted) {
+    return;
+  }
+
+  // Get sound bank
+  var soundBank = this.soundBanks_[bankName];
+  if (!soundBank) {
+    gf.log.debug('Sound bank ' + bankName + '@' + cue + ' not found');
+    return;
+  }
+
   // TODO(benvanik): add dampening factor/etc based on line of sight
+  // TODO(benvanik): max distance based on listener? (ear types)
 
   var listener = this.game.getAudioManager().listener;
   var distance = listener.getDistance(position);
   if (distance < blk.env.MAX_SOUND_DISTANCE) {
-    if (!this.game.settings.soundFxMuted) {
-      soundBank.playPoint(cue, position);
-    }
+    soundBank.playPoint(cue, position);
   }
 };
 
@@ -597,6 +644,7 @@ blk.game.client.ClientController.prototype.entityAdded = function(entity) {
   if (entity instanceof blk.sim.Root) {
     // Grab root
     this.root_ = entity;
+    this.root_.setGameController(this);
   } else if (entity instanceof blk.sim.Player) {
     var player = /** @type {!blk.sim.Player} */ (entity);
 

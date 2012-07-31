@@ -20,6 +20,7 @@
 
 goog.provide('blk.sim.World');
 
+goog.require('blk.game.SoundBanks');
 goog.require('blk.sim');
 goog.require('blk.sim.EntityType');
 goog.require('blk.sim.commands.SetBlockCommand');
@@ -185,38 +186,47 @@ blk.sim.World.prototype.setBlock = function(x, y, z, data, opt_filterPlayer) {
 
   // Change the block in the map
   var oldData = map.setBlock(x, y, z, data);
-  var changed = oldData != data;
+  if (oldData == data) {
+    // No change - ignore
+    return;
+  }
 
   if (gf.SERVER) {
     // Broadcast update, if it changed
     // TODO(benvanik): coalesce these changes and push on update?
-    if (changed) {
-      // Create command
-      var cmd = /** @type {!blk.sim.commands.SetBlockCommand} */ (
-          this.createCommand(blk.sim.commands.SetBlockCommand.ID));
-      cmd.x = x;
-      cmd.y = y;
-      cmd.z = z;
-      cmd.data = data;
-      var filterUser = opt_filterPlayer ? opt_filterPlayer.getUser() : null;
-      this.simulator.broadcastCommand(cmd, filterUser);
-    }
+    // Create command
+    var cmd = /** @type {!blk.sim.commands.SetBlockCommand} */ (
+        this.createCommand(blk.sim.commands.SetBlockCommand.ID));
+    cmd.x = x;
+    cmd.y = y;
+    cmd.z = z;
+    cmd.data = data;
+    var filterUser = opt_filterPlayer ? opt_filterPlayer.getUser() : null;
+    this.simulator.broadcastCommand(cmd, filterUser);
   } else if (gf.CLIENT) {
     // Play sound effect on block change
-    if (changed) {
-      // TODO(benvanik): centralize sound control
-      var soundBlockId = (data ? data : oldData) >> 8;
-      if (soundBlockId) {
-        var block = map.blockSet.getBlockWithId(soundBlockId);
-        var cue = block ? block.material.actionCue : null;
-        if (cue) {
-          // TODO(benvanik): play sound
-          gf.log.write('would play sound', cue);
-//         var soundPosition = goog.vec.Vec3.createFloat32FromValues(x, y, z);
-//         var soundBank = this.blockSoundBank_;
-//         this.playPointSound(soundBank, cue, soundPosition);
-        }
+    // TODO(benvanik): centralize sound control
+    var soundBlockId = (data ? data : oldData) >> 8;
+    if (soundBlockId) {
+      var block = map.blockSet.getBlockWithId(soundBlockId);
+      var cue = block ? block.material.actionCue : null;
+      if (cue) {
+        var position = blk.sim.World.tmpVec3_;
+        position[0] = x; position[1] = y; position[2] = z;
+        var controller = blk.sim.getClientController(this);
+        controller.playPointSound(
+            blk.game.SoundBanks.BLOCKS,
+            cue,
+            position);
       }
     }
   }
 };
+
+
+/**
+ * Scratch Vec3.
+ * @private
+ * @type {!goog.vec.Vec3.Float32}
+ */
+blk.sim.World.tmpVec3_ = goog.vec.Vec3.createFloat32();

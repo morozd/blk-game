@@ -72,7 +72,32 @@ blk.sim.getMap = function(entity) {
 };
 
 
+if (gf.SERVER) {
+  /**
+   * Gets the game controller that owns the simulator.
+   * @param {!gf.sim.Entity} entity Entity in the simulation.
+   * @return {!blk.game.server.ServerController} Server controller.
+   */
+  blk.sim.getServerController = function(entity) {
+    var root = blk.sim.getRoot(entity);
+    return /** @type {!blk.game.server.ServerController} */ (
+        root.getGameController());
+  };
+}
+
+
 if (gf.CLIENT) {
+  /**
+   * Gets the game controller that owns the simulator.
+   * @param {!gf.sim.Entity} entity Entity in the simulation.
+   * @return {!blk.game.client.ClientController} Client controller.
+   */
+  blk.sim.getClientController = function(entity) {
+    var root = blk.sim.getRoot(entity);
+    return /** @type {!blk.game.client.ClientController} */ (
+        root.getGameController());
+  };
+
   /**
    * Gets the local player.
    * @param {!gf.sim.Entity} entity Entity in the simulation.

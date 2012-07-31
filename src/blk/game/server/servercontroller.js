@@ -206,6 +206,7 @@ blk.game.server.ServerController.prototype.load = function() {
       this.simulator_.createEntity(
           blk.sim.Root.ID,
           0));
+  this.root_.setGameController(this);
   simulator.setRootEntity(this.root_);
 
   // Create initial simulation state

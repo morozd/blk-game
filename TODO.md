@@ -304,20 +304,10 @@ getMap()
             - set block
             - broadcast on world SetBlockCommand
 
-
-- Simulator::get|setRootEntity
-    - blk.sim.Root:
-        - world
-        - players
-        - client:
-            - local player? (cached on entityAdded?)
-            - getCamera
-- Actor::getWorld
-- Tool::getWorld
-
 - make chunk views efficient, each controller gets one (AI too)
     - controller command, pass view down to tools
 
 - interpolation
     - spawn random, interp rotation
 - move (physics system?)
+    - Actor -> blk.sim.PhysicsEntity <- SpatialEntity

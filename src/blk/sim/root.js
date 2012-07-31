@@ -44,6 +44,13 @@ blk.sim.Root = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 
+  /**
+   * Client/server game controller.
+   * @private
+   * @type {Object}
+   */
+  this.gameController_ = null;
+
   if (gf.CLIENT) {
     /**
      * Local player.
@@ -64,6 +71,25 @@ goog.inherits(blk.sim.Root, gf.sim.Entity);
  */
 blk.sim.Root.ID = gf.sim.createTypeId(
     blk.sim.BLK_MODULE_ID, blk.sim.EntityType.ROOT);
+
+
+/**
+ * Gets the game controller.
+ * @return {!Object} Game controller.
+ */
+blk.sim.Root.prototype.getGameController = function() {
+  goog.asserts.assert(this.gameController_);
+  return this.gameController_;
+};
+
+
+/**
+ * Sets the game controller.
+ * @param {!Object} value Game controller.
+ */
+blk.sim.Root.prototype.setGameController = function(value) {
+  this.gameController_ = value;
+};
 
 
 /**
