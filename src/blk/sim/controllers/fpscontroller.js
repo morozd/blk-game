@@ -23,6 +23,7 @@ goog.provide('blk.sim.controllers.FpsController');
 goog.require('blk.sim');
 goog.require('blk.sim.Controller');
 goog.require('blk.sim.EntityType');
+goog.require('blk.sim.Tool');
 goog.require('blk.sim.commands.PlayerMoveCommand');
 goog.require('gf.sim');
 goog.require('gf.vec.Viewport');
@@ -130,7 +131,10 @@ blk.sim.controllers.FpsController.prototype.executeCommand = function(
     if (command.actions) {
       var heldTool = target.getHeldTool();
       if (heldTool) {
-        heldTool.use(command, viewport, chunkView, target);
+        var params = blk.sim.controllers.FpsController.tmpActionParams_;
+        params.initWithPlayerMove(
+            command, viewport, chunkView, player, target);
+        heldTool.executePlayerAction(command, params);
       }
     }
   }
@@ -144,3 +148,12 @@ blk.sim.controllers.FpsController.prototype.executeCommand = function(
  */
 blk.sim.controllers.FpsController.tmpQuat_ =
     goog.vec.Quaternion.createFloat32();
+
+
+/**
+ * Scratch action parameters.
+ * @private
+ * @type {!blk.sim.Tool.ActionParameters}
+ */
+blk.sim.controllers.FpsController.tmpActionParams_ =
+    new blk.sim.Tool.ActionParameters();

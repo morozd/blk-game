@@ -86,17 +86,17 @@ blk.sim.tools.BlockTool.prototype.setBlockType = function(value) {
 /**
  * @override
  */
-blk.sim.tools.BlockTool.prototype.performAction = function(
-    time, viewport, chunkView, user, screenX, screenY, ray, action) {
+blk.sim.tools.BlockTool.prototype.performAction = function(params, action) {
   var maxDistance = 100;
-  var intersection = chunkView.intersectBlock(ray, maxDistance);
+  var intersection = params.chunkView.intersectBlock(params.ray, maxDistance);
   if (intersection && intersection.distance <= maxDistance) {
     gf.log.write('clicked block',
         intersection.blockX, intersection.blockY, intersection.blockZ);
     if (action == 0) {
-      this.addBlock_(intersection);
+      this.addBlock_(params, intersection);
     } else if (action == 1) {
       this.setBlock_(
+          params,
           intersection.blockX,
           intersection.blockY,
           intersection.blockZ,
@@ -109,9 +109,10 @@ blk.sim.tools.BlockTool.prototype.performAction = function(
 /**
  * Adds a block based on the given intersection.
  * @private
+ * @param {!blk.sim.Tool.ActionParameters} params Action parameters.
  * @param {!blk.env.BlockIntersection} intersection Intersection.
  */
-blk.sim.tools.BlockTool.prototype.addBlock_ = function(intersection) {
+blk.sim.tools.BlockTool.prototype.addBlock_ = function(params, intersection) {
   var wx = intersection.blockX;
   var wy = intersection.blockY;
   var wz = intersection.blockZ;
@@ -140,25 +141,22 @@ blk.sim.tools.BlockTool.prototype.addBlock_ = function(intersection) {
   var ny = wy + dy;
   var nz = wz + dz;
 
-  this.setBlock_(nx, ny, nz, this.getBlockType());
+  this.setBlock_(params, nx, ny, nz, this.getBlockType());
 };
 
 
 /**
  * Sets the block at the given coordinates.
  * @private
+ * @param {!blk.sim.Tool.ActionParameters} params Action parameters.
  * @param {number} x Block X.
  * @param {number} y Block Y.
  * @param {number} z Block Z.
  * @param {blk.env.Block} block Block type, or null to remove.
  */
-blk.sim.tools.BlockTool.prototype.setBlock_ = function(x, y, z, block) {
+blk.sim.tools.BlockTool.prototype.setBlock_ = function(params, x, y, z, block) {
+  var filterPlayer = params.player;
   var data = block ? block.id << 8 : 0;
-
-  // Change the block in the map
-  var map = blk.sim.getMap(this);
-  var changed = map.setBlock(x, y, z, data);
-
-  // TODO(benvanik): broadcast to clients (except sender)
-  gf.log.write('would set block data to ', data);
+  var world = blk.sim.getWorld(this);
+  world.setBlock(x, y, z, data, filterPlayer);
 };

@@ -237,29 +237,30 @@ blk.env.Map.prototype.getBlock = function(x, y, z) {
  * @param {number} y Block Y, in world coordinates.
  * @param {number} z Block Z, in world coordinates.
  * @param {number} value Raw 2-byte block data.
- * @return {boolean} True if the block data changed.
+ * @return {number} Existing raw block data.
  */
 blk.env.Map.prototype.setBlock = function(x, y, z, value) {
   var chunk = this.chunkCache_.get(x, y, z);
   if (!chunk) {
     // This is technically a failure, it should be gracefully handled though
-    return false;
+    return 0;
   } else if (chunk.state != blk.env.Chunk.State.LOADED) {
     // TODO(benvanik): queue the set for handling when the chunk has been loaded
     //     to ensure consistency (if a setBlock occurs while the client is
     //     waiting for a chunk to download)
     gf.log.write('setBlock before chunk fully loaded - inconsistent state!');
-    return false;
+    return 0;
   }
 
-  if (!chunk.setBlock(x, y, z, value)) {
-    return false;
-  }
+  // Change chunk data
+  var oldValue = chunk.setBlock(x, y, z, value);
 
   // Notify listeners on all viewers
-  for (var n = 0; n < this.activeViews.length; n++) {
-    this.activeViews[n].notifyBlockChanged(x, y, z);
+  if (oldValue != value) {
+    for (var n = 0; n < this.activeViews.length; n++) {
+      this.activeViews[n].notifyBlockChanged(x, y, z);
+    }
   }
 
-  return true;
+  return oldValue;
 };

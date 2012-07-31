@@ -22,6 +22,7 @@ goog.provide('blk.sim.World');
 
 goog.require('blk.sim');
 goog.require('blk.sim.EntityType');
+goog.require('blk.sim.commands.SetBlockCommand');
 goog.require('gf');
 goog.require('gf.log');
 goog.require('gf.sim');
@@ -94,6 +95,20 @@ blk.sim.World.prototype.setMap = function(map) {
 };
 
 
+if (gf.CLIENT) {
+  /**
+   * @override
+   */
+  blk.sim.World.prototype.executeCommand = function(command) {
+    goog.base(this, 'executeCommand', command);
+
+    if (command instanceof blk.sim.commands.SetBlockCommand) {
+      this.setBlock(command.x, command.y, command.z, command.data);
+    }
+  };
+}
+
+
 /**
  * @override
  */
@@ -145,3 +160,63 @@ if (gf.CLIENT) {
 // - sun light color
 // - fog color
 // - fog params?
+
+
+/**
+ * Sets the block at the given coordinates.
+ * This will broadcast world changes to all clients, excluding the given user
+ * if desired.
+ * @param {number} x Block X.
+ * @param {number} y Block Y.
+ * @param {number} z Block Z.
+ * @param {number} data Raw block data.
+ * @param {blk.sim.Player=} opt_filterPlayer Player to prevent sending the event
+ *     to. This should be a player that initiated the change if the block change
+ *     was predicted on the client.
+ */
+blk.sim.World.prototype.setBlock = function(x, y, z, data, opt_filterPlayer) {
+  var map = this.getMap();
+
+  // Validate block type
+  if (data && !map.blockSet.hasBlockWithId(data >> 8)) {
+    gf.log.write('unknown block type', data);
+    return;
+  }
+
+  // Change the block in the map
+  var oldData = map.setBlock(x, y, z, data);
+  var changed = oldData != data;
+
+  if (gf.SERVER) {
+    // Broadcast update, if it changed
+    // TODO(benvanik): coalesce these changes and push on update?
+    if (changed) {
+      // Create command
+      var cmd = /** @type {!blk.sim.commands.SetBlockCommand} */ (
+          this.createCommand(blk.sim.commands.SetBlockCommand.ID));
+      cmd.x = x;
+      cmd.y = y;
+      cmd.z = z;
+      cmd.data = data;
+      var filterUser = opt_filterPlayer ? opt_filterPlayer.getUser() : null;
+      this.simulator.broadcastCommand(cmd, filterUser);
+    }
+  } else if (gf.CLIENT) {
+    // Play sound effect on block change
+    if (changed) {
+      // TODO(benvanik): centralize sound control
+      var soundBlockId = (data ? data : oldData) >> 8;
+      if (soundBlockId) {
+        var block = map.blockSet.getBlockWithId(soundBlockId);
+        var cue = block ? block.material.actionCue : null;
+        if (cue) {
+          // TODO(benvanik): play sound
+          gf.log.write('would play sound', cue);
+//         var soundPosition = goog.vec.Vec3.createFloat32FromValues(x, y, z);
+//         var soundBank = this.blockSoundBank_;
+//         this.playPointSound(soundBank, cue, soundPosition);
+        }
+      }
+    }
+  }
+};

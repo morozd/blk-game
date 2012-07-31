@@ -362,46 +362,6 @@ blk.game.server.ServerController.prototype.render = function(frame) {
 };
 
 
-// // SIMDEPRECATED
-// /**
-//  * Sets a block and broadcasts the update.
-//  * @param {!gf.net.User} user User who performed the change.
-//  * @param {number} x Block X.
-//  * @param {number} y Block Y.
-//  * @param {number} z Block Z.
-//  * @param {number} blockData Block data.
-//  * @return {boolean} False if an error occurred setting the block.
-//  */
-// blk.game.server.ServerController.prototype.setBlock =
-//     function(user, x, y, z, blockData) {
-//   var player = /** @type {blk.sim.Player} */ (user.data);
-//   if (!player || !player.view) {
-//     return false;
-//   }
-
-//   var view = player.view;
-
-//   // TODO(benvanik): verify user can act on the block (distance check/etc)
-
-//   // Validate block type
-//   if (blockData && !this.map_.blockSet.hasBlockWithId(blockData >> 8)) {
-//     gf.log.write('unknown block type');
-//     return false;
-//   }
-
-//   // Set
-//   var changed = view.setBlock(x, y, z, blockData);
-
-//   // Broadcast update, if it changed
-//   if (changed) {
-//     this.session.send(blk.net.packets.SetBlock.createData(
-//         x, y, z, blockData));
-//   }
-
-//   return true;
-// };
-
-
 /**
  * @override
  */

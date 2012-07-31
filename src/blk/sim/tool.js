@@ -63,13 +63,11 @@ blk.sim.Tool.prototype.parentChanged = function(oldParent, newParent) {
 
 
 /**
- * Uses the tool.
+ * Handles player move command actions.
  * @param {!blk.sim.commands.PlayerMoveCommand} command Command.
- * @param {!gf.vec.Viewport} viewport Viewport of the user.
- * @param {!blk.env.ChunkView} chunkView Chunk view the tool acts in.
- * @param {blk.sim.Actor} user Using actor, if any.
+ * @param {!blk.sim.Tool.ActionParameters} params Action parameters.
  */
-blk.sim.Tool.prototype.use = function(command, viewport, chunkView, user) {
+blk.sim.Tool.prototype.executePlayerAction = function(command, params) {
   // TODO(benvanik): handle prediction logic (hasPredicted)
   if (command.hasPredicted) {
     // For now we ignore - in the future we'll want to predict properly
@@ -79,25 +77,14 @@ blk.sim.Tool.prototype.use = function(command, viewport, chunkView, user) {
   // TODO(benvanik): tool flags (melee-able, use-from-inventory, etc)
   // TODO(benvanik): handle basic repeat logic (instaneous, held-down, etc)
 
+  // Perform each requested action
+  // All state stays the same, so reissue with different action indices
   var actions = command.actions;
-
-  var sx = 0.5;
-  var sy = 0.5;
-  if (actions & blk.sim.commands.PlayerMoveAction.PERFORM_AT_POINT) {
-    sx = command.getScreenX();
-    sy = command.getScreenY();
-  }
-
-  var ray = blk.sim.Tool.tmpRay_;
-  viewport.getRay(sx, sy, ray);
-
   if (actions & blk.sim.commands.PlayerMoveAction.USE_NORMAL_DOWN) {
-    this.performAction(
-        command.getTime(), viewport, chunkView, user, sx, sy, ray, 0);
+    this.performAction(params, 0);
   }
   if (actions & blk.sim.commands.PlayerMoveAction.USE_ALTERNATE_DOWN) {
-    this.performAction(
-        command.getTime(), viewport, chunkView, user, sx, sy, ray, 1);
+    this.performAction(params, 1);
   }
 };
 
@@ -105,21 +92,100 @@ blk.sim.Tool.prototype.use = function(command, viewport, chunkView, user) {
 /**
  * Performs an action.
  * @protected
- * @param {number} time Time the action occurred.
- * @param {!gf.vec.Viewport} viewport Viewport of the user.
- * @param {!blk.env.ChunkView} chunkView Chunk view.
- * @param {blk.sim.Actor} user Using actor, if any.
- * @param {number} screenX Screen X, in [0-1].
- * @param {number} screenY Screen Y, in [0-1].
- * @param {!gf.vec.Ray.Type} ray Ray along the user click.
- * @param {number} action Action index.
+ * @param {!blk.sim.Tool.ActionParameters} params Action parameters.
+ * @param {number} action Action index; 0 = normal, 1 = alternate.
  */
 blk.sim.Tool.prototype.performAction = goog.nullFunction;
 
 
+
 /**
- * Scratch ray.
- * @private
- * @type {!gf.vec.Ray.Type}
+ * Parameters populated by tool use.
+ * Used in lieu of function arguments to enable more complex parameter setup.
+ * @constructor
  */
-blk.sim.Tool.tmpRay_ = gf.vec.Ray.create();
+blk.sim.Tool.ActionParameters = function() {
+  /**
+   * Time the action occurred.
+   * @type {number}
+   */
+  this.time = 0;
+
+  /**
+   * Viewport of the user.
+   * Used for handling any screen-related picking/etc.
+   * The dimensions may not match the screen size, but the aspect ratio will
+   * be the same.
+   * @type {gf.vec.Viewport}
+   */
+  this.viewport = null;
+
+  /**
+   * Chunk view, centered around or near the actor.
+   * @type {blk.env.ChunkView}
+   */
+  this.chunkView = null;
+
+  /**
+   * Player that used the tool.
+   * Both this and an actor can be set, indicating that a player-predicted actor
+   * issued the use.
+   * If an AI used the tool then this will be null.
+   * @type {blk.sim.Player}
+   */
+  this.player = null;
+
+  /**
+   * Actor that used the tool.
+   * This actor may be controlled by the player or by an AI.
+   * @type {blk.sim.Actor}
+   */
+  this.actor = null;
+
+  /**
+   * Input position X in screen [0-1].
+   * @type {number}
+   */
+  this.screenX = 0;
+
+  /**
+   * Input position Y in screen [0-1].
+   * @type {number}
+   */
+  this.screenY = 0;
+
+  /**
+   * Ray along the user click.
+   * @type {!gf.vec.Ray.Type}
+   */
+  this.ray = gf.vec.Ray.create();
+};
+
+
+/**
+ * Prepares the parameters from the given player move command.
+ * @param {!blk.sim.commands.PlayerMoveCommand} command Command.
+ * @param {!gf.vec.Viewport} viewport Camera viewport.
+ * @param {!blk.env.ChunkView} chunkView Chunk view.
+ * @param {!blk.sim.Player} player Player using the tool.
+ * @param {!blk.sim.Actor} actor Actor using the tool.
+ */
+blk.sim.Tool.ActionParameters.prototype.initWithPlayerMove = function(
+    command, viewport, chunkView, player, actor) {
+  this.time = command.getTime();
+  this.viewport = viewport;
+  this.chunkView = chunkView;
+  this.player = player;
+  this.actor = actor;
+
+  // Get screen X/Y (in [0-1])
+  this.screenX = 0.5;
+  this.screenY = 0.5;
+  if (command.actions & blk.sim.commands.PlayerMoveAction.PERFORM_AT_POINT) {
+    this.screenX = command.getScreenX();
+    this.screenY = command.getScreenY();
+  }
+
+  // Cast a ray
+  viewport.getRay(this.screenX, this.screenY, this.ray);
+};

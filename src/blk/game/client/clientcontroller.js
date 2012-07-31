@@ -451,6 +451,7 @@ blk.game.client.ClientController.prototype.render = function(frame) {
   // Reset screen viewport
   var display = this.game.getDisplay();
   this.screenViewport_.setSize(display.getSize());
+  this.screenViewport_.calculate();
 
   // Grab latest input data as early in the frame as possible
   this.inputData_.poll();
@@ -587,45 +588,6 @@ blk.game.client.ClientController.prototype.playPointSound =
     }
   }
 };
-
-
-// // SIMDEPRECATED
-// /**
-//  * Sets a block and plays sound if required.
-//  * Note that the block specified may have originated from the network and as
-//  * such it may not be in our view but may be in the cache. Because of this,
-//  * we must pass the change off to the map, which will try to update the
-//  * chunk.
-//  *
-//  * @param {number} x Block X.
-//  * @param {number} y Block Y.
-//  * @param {number} z Block Z.
-//  * @param {number} blockData Block Data.
-//  */
-// blk.game.client.ClientController.prototype.setBlock =
-//     function(x, y, z, blockData) {
-//   var map = this.getMap();
-
-//   var oldData = 0;
-//   if (!blockData) {
-//     oldData = map.getBlock(x, y, z);
-//   }
-//   var changed = map.setBlock(x, y, z, blockData);
-
-//   // Play block sound, if any and only if needed
-//   if (changed) {
-//     var soundData = blockData ? blockData : oldData;
-//     if (soundData >> 8) {
-//       var block = map.blockSet.getBlockWithId(soundData >> 8);
-//       var cue = block ? block.material.actionCue : null;
-//       if (cue) {
-//         var soundPosition = goog.vec.Vec3.createFloat32FromValues(x, y, z);
-//         var soundBank = this.blockSoundBank_;
-//         this.playPointSound(soundBank, cue, soundPosition);
-//       }
-//     }
-//   }
-// };
 
 
 /**

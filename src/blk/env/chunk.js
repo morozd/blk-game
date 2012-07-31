@@ -370,7 +370,7 @@ blk.env.Chunk.prototype.getBlock = function(x, y, z) {
  * @param {number} y Block Y, in world coordinates.
  * @param {number} z Block Z, in world coordinates.
  * @param {number} value Raw 2-byte block data.
- * @return {boolean} True if the block data changed.
+ * @return {number} Existing raw block data.
  */
 blk.env.Chunk.prototype.setBlock = function(x, y, z, value) {
   goog.asserts.assert(this.state == blk.env.Chunk.State.LOADED);
@@ -387,7 +387,7 @@ blk.env.Chunk.prototype.setBlock = function(x, y, z, value) {
   if (changed && !this.dirty_) {
     this.markDirty();
   }
-  return changed;
+  return oldValue;
 };
 
 
