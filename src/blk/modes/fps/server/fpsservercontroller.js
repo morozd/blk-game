@@ -62,6 +62,7 @@ blk.modes.fps.server.FpsServerController.prototype.setupSimulation =
       this.simulator_.createEntity(
           blk.sim.World.ID,
           0));
+  this.world_.setParent(root);
 
   // Setup world
   // This binds the map and the world together

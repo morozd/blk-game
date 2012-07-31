@@ -132,6 +132,19 @@ blk.sim.Player.prototype.getInventory = function() {
 };
 
 
+/**
+ * @override
+ */
+blk.sim.Player.prototype.getOwnedEntities = function() {
+  return [
+    this.getActor(),
+    this.getController(),
+    this.getCamera(),
+    this.getInventory()
+  ];
+};
+
+
 if (gf.SERVER) {
   /**
    * Sets up the player entity for the given user.
