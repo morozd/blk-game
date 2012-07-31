@@ -16,7 +16,7 @@
 
 goog.provide('blk.game.server.ServerGame');
 
-goog.require('blk.modes.fps.server.FpsServerController');
+goog.require('blk.game.fps.FpsServerController');
 goog.require('gf.Game');
 goog.require('gf.log');
 goog.require('gf.net.SessionType');
@@ -38,7 +38,7 @@ blk.game.server.ServerGame = function(launchOptions, session, mapStore) {
   goog.base(this, launchOptions, session.clock);
 
   // TODO(benvanik): pull from options? etc
-  var controllerCtor = blk.modes.fps.server.FpsServerController;
+  var controllerCtor = blk.game.fps.FpsServerController;
 
   /**
    * Server controller instance.

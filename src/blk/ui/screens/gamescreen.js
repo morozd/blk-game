@@ -20,7 +20,7 @@
 
 goog.provide('blk.ui.screens.GameScreen');
 
-goog.require('blk.modes.fps.client.FpsClientController');
+goog.require('blk.game.fps.FpsClientController');
 goog.require('gf.ui.Screen');
 
 
@@ -42,7 +42,7 @@ blk.ui.screens.GameScreen = function(game, session) {
       gf.ui.Screen.Flags.MODAL_INPUT);
 
   // TODO(benvanik): pull from options? etc
-  var controllerCtor = blk.modes.fps.client.FpsClientController;
+  var controllerCtor = blk.game.fps.FpsClientController;
 
   /**
    * @private

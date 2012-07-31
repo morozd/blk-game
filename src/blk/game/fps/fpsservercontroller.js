@@ -18,7 +18,7 @@
  * @author benvanik@google.com (Ben Vanik)
  */
 
-goog.provide('blk.modes.fps.server.FpsServerController');
+goog.provide('blk.game.fps.FpsServerController');
 
 goog.require('blk.game.server.ServerController');
 goog.require('blk.sim.Player');
@@ -35,7 +35,7 @@ goog.require('goog.asserts');
  * @param {!blk.io.MapStore} mapStore Map storage provider, ownership
  *     transferred.
  */
-blk.modes.fps.server.FpsServerController = function(game, session, mapStore) {
+blk.game.fps.FpsServerController = function(game, session, mapStore) {
   goog.base(this, game, session, mapStore);
 
   /**
@@ -45,14 +45,14 @@ blk.modes.fps.server.FpsServerController = function(game, session, mapStore) {
    */
   this.world_ = null;
 };
-goog.inherits(blk.modes.fps.server.FpsServerController,
+goog.inherits(blk.game.fps.FpsServerController,
     blk.game.server.ServerController);
 
 
 /**
  * @override
  */
-blk.modes.fps.server.FpsServerController.prototype.setupSimulation =
+blk.game.fps.FpsServerController.prototype.setupSimulation =
     function() {
   var simulator = this.getSimulator();
   var root = this.getRoot();
@@ -76,7 +76,7 @@ blk.modes.fps.server.FpsServerController.prototype.setupSimulation =
 /**
  * @override
  */
-blk.modes.fps.server.FpsServerController.prototype.createPlayer =
+blk.game.fps.FpsServerController.prototype.createPlayer =
     function(user) {
   var simulator = this.getSimulator();
   goog.asserts.assert(this.world_);
@@ -100,7 +100,7 @@ blk.modes.fps.server.FpsServerController.prototype.createPlayer =
 /**
  * @override
  */
-blk.modes.fps.server.FpsServerController.prototype.deletePlayer =
+blk.game.fps.FpsServerController.prototype.deletePlayer =
     function(player) {
   var simulator = this.getSimulator();
 
