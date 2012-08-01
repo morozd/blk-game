@@ -14,14 +14,47 @@
  * limitations under the License.
  */
 
-//#name blk_common
-//#description Common BLK shader functions.
+//#name ModelProgram
+//#description Unskinned model program
+
+//! NAMESPACE=blk.assets.programs
+//! CLASS=ModelProgram
+//! INCLUDE blk_precision.glsllib
+//! INCLUDE blk_common.glsllib
+//! INCLUDE blk_fog.glsllib
+//! INCLUDE blk_model.glsllib
 
 
 //! COMMON
 
 
-/**
- * World-view-projection matrix.
- */
-uniform mat4 u_worldViewProjMatrix;
+varying vec2 v_uv;
+
+
+//! VERTEX
+
+
+attribute vec3 a_position;
+attribute vec3 a_normal;
+attribute vec2 a_uv;
+
+
+void main() {
+  gl_Position = calculatePositionStatic(a_position);
+  v_uv = a_uv;
+}
+
+
+//! FRAGMENT
+
+
+uniform sampler2D u_texSampler;
+
+
+void main() {
+  vec4 texColor = texture2D(u_texSampler, v_uv);
+  if (texColor.a == 0.0) {
+    discard;
+  }
+  gl_FragColor = mixFog(texColor);
+}

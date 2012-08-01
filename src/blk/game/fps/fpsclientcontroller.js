@@ -337,6 +337,9 @@ blk.game.fps.FpsClientController.prototype.drawWorld =
   if (this.world_) {
     this.world_.render(frame, viewport, renderList);
   }
+
+  // Flush render list
+  renderList.flush(viewport);
 };
 
 

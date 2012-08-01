@@ -25,15 +25,18 @@
 
 //! COMMON
 
+
 varying vec2 v_texCoord;
 varying vec4 v_color;
 
 
 //! VERTEX
 
+
 attribute vec3 a_position;
 attribute vec2 a_texCoord;
 attribute vec4 a_color;
+
 
 void main() {
   gl_Position = u_worldViewProjMatrix * vec4(a_position, 1.0);
@@ -44,8 +47,10 @@ void main() {
 
 //! FRAGMENT
 
+
 uniform sampler2D u_texSampler;
 uniform vec4 u_color;
+
 
 void main() {
   vec4 texColor = texture2D(u_texSampler, v_texCoord);

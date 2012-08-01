@@ -20,7 +20,10 @@
 
 goog.provide('blk.sim.Model');
 
+goog.require('blk.sim');
 goog.require('gf');
+goog.require('gf.sim');
+goog.require('gf.sim.SchedulingPriority');
 goog.require('gf.sim.SpatialEntity');
 
 
@@ -92,12 +95,11 @@ blk.sim.Model.prototype.checkModelReload_ = function() {
   if (!this.reloadPending_) {
     this.reloadPending_ = true;
     this.simulator.getScheduler().scheduleEvent(
-      gf.sim.SchedulingPriority.IDLE,
-      gf.sim.NEXT_TICK,
-      this.reloadModel_, this);
+        gf.sim.SchedulingPriority.IDLE,
+        gf.sim.NEXT_TICK,
+        this.reloadModel_, this);
   }
 };
-
 
 
 /**
@@ -192,7 +194,19 @@ if (gf.CLIENT) {
    */
   blk.sim.Model.prototype.render = function(
       frame, viewport, distanceToViewport, renderList) {
-    // TODO(benvanik): queue for rendering
+    if (!this.modelInstance_) {
+      return;
+    }
+
+    // TODO(benvanik): pick LOD
+
+    // Animate
+    // TODO(benvanik): update instance with time/etc
+
+    // Queue for rendering
+    var transformMatrix = renderList.drawModelInstance(
+        this.modelInstance_);
+    this.getTransform(transformMatrix);
 
     // TODO(benvanik): render attachments
   };

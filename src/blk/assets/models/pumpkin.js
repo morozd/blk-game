@@ -40,7 +40,7 @@ blk.assets.models.pumpkin.ID = 'pumpkin';
 /**
  * Creates the model.
  * @param {!gf.assets.AssetManager} assetManager Asset manager.
- * @return {blk.assets.models.Pumpkin} Model.
+ * @return {!gf.mdl.Model} Model.
  */
 blk.assets.models.pumpkin.create = function(assetManager) {
   var model = new gf.mdl.Model(blk.assets.models.pumpkin.ID);
@@ -57,12 +57,12 @@ blk.assets.models.pumpkin.buildModel = function(model) {
   // Set bounding volumes
   gf.vec.BoundingBox.setFromArray(
       model.boundingBox, [
-        0, 0, 0,
-        1, 2, 1
+        -0.5, -1, 0,
+        0.5, 1, 0.5
       ]);
   goog.vec.Vec4.setFromValues(
       model.boundingSphere,
-      0, 1, 0, 1);
+      0, 0, 0, 1);
 
   // Setup geometry
   var geometryData = blk.assets.models.pumpkin.buildGeometryData_();
@@ -94,7 +94,7 @@ blk.assets.models.pumpkin.buildGeometryData_ = function() {
   var sideTexCoords = goog.vec.Vec4.createFloat32FromValues(
       96, 112, 96 + 16, 112 + 16);
   var faceTexCoords = goog.vec.Vec4.createFloat32FromValues(
-      128, 112, 128 + 16, 112 + 16);
+      112, 112, 112 + 16, 112 + 16);
   var topTexCoords = goog.vec.Vec4.createFloat32FromValues(
       96, 96, 96 + 16, 96 + 16);
   goog.vec.Vec4.scale(sideTexCoords, 1 / 256, sideTexCoords);
@@ -104,35 +104,35 @@ blk.assets.models.pumpkin.buildGeometryData_ = function() {
   // Attributes, in XYZ NXYZ UV
   var attributeData = new Float32Array([
     // Front face (+Z)
-    0, 0, 1, 0, 0, 1, sideTexCoords[2], sideTexCoords[3],
-    1, 0, 1, 0, 0, 1, sideTexCoords[0], sideTexCoords[3],
-    1, 2, 1, 0, 0, 1, sideTexCoords[0], sideTexCoords[1],
-    0, 2, 1, 0, 0, 1, sideTexCoords[2], sideTexCoords[1],
+    -0.5, -1, 0.5, 0, 0, 1, sideTexCoords[2], sideTexCoords[3],
+    0.5, -1, 0.5, 0, 0, 1, sideTexCoords[0], sideTexCoords[3],
+    0.5, 1, 0.5, 0, 0, 1, sideTexCoords[0], sideTexCoords[1],
+    -0.5, 1, 0.5, 0, 0, 1, sideTexCoords[2], sideTexCoords[1],
     // Back face (-Z)
-    0, 0, 0, 0, 0, -1, faceTexCoords[0], faceTexCoords[3],
-    0, 2, 0, 0, 0, -1, faceTexCoords[0], faceTexCoords[1],
-    1, 2, 0, 0, 0, -1, faceTexCoords[2], faceTexCoords[1],
-    1, 0, 0, 0, 0, -1, faceTexCoords[2], faceTexCoords[3],
+    -0.5, -1, -0.5, 0, 0, -1, faceTexCoords[0], faceTexCoords[3],
+    -0.5, 1, -0.5, 0, 0, -1, faceTexCoords[0], faceTexCoords[1],
+    0.5, 1, -0.5, 0, 0, -1, faceTexCoords[2], faceTexCoords[1],
+    0.5, -1, -0.5, 0, 0, -1, faceTexCoords[2], faceTexCoords[3],
     // Top face (+Y)
-    0, 2, 0, 0, 1, 0, topTexCoords[2], topTexCoords[1],
-    0, 2, 1, 0, 1, 0, topTexCoords[2], topTexCoords[3],
-    1, 2, 1, 0, 1, 0, topTexCoords[0], topTexCoords[3],
-    1, 2, 0, 0, 1, 0, topTexCoords[0], topTexCoords[1],
+    -0.5, 1, -0.5, 0, 1, 0, topTexCoords[2], topTexCoords[1],
+    -0.5, 1, 0.5, 0, 1, 0, topTexCoords[2], topTexCoords[3],
+    0.5, 1, 0.5, 0, 1, 0, topTexCoords[0], topTexCoords[3],
+    0.5, 1, -0.5, 0, 1, 0, topTexCoords[0], topTexCoords[1],
     // Bottom face (-Y)
-    0, 0, 0, 0, -1, 0, sideTexCoords[0], sideTexCoords[1],
-    1, 0, 0, 0, -1, 0, sideTexCoords[2], sideTexCoords[1],
-    1, 0, 1, 0, -1, 0, sideTexCoords[2], sideTexCoords[3],
-    0, 0, 1, 0, -1, 0, sideTexCoords[0], sideTexCoords[3],
+    -0.5, -1, -0.5, 0, -1, 0, sideTexCoords[0], sideTexCoords[1],
+    0.5, -1, -0.5, 0, -1, 0, sideTexCoords[2], sideTexCoords[1],
+    0.5, -1, 0.5, 0, -1, 0, sideTexCoords[2], sideTexCoords[3],
+    -0.5, -1, 0.5, 0, -1, 0, sideTexCoords[0], sideTexCoords[3],
     // Right face (+X)
-    1, 0, 0, 1, 0, 0, sideTexCoords[0], sideTexCoords[3],
-    1, 2, 0, 1, 0, 0, sideTexCoords[0], sideTexCoords[1],
-    1, 2, 1, 1, 0, 0, sideTexCoords[2], sideTexCoords[1],
-    1, 0, 1, 1, 0, 0, sideTexCoords[2], sideTexCoords[3],
+    0.5, -1, -0.5, 1, 0, 0, sideTexCoords[0], sideTexCoords[3],
+    0.5, 1, -0.5, 1, 0, 0, sideTexCoords[0], sideTexCoords[1],
+    0.5, 1, 0.5, 1, 0, 0, sideTexCoords[2], sideTexCoords[1],
+    0.5, -1, 0.5, 1, 0, 0, sideTexCoords[2], sideTexCoords[3],
     // Left face (-X)
-    0, 0, 0, -1, 0, 0, sideTexCoords[2], sideTexCoords[3],
-    0, 0, 1, -1, 0, 0, sideTexCoords[0], sideTexCoords[3],
-    0, 2, 1, -1, 0, 0, sideTexCoords[0], sideTexCoords[1],
-    0, 2, 0, -1, 0, 0, sideTexCoords[2], sideTexCoords[1]
+    -0.5, -1, -0.5, -1, 0, 0, sideTexCoords[2], sideTexCoords[3],
+    -0.5, -1, 0.5, -1, 0, 0, sideTexCoords[0], sideTexCoords[3],
+    -0.5, 1, 0.5, -1, 0, 0, sideTexCoords[0], sideTexCoords[1],
+    -0.5, 1, -0.5, -1, 0, 0, sideTexCoords[2], sideTexCoords[1]
   ]);
 
   // Indices
@@ -151,10 +151,10 @@ blk.assets.models.pumpkin.buildGeometryData_ = function() {
     new gf.mdl.GeometryData.Attribute(
         3, gf.mdl.ComponentType.FLOAT, false, 32, 0),
     // NXYZ
-    new gf.mdl.GeometryData.Attribute(
-        3, gf.mdl.ComponentType.FLOAT, false, 32, 12),
+    // new gf.mdl.GeometryData.Attribute(
+    //     3, gf.mdl.ComponentType.FLOAT, false, 32, 12),
     // UV
     new gf.mdl.GeometryData.Attribute(
         2, gf.mdl.ComponentType.FLOAT, false, 32, 24)
-  ], attributeData, elementData);
+  ], attributeData, elementData.buffer);
 };

@@ -27,13 +27,16 @@
 
 //! COMMON
 
+
 varying vec4 v_texInfo;
 
 
 //! VERTEX
 
+
 attribute vec3 a_position;
 attribute vec4 a_texInfo;
+
 
 void main() {
   gl_Position = u_worldViewProjMatrix * vec4(a_position, 1.0);
@@ -44,8 +47,10 @@ void main() {
 
 //! FRAGMENT
 
+
 uniform sampler2D u_texSampler;
 uniform vec2 u_texSize;
+
 
 void main() {
   vec2 texCoords = (v_texInfo.xy + 1.0) / u_texSize;

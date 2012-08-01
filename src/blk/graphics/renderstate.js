@@ -20,6 +20,7 @@ goog.require('blk.assets.blocksets.simple');
 goog.require('blk.assets.fonts.MonospaceFont');
 goog.require('blk.assets.programs.FaceProgram');
 goog.require('blk.assets.programs.LineProgram');
+goog.require('blk.assets.programs.ModelProgram');
 goog.require('blk.assets.programs.SpriteProgram');
 goog.require('blk.assets.textures.ui');
 goog.require('blk.graphics.BlockBuilder');
@@ -98,6 +99,14 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
   this.programCache_.register(this.faceProgram);
 
   /**
+   * Program used to render unskinned models.
+   * @type {!blk.assets.programs.ModelProgram}
+   */
+  this.modelProgram = blk.assets.programs.ModelProgram.create(
+      assetManager, graphicsContext);
+  this.programCache_.register(this.modelProgram);
+
+  /**
    * Font.
    * @type {!blk.assets.fonts.MonospaceFont}
    */
@@ -149,7 +158,7 @@ blk.graphics.RenderState = function(runtime, assetManager, graphicsContext) {
    * @private
    * @type {!blk.graphics.RenderList}
    */
-  this.renderList_ = new blk.graphics.RenderList();
+  this.renderList_ = new blk.graphics.RenderList(this);
   this.registerDisposable(this.renderList_);
 };
 goog.inherits(blk.graphics.RenderState, gf.graphics.Resource);
@@ -225,7 +234,11 @@ blk.graphics.RenderState.Mode = {
   /**
    * 2D sprites.
    */
-  SPRITES: 5
+  SPRITES: 5,
+  /**
+   * Unskinned models.
+   */
+  MODELS: 6
 };
 
 
@@ -459,11 +472,35 @@ blk.graphics.RenderState.prototype.beginChunkPass2 = function() {
 
 
 /**
- * Begins the entity drawing mode.
+ * Begins the model drawing mode.
+ * @param {boolean} skinned Whether the models are skinned or not.
  */
-blk.graphics.RenderState.prototype.beginEntities = function() {
-  // HACK: just chunk pass 1 for now
-  this.beginChunkPass1();
+blk.graphics.RenderState.prototype.beginModels = function(skinned) {
+  if (this.mode == blk.graphics.RenderState.Mode.MODELS) {
+    return;
+  }
+  this.mode = blk.graphics.RenderState.Mode.MODELS;
+
+  var ctx = this.graphicsContext;
+  var gl = ctx.getGL();
+
+  ctx.setBlendState(blk.graphics.RenderState.BLEND_CHUNK_PASS1_);
+  ctx.setDepthState(blk.graphics.RenderState.DEPTH_CHUNK_PASS1_);
+
+  ctx.setProgram(this.modelProgram);
+  this.lightingInfo.setModelUniforms(gl, this.modelProgram);
+
+  // Texture atlas
+  ctx.setTexture(0, this.blockAtlas);
+};
+
+
+/**
+ * Ends the model drawing mode.
+ */
+blk.graphics.RenderState.prototype.endModels = function() {
+  var ctx = this.graphicsContext;
+  ctx.setVertexBinding(null);
 };
 
 
@@ -568,6 +605,12 @@ blk.graphics.RenderState.LightingInfo = function() {
    * @type {boolean}
    */
   this.faceUniformsDirty_ = true;
+
+  /**
+   * @private
+   * @type {boolean}
+   */
+  this.modelUniformsDirty_ = true;
 };
 
 
@@ -609,7 +652,9 @@ blk.graphics.RenderState.LightingInfo.prototype.update = function(
   }
 
   if (dirty) {
-    this.lineUniformsDirty_ = this.faceUniformsDirty_ = true;
+    this.lineUniformsDirty_ = true;
+    this.faceUniformsDirty_ = true;
+    this.modelUniformsDirty_ = true;
   }
 };
 
@@ -667,6 +712,31 @@ blk.graphics.RenderState.LightingInfo.prototype.setFaceUniforms =
       this.sunLightColor[0],
       this.sunLightColor[1],
       this.sunLightColor[2]);
+  gl.uniform2f(
+      program.u_fogInfo,
+      this.fogNear,
+      this.fogFar);
+  gl.uniform3f(
+      program.u_fogColor,
+      this.fogColor[0],
+      this.fogColor[1],
+      this.fogColor[2]);
+};
+
+
+/**
+ * Sets the uniforms on the model program, if required.
+ * Assumes the program has already been set on the context.
+ * @param {!WebGLRenderingContext} gl WebGL context.
+ * @param {!blk.assets.programs.ModelProgram} program Model program.
+ */
+blk.graphics.RenderState.LightingInfo.prototype.setModelUniforms =
+    function(gl, program) {
+  if (!this.modelUniformsDirty_) {
+    return;
+  }
+  this.modelUniformsDirty_ = false;
+
   gl.uniform2f(
       program.u_fogInfo,
       this.fogNear,

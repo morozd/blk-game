@@ -20,10 +20,12 @@
 
 //! VERTEX
 
+
 attribute vec3 a_normal;
 
 
 //! COMMON
+
 
 /**
  * Normal matrix.

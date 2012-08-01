@@ -32,6 +32,7 @@ goog.require('gf.log');
 goog.require('gf.net.INetworkService');
 goog.require('gf.net.SessionState');
 goog.require('gf.net.chat.ServerChatService');
+goog.require('gf.sim.EntityFlag');
 goog.require('gf.sim.ServerSimulator');
 goog.require('goog.Disposable');
 goog.require('goog.array');

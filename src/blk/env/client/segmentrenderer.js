@@ -389,6 +389,12 @@ blk.env.client.SegmentRenderer.prototype.build = function() {
   var results = this.blockBuilder_.finish(this.faceBuffer_);
   this.faceBuffer_ = results.buffer;
   this.faceBufferElementCount_ = results.elementCount;
+
+  if (goog.DEBUG && this.faceBuffer_) {
+    this.faceBuffer_['displayName'] = 'Segment ' +
+        this.chunk.x + ',' + (this.chunk.y + this.by) + ',' + this.chunk.z;
+  }
+
   var oldSize = this.estimatedSize;
   this.estimatedSize = results.bytesUsed;
   return this.estimatedSize - oldSize;

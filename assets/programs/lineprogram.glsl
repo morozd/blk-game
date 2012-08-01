@@ -26,13 +26,16 @@
 
 //! COMMON
 
+
 varying vec4 v_color;
 
 
 //! VERTEX
 
+
 attribute vec3 a_position;
 attribute vec4 a_color;
+
 
 void main() {
   gl_Position = u_worldViewProjMatrix * vec4(a_position, 1.0);
@@ -41,6 +44,7 @@ void main() {
 
 
 //! FRAGMENT
+
 
 void main() {
   gl_FragColor = mixFog(v_color);

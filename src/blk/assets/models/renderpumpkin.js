@@ -28,7 +28,7 @@ goog.require('gf.mdl.RenderModel');
  * Creates the model.
  * @param {!gf.assets.AssetManager} assetManager Asset manager.
  * @param {!gf.graphics.GraphicsContext} graphicsContext Graphics context.
- * @return {blk.assets.models.RenderPumpkin} Model.
+ * @return {!gf.mdl.RenderModel} Model.
  */
 blk.assets.models.renderpumpkin.create = function(
     assetManager, graphicsContext) {
