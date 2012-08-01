@@ -43,7 +43,7 @@ blk.assets.models.pumpkin.ID = 'pumpkin';
  * @return {blk.assets.models.Pumpkin} Model.
  */
 blk.assets.models.pumpkin.create = function(assetManager) {
-  var model = new gf.mdl.Model();
+  var model = new gf.mdl.Model(blk.assets.models.pumpkin.ID);
   blk.assets.models.pumpkin.buildModel(model);
   return model;
 };
@@ -79,8 +79,8 @@ blk.assets.models.pumpkin.buildModel = function(model) {
 
   // Setup root bone
   var rootBone = model.createBone(null);
-  gf.vec.BoundingBox.set(bone.boundingBox, model.boundingBox);
-  goog.vec.Vec4.setFromArray(bone.boundingSphere, model.boundingSphere);
+  gf.vec.BoundingBox.set(rootBone.boundingBox, model.boundingBox);
+  goog.vec.Vec4.setFromArray(rootBone.boundingSphere, model.boundingSphere);
 };
 
 

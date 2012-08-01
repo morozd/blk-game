@@ -18,6 +18,7 @@ goog.provide('blk.game.server.ServerGame');
 
 goog.require('blk.game.fps.FpsServerController');
 goog.require('gf.Game');
+goog.require('gf.assets.AssetManager');
 goog.require('gf.log');
 goog.require('gf.net.SessionType');
 goog.require('gf.net.browser.BrowserClient');
@@ -36,6 +37,15 @@ goog.require('gf.net.browser.BrowserClient');
  */
 blk.game.server.ServerGame = function(launchOptions, session, mapStore) {
   goog.base(this, launchOptions, session.clock);
+
+  /**
+   * Asset manager.
+   * @private
+   * @type {!gf.assets.AssetManager}
+   */
+  this.assetManager_ = new gf.assets.AssetManager(this, this.dom);
+  this.registerDisposable(this.assetManager_);
+  this.addComponent(this.assetManager_);
 
   // TODO(benvanik): pull from options? etc
   var controllerCtor = blk.game.fps.FpsServerController;
@@ -87,6 +97,14 @@ blk.game.server.ServerGame.prototype.disposeInternal = function() {
   }
 
   goog.base(this, 'disposeInternal');
+};
+
+
+/**
+ * @return {!gf.assets.AssetManager} Asset manager.
+ */
+blk.game.server.ServerGame.prototype.getAssetManager = function() {
+  return this.assetManager_;
 };
 
 

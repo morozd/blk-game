@@ -40,11 +40,133 @@ blk.sim.Model = function(
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 
   // TODO(benvanik): add locals:
-  // - render model
-  // - render state
   // - attachments (track child add/remove)
+
+  /**
+   * Loaded model instance.
+   * On clients this will be a render model, on the server this will be
+   * data-only.
+   * @private
+   * @type {gf.mdl.Instance}
+   */
+  this.modelInstance_ = null;
+
+  /**
+   * True if a model reload is pending.
+   * This is used to prevent multiple reloads.
+   * @private
+   * @type {boolean}
+   */
+  this.reloadPending_ = false;
 };
 goog.inherits(blk.sim.Model, gf.sim.SpatialEntity);
+
+
+/**
+ * @override
+ */
+blk.sim.Model.prototype.disposeInternal = function() {
+  goog.dispose(this.modelInstance_);
+  this.modelInstance_ = null;
+
+  goog.base(this, 'disposeInternal');
+};
+
+
+/**
+ * Checks if a model needs to be reloaded and schedules the reload.
+ * Loads, reloads, or unloads the model as needed.
+ * @private
+ */
+blk.sim.Model.prototype.checkModelReload_ = function() {
+  var state = /** @type {!blk.sim.ModelState} */ (this.getState());
+  var newModelId = state.getModelId();
+  newModelId = newModelId.length ? newModelId : null;
+  var oldModelId = this.modelInstance_ ? this.modelInstance_.model.id : null;
+  if (newModelId == oldModelId) {
+    // Same model (or unloaded) - ignore
+    return;
+  }
+
+  // Schedule reload
+  if (!this.reloadPending_) {
+    this.reloadPending_ = true;
+    this.simulator.getScheduler().scheduleEvent(
+      gf.sim.SchedulingPriority.IDLE,
+      gf.sim.NEXT_TICK,
+      this.reloadModel_, this);
+  }
+};
+
+
+
+/**
+ * Loads, reloads, or unloads the model as needed.
+ * @private
+ * @param {number} time Current time.
+ * @param {number} timeDelta Time elapsed since the event was scheduled.
+ */
+blk.sim.Model.prototype.reloadModel_ = function(time, timeDelta) {
+  var state = /** @type {!blk.sim.ModelState} */ (this.getState());
+  var newModelId = state.getModelId();
+
+  if (!this.reloadPending_) {
+    return;
+  }
+
+  // Unload current
+  if (this.modelInstance_) {
+    goog.dispose(this.modelInstance_);
+    this.modelInstance_ = null;
+  }
+
+  // Perform reload
+  if (newModelId) {
+    var library;
+    if (gf.CLIENT) {
+      library = blk.sim.getClientController(this).getModelLibrary();
+    } else if (gf.SERVER) {
+      library = blk.sim.getServerController(this).getModelLibrary();
+    }
+    this.modelInstance_ = library.createModelInstance(newModelId);
+  }
+
+  this.reloadPending_ = false;
+};
+
+
+/**
+ * @return {string} Model name.
+ */
+blk.sim.Model.prototype.getModelId = function() {
+  var state = /** @type {!blk.sim.ModelState} */ (this.getState());
+  return state.getModelId();
+};
+
+
+if (gf.SERVER) {
+  /**
+   * Sets the model name.
+   * @param {string} value New model name.
+   */
+  blk.sim.Model.prototype.setModelId = function(value) {
+    var state = /** @type {!blk.sim.ModelState} */ (this.getState());
+    state.setModelId(value);
+
+    this.checkModelReload_();
+  };
+}
+
+if (gf.CLIENT) {
+  /**
+   * @override
+   */
+  blk.sim.Model.prototype.postNetworkUpdate = function() {
+    goog.base(this, 'postNetworkUpdate');
+
+    this.checkModelReload_();
+  };
+}
 
 
 /**

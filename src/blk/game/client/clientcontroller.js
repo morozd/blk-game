@@ -21,6 +21,7 @@
 goog.provide('blk.game.client.ClientController');
 
 goog.require('blk.assets.audio.BlockSounds');
+goog.require('blk.assets.models.BaseRenderLibrary');
 goog.require('blk.env');
 goog.require('blk.env.client.ClientMap');
 goog.require('blk.game.SoundBanks');
@@ -167,6 +168,15 @@ blk.game.client.ClientController = function(game, session) {
    */
   this.localPlayer_ = null;
 
+  /**
+   * Render model library.
+   * @private
+   * @type {!gf.mdl.RenderLibrary}
+   */
+  this.modelLibrary_ = new blk.assets.models.BaseRenderLibrary(
+      this.game.getAssetManager(), this.game.getGraphicsContext());
+  this.registerDisposable(this.modelLibrary_);
+
   // Simulated latency
   var launchOptions = this.game.launchOptions;
   this.session.socket.simulatedLatency = launchOptions.simulatedLatency;
@@ -285,6 +295,14 @@ blk.game.client.ClientController.prototype.getLocalPlayer = function() {
  */
 blk.game.client.ClientController.prototype.handlePlayersChanged =
     goog.nullFunction;
+
+
+/**
+ * @return {!gf.mdl.Library} Render model library.
+ */
+blk.game.client.ClientController.prototype.getModelLibrary = function() {
+  return this.modelLibrary_;
+};
 
 
 /**

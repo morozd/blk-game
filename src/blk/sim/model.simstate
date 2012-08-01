@@ -3,7 +3,7 @@
   "super": "gf.sim.SpatialEntityState",
   "vars": [
     {
-      "name": "modelName",
+      "name": "modelId",
       "type": "String",
       "flags": [
       ]

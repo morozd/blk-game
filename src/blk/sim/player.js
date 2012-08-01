@@ -174,6 +174,7 @@ if (gf.SERVER) {
             gf.sim.EntityFlag.INTERPOLATED |
             gf.sim.EntityFlag.LATENCY_COMPENSATED));
     state.setActorId(actor.getId());
+    actor.setModelId('pumpkin');
 
     // Create player controller
     var controller = /** @type {!blk.sim.controllers.FpsController} */ (
@@ -274,6 +275,8 @@ if (gf.CLIENT) {
    * @override
    */
   blk.sim.Player.prototype.postNetworkUpdate = function() {
+    goog.base(this, 'postNetworkUpdate');
+
     // Player was created - find entities
     if (this.dirtyFlags & gf.sim.EntityDirtyFlag.CREATED) {
       var simulator = this.getSimulator();

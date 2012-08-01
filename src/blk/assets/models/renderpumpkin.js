@@ -32,7 +32,8 @@ goog.require('gf.mdl.RenderModel');
  */
 blk.assets.models.renderpumpkin.create = function(
     assetManager, graphicsContext) {
-  var model = new gf.mdl.RenderModel(graphicsContext);
+  var model = new gf.mdl.RenderModel(
+      blk.assets.models.pumpkin.ID, graphicsContext);
   blk.assets.models.pumpkin.buildModel(model);
   return model;
 };

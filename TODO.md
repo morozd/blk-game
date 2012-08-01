@@ -275,11 +275,9 @@ entity parenting
 // SIMDEPRECATED
 
 - render actors
-    - models/etc
-        - model table, by name
-        - ModelRenderer
-            - gf.graphics.Mesh/etc, for now: cubes
-            - optional title adorner
+    - add library to root from client|servercontroller (data|renderlibrary)
+    - model, on model name change, library.getModel (?)
+    - render() that doesn't leak to server
 
 - inventory
     -

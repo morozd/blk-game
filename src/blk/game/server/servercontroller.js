@@ -20,6 +20,7 @@
 
 goog.provide('blk.game.server.ServerController');
 
+goog.require('blk.assets.models.BaseDataLibrary');
 goog.require('blk.env.MapParameters');
 goog.require('blk.env.server.ServerMap');
 goog.require('blk.game.server.SimulationObserver');
@@ -112,6 +113,15 @@ blk.game.server.ServerController = function(game, session, mapStore) {
    * @type {!Array.<!blk.sim.Player>}
    */
   this.players_ = [];
+
+  /**
+   * Data model library.
+   * @private
+   * @type {!gf.mdl.Library}
+   */
+  this.modelLibrary_ = new blk.assets.models.BaseDataLibrary(
+      this.game.getAssetManager());
+  this.registerDisposable(this.modelLibrary_);
 };
 goog.inherits(blk.game.server.ServerController, goog.Disposable);
 
@@ -192,6 +202,14 @@ blk.game.server.ServerController.prototype.handlePlayersChanged =
 
 
 /**
+ * @return {!gf.mdl.Library} Render model library.
+ */
+blk.game.server.ServerController.prototype.getModelLibrary = function() {
+  return this.modelLibrary_;
+};
+
+
+/**
  * Loads any resources required by the controller before the game can start.
  * @return {!goog.async.Deferred} A deferred fulfilled when the server is ready.
  */
@@ -206,9 +224,8 @@ blk.game.server.ServerController.prototype.load = function() {
   this.root_ = /** @type {!blk.sim.Root} */ (
       this.simulator_.createEntity(
           blk.sim.Root.ID,
-          0));
+          gf.sim.EntityFlag.ROOT));
   this.root_.setGameController(this);
-  simulator.setRootEntity(this.root_);
 
   // Create initial simulation state
   this.setupSimulation();
