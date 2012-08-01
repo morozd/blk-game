@@ -25,10 +25,12 @@ goog.require('blk.sim.Controller');
 goog.require('blk.sim.EntityType');
 goog.require('blk.sim.Tool');
 goog.require('blk.sim.commands.PlayerMoveCommand');
+goog.require('blk.sim.commands.PlayerMoveTranslation');
 goog.require('gf.sim');
 goog.require('gf.vec.Viewport');
 goog.require('goog.asserts');
 goog.require('goog.vec.Quaternion');
+goog.require('goog.vec.Vec3');
 
 
 
@@ -160,22 +162,22 @@ blk.sim.controllers.FpsController.prototype.tempPhysics_ = function(
 
   var dx = 0, dy = 0, dz = 0;
   if (command.translation & blk.sim.commands.PlayerMoveTranslation.POS_X) {
-    dx = 1;
+    dx += 1;
   }
   if (command.translation & blk.sim.commands.PlayerMoveTranslation.NEG_X) {
-    dx = -1;
+    dx -= 1;
   }
   if (command.translation & blk.sim.commands.PlayerMoveTranslation.POS_Y) {
-    dy = 1;
+    dy += 1;
   }
   if (command.translation & blk.sim.commands.PlayerMoveTranslation.NEG_Y) {
-    dy = -1;
+    dy -= 1;
   }
   if (command.translation & blk.sim.commands.PlayerMoveTranslation.POS_Z) {
-    dz = 1;
+    dz += 1;
   }
   if (command.translation & blk.sim.commands.PlayerMoveTranslation.NEG_Z) {
-    dz = -1;
+    dz -= 1;
   }
 
   newPosition[0] += dx * dt;

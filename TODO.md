@@ -274,18 +274,22 @@ entity parenting
 
 // SIMDEPRECATED
 
+- render actors
+    - models/etc
+        - model table, by name
+        - ModelRenderer
+            - gf.graphics.Mesh/etc, for now: cubes
+            - optional title adorner
 
-blk.sim.Player:
-    - user session id
-    - skin info (color/etc)
-    - controller ent id
-    - actor ent id
+- inventory
+    -
 
+- move (physics system?)
+    - playermovecommand needs time delta
+    - Actor -> blk.sim.PhysicsEntity <- SpatialEntity
 
-move map into world
-setupMap()
-getMap()
-
+- interpolation
+    - spawn random, interp rotation
 
 - tools:
     - toolFlags:
@@ -297,15 +301,3 @@ getMap()
 - make chunk views efficient, each controller gets one (AI too)
     - controller command, pass view down to tools
 
-- interpolation
-    - spawn random, interp rotation
-- move (physics system?)
-    - Actor -> blk.sim.PhysicsEntity <- SpatialEntity
-
-
-- render actors
-    - models/etc
-        - model table, by name
-        - ModelRenderer
-            - gf.graphics.Mesh/etc, for now: cubes
-            - optional title adorner

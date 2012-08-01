@@ -412,13 +412,17 @@ blk.game.fps.FpsClientController.prototype.drawInputUI_ =
  */
 blk.game.fps.FpsClientController.prototype.drawBlockTypes_ =
     function(frame) {
-  var renderState = this.game.getRenderState();
-  var viewport = this.getScreenViewport();
-  var blockAtlas = renderState.blockAtlas;
-
+  var localPlayer = this.getLocalPlayer();
+  if (!localPlayer) {
+    return;
+  }
+  var inventory = localPlayer.getInventory();
   var selectedIndex = 0;//localPlayer.blockIndex;
   var blockTypes = [];//localPlayer.blockTypes;
 
+  var renderState = this.game.getRenderState();
+  var viewport = this.getScreenViewport();
+  var blockAtlas = renderState.blockAtlas;
   var spriteBuffer = this.spriteBuffer_;
   spriteBuffer.clear();
 
@@ -457,10 +461,14 @@ blk.game.fps.FpsClientController.prototype.drawBlockTypes_ =
  */
 blk.game.fps.FpsClientController.prototype.hitTestBlockTypes_ =
     function(mouseData) {
-  var viewport = this.getScreenViewport();
-
+  var localPlayer = this.getLocalPlayer();
+  if (!localPlayer) {
+    return;
+  }
+  var inventory = localPlayer.getInventory();
   var blockTypes = [];//localPlayer.blockTypes;
 
+  var viewport = this.getScreenViewport();
   var scale = 2;
   var itemSize = (16 + 1) * scale;
   var width = blockTypes.length * itemSize;
