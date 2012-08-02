@@ -237,8 +237,8 @@ blk.sim.commands.PlayerMoveCommand.prototype.getQuaternion = function(result) {
 /**
  * @override
  */
-blk.sim.commands.PlayerMoveCommand.prototype.read = function(reader, timeBase) {
-  goog.base(this, 'read', reader, timeBase);
+blk.sim.commands.PlayerMoveCommand.prototype.read = function(reader) {
+  goog.base(this, 'read', reader);
 
   this.translation = reader.readUint8();
   this.actions = reader.readUint8();
@@ -255,9 +255,8 @@ blk.sim.commands.PlayerMoveCommand.prototype.read = function(reader, timeBase) {
 /**
  * @override
  */
-blk.sim.commands.PlayerMoveCommand.prototype.write = function(
-    writer, timeBase) {
-  goog.base(this, 'write', writer, timeBase);
+blk.sim.commands.PlayerMoveCommand.prototype.write = function(writer) {
+  goog.base(this, 'write', writer);
 
   writer.writeUint8(this.translation);
   writer.writeUint8(this.actions);

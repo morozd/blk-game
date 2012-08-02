@@ -8,6 +8,8 @@ Before Release
 
 * first ServerPlayer send pass is not sorted, make lastTime negative?
 
+* RenderList/drawModelInstance needs to cache
+
 M3: Replace UI with DOM
 ================================================================================
 
@@ -37,8 +39,6 @@ M4: Infinite Maps
 * Map#setBlock - queue block sets until chunks load
 
 * programmable views
-    * packets for create/delete per player, attach to entity
-        * change view distance is a delete/create/wait
     * waitForLoaded or something (before entering player into the world)
 
 M5: Performance Tuning
@@ -278,8 +278,9 @@ entity parenting
     - spawn random, interp rotation
 
 - move (physics system?)
-    - playermovecommand needs time delta
     - Actor -> blk.sim.PhysicsEntity <- SpatialEntity
+    - run physics without updates
+    - every server update, need to process?
 
 - title adorner
 
@@ -301,3 +302,54 @@ entity parenting
     - register entities different on client/server to avoid clientfpscontroller
 
 - check for entity leaks/etc (deleting on disconnect, etc)
+
+
+
+// TODO(benvanik): magic with time to place the user command at the time it
+// was executed relative to the current sim time
+// This is needed to ensure collision detection and actions occur in the
+// proper state
+//
+// I'm not sure how to do this yet without keeping a sliding window of
+// previous block states (old -> new) so that the world state can be
+// rewound
+//
+// This logic only needs to happen on the server side, and if we rewind the
+// world to the time of the first cmd in `commands` we can play through
+// at the same rate.
+// So we need:
+// - MapEvent[]
+//   - time
+//   - xyz
+//   - type: set block, action (changing state, etc?)
+//   - old/new block data, etc
+//
+// Then we can find the time of the commands in the array w/ binary search
+// and step through the array as we step through commands:
+// -- world is in server state (up to date)
+// var eventIndex = bsearch(history, first_command.time)
+// for eventIndex to 0 in history as e:
+//    unapply e
+// for each command:
+//     while !event.time < command.time as e:
+//        apply e
+//     execute command
+//        if action:
+//          queue history event to scratch list
+// for each remaining event e:
+//    apply e
+// sorted insert scratch list in history
+// -- world should now match what it did at the start (up to date, plus
+//    any deltas made by the user commands)
+//
+// History actions will need to take user actions into account - for example
+// if the user has an action that modifies a block from A to B, if there is
+// a later history event that is supposed to modify it from A to C, some
+// conflict resolution must occur. Either the block could be always forced
+// to C (last-actor in simulation time wins), or some more complex logic
+// could be used.
+//
+// All modifications to the world need to go through the history, including
+// server-side modifications such as scheduled updates (grass growing/etc).
+// The 'history' should probably live outside of blk.physics and in
+// the ServerMap instance.

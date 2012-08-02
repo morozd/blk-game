@@ -69,8 +69,8 @@ goog.inherits(blk.sim.commands.SetBlockCommand, gf.sim.Command);
 /**
  * @override
  */
-blk.sim.commands.SetBlockCommand.prototype.read = function(reader, timeBase) {
-  goog.base(this, 'read', reader, timeBase);
+blk.sim.commands.SetBlockCommand.prototype.read = function(reader) {
+  goog.base(this, 'read', reader);
 
   this.x = reader.readVarInt();
   this.y = reader.readVarInt();
@@ -82,9 +82,8 @@ blk.sim.commands.SetBlockCommand.prototype.read = function(reader, timeBase) {
 /**
  * @override
  */
-blk.sim.commands.SetBlockCommand.prototype.write = function(
-    writer, timeBase) {
-  goog.base(this, 'write', writer, timeBase);
+blk.sim.commands.SetBlockCommand.prototype.write = function(writer) {
+  goog.base(this, 'write', writer);
 
   writer.writeVarInt(this.x);
   writer.writeVarInt(this.y);

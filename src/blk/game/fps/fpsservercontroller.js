@@ -21,6 +21,7 @@
 goog.provide('blk.game.fps.FpsServerController');
 
 goog.require('blk.game.server.ServerController');
+goog.require('blk.sim');
 goog.require('blk.sim.Player');
 goog.require('blk.sim.World');
 goog.require('goog.asserts');

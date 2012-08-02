@@ -50,9 +50,8 @@ goog.inherits(blk.sim.commands.SetAspectRatioCommand, gf.sim.Command);
 /**
  * @override
  */
-blk.sim.commands.SetAspectRatioCommand.prototype.read = function(
-    reader, timeBase) {
-  goog.base(this, 'read', reader, timeBase);
+blk.sim.commands.SetAspectRatioCommand.prototype.read = function(reader) {
+  goog.base(this, 'read', reader);
 
   this.aspectRatio = reader.readFloat32();
 };
@@ -61,9 +60,8 @@ blk.sim.commands.SetAspectRatioCommand.prototype.read = function(
 /**
  * @override
  */
-blk.sim.commands.SetAspectRatioCommand.prototype.write = function(
-    writer, timeBase) {
-  goog.base(this, 'write', writer, timeBase);
+blk.sim.commands.SetAspectRatioCommand.prototype.write = function(writer) {
+  goog.base(this, 'write', writer);
 
   writer.writeFloat32(this.aspectRatio);
 };

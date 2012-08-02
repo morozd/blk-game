@@ -175,6 +175,9 @@ blk.sim.controllers.ClientFpsController.prototype.processInput = function(
 blk.sim.controllers.ClientFpsController.prototype.processMovement_ =
     function(frame, inputData, target, viewport) {
   var mouseData = inputData.mouse;
+  if (frame.time <= 0) {
+    return;
+  }
 
   // TODO(benvanik): to reduce network traffic this needs to be reworked such
   // that this function is only capturing state. Each client update tick the
@@ -196,11 +199,14 @@ blk.sim.controllers.ClientFpsController.prototype.processMovement_ =
 
   // Generate a movement command, if movement occurred
   var didChange = !!translation || lookChanged || !!actions;
+  // TODO(benvanik): find a way to run physics without sending each frame
+  didChange = true;
   if (didChange) {
     // Create command
     var cmd = /** @type {!blk.sim.commands.PlayerMoveCommand} */ (
         this.createCommand(blk.sim.commands.PlayerMoveCommand.ID));
     cmd.setTime(frame.time);
+    cmd.setTimeDelta(frame.timeDelta);
     cmd.translation = translation;
     cmd.actions = actions;
     cmd.setAngles(this.yaw_, this.pitch_, this.roll_);

@@ -63,6 +63,7 @@ goog.inherits(blk.graphics.RenderList, goog.Disposable);
  *     with the instances world transform.
  */
 blk.graphics.RenderList.prototype.drawModelInstance = function(instance) {
+  // TODO(benvanik): cache and reuse - this is bad
   var transform = goog.vec.Mat4.createFloat32Identity();
   this.list_.push({
     instance: instance,

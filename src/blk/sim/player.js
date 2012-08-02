@@ -187,8 +187,6 @@ if (gf.SERVER) {
         simulator.createEntity(
             blk.sim.Camera.ID,
             gf.sim.EntityFlag.UPDATED_FREQUENTLY |
-            gf.sim.EntityFlag.PREDICTED |
-            gf.sim.EntityFlag.INTERPOLATED |
             gf.sim.EntityFlag.OWNER_ONLY));
     camera.setOwner(user);
     camera.setParent(actor);

@@ -20,17 +20,15 @@
 
 goog.provide('blk.sim.controllers.FpsController');
 
+goog.require('blk.physics.Movement');
 goog.require('blk.sim');
 goog.require('blk.sim.Controller');
 goog.require('blk.sim.EntityType');
 goog.require('blk.sim.Tool');
 goog.require('blk.sim.commands.PlayerMoveCommand');
-goog.require('blk.sim.commands.PlayerMoveTranslation');
 goog.require('gf.sim');
 goog.require('gf.vec.Viewport');
 goog.require('goog.asserts');
-goog.require('goog.vec.Quaternion');
-goog.require('goog.vec.Vec3');
 
 
 
@@ -59,6 +57,15 @@ blk.sim.controllers.FpsController = function(
    * @type {!gf.vec.Viewport}
    */
   this.viewport_ = new gf.vec.Viewport();
+
+  /**
+   * Movement logic.
+   * This retains state such as velocity/etc, and must be updated when the
+   * controller decides to radically change things (such as respawn/etc).
+   * @private
+   * @type {!blk.physics.Movement}
+   */
+  this.movement_ = new blk.physics.Movement();
 };
 goog.inherits(blk.sim.controllers.FpsController,
     blk.sim.Controller);
@@ -114,17 +121,12 @@ blk.sim.controllers.FpsController.prototype.executeCommand = function(
     var targetState = /** @type {!gf.sim.SpatialEntityState} */ (
         target.getState());
 
+    // Execute movement logic
+    this.movement_.executeCommand(command, targetState);
+
     var player = this.getPlayer();
     var camera = player.getCamera();
     var chunkView = camera.getView();
-
-    // Set view rotation directly
-    var q = blk.sim.controllers.FpsController.tmpQuat_;
-    command.getQuaternion(q);
-    targetState.setRotation(q);
-
-    // TODO(benvanik): apply translation
-    this.tempPhysics_(command, targetState);
 
     // Calculate viewport for use with tool logic
     // TODO(benvanik): calculate elsewhere? cache longer?
@@ -146,59 +148,6 @@ blk.sim.controllers.FpsController.prototype.executeCommand = function(
     }
   }
 };
-
-
-/**
- * Temporary physics hackiness.
- * @private
- * @param {!blk.sim.commands.PlayerMoveCommand} command Command.
- * @param {!gf.sim.SpatialEntityState} targetState Target actor state.
- */
-blk.sim.controllers.FpsController.prototype.tempPhysics_ = function(
-    command, targetState) {
-  var dt = 1;
-
-  var oldPosition = targetState.getPosition();
-  var newPosition = goog.vec.Vec3.createFloat32();
-  newPosition[0] = oldPosition[0];
-  newPosition[1] = oldPosition[1];
-  newPosition[2] = oldPosition[2];
-
-  var dx = 0, dy = 0, dz = 0;
-  if (command.translation & blk.sim.commands.PlayerMoveTranslation.POS_X) {
-    dx += 1;
-  }
-  if (command.translation & blk.sim.commands.PlayerMoveTranslation.NEG_X) {
-    dx -= 1;
-  }
-  if (command.translation & blk.sim.commands.PlayerMoveTranslation.POS_Y) {
-    dy += 1;
-  }
-  if (command.translation & blk.sim.commands.PlayerMoveTranslation.NEG_Y) {
-    dy -= 1;
-  }
-  if (command.translation & blk.sim.commands.PlayerMoveTranslation.POS_Z) {
-    dz += 1;
-  }
-  if (command.translation & blk.sim.commands.PlayerMoveTranslation.NEG_Z) {
-    dz -= 1;
-  }
-
-  newPosition[0] += dx * dt;
-  newPosition[1] += dy * dt;
-  newPosition[2] += dz * dt;
-
-  targetState.setPosition(newPosition);
-};
-
-
-/**
- * Scratch quaternion.
- * @private
- * @type {!goog.vec.Quaternion.Float32}
- */
-blk.sim.controllers.FpsController.tmpQuat_ =
-    goog.vec.Quaternion.createFloat32();
 
 
 /**
