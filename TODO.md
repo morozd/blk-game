@@ -274,20 +274,17 @@ entity parenting
 
 // SIMDEPRECATED
 
-- render actors
-    - add library to root from client|servercontroller (data|renderlibrary)
-    - model, on model name change, library.getModel (?)
-    - render() that doesn't leak to server
-
-- inventory
-    -
+- interpolation
+    - spawn random, interp rotation
 
 - move (physics system?)
     - playermovecommand needs time delta
     - Actor -> blk.sim.PhysicsEntity <- SpatialEntity
 
-- interpolation
-    - spawn random, interp rotation
+- title adorner
+
+- inventory
+    -
 
 - tools:
     - toolFlags:
@@ -299,3 +296,8 @@ entity parenting
 - make chunk views efficient, each controller gets one (AI too)
     - controller command, pass view down to tools
 
+
+- remove warnings:
+    - register entities different on client/server to avoid clientfpscontroller
+
+- check for entity leaks/etc (deleting on disconnect, etc)

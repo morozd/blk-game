@@ -93,6 +93,9 @@ blk.game.fps.FpsServerController.prototype.createPlayer =
   // Spawn the player
   player.spawn();
 
+  // TODO(benvanik): make hotkey
+  blk.sim.getRoot(player).dumpInfo(0);
+
   return player;
 };
 
@@ -107,4 +110,7 @@ blk.game.fps.FpsServerController.prototype.deletePlayer =
   // TODO(benvanik): delete other player entities
 
   simulator.removeEntity(player);
+
+  // TODO(benvanik): make hotkey
+  blk.sim.getRoot(player).dumpInfo(0);
 };

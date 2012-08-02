@@ -57,6 +57,10 @@ blk.sim.Camera = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 
+  if (goog.DEBUG) {
+    this.debugName = 'Camera';
+  }
+
   // TODO(benvanik): viewport picking without AR
   /**
    * Aspect ratio to force viewports to.

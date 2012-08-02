@@ -49,6 +49,10 @@ blk.sim.controllers.FpsController = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 
+  if (goog.DEBUG) {
+    this.debugName = 'FpsController';
+  }
+
   /**
    * Cached scratch viewport.
    * @private

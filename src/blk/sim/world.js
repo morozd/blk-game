@@ -52,6 +52,10 @@ blk.sim.World = function(
   var db = new gf.sim.search.ListDatabase();
   goog.base(this, simulator, entityFactory, entityId, entityFlags, db);
 
+  if (goog.DEBUG) {
+    this.debugName = 'World';
+  }
+
   /**
    * Map this world is drawing.
    * @private

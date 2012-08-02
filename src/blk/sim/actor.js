@@ -41,6 +41,10 @@ goog.require('gf.sim');
 blk.sim.Actor = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
+
+  if (goog.DEBUG) {
+    this.debugName = 'Actor';
+  }
 };
 goog.inherits(blk.sim.Actor, blk.sim.Model);
 

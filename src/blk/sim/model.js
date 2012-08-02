@@ -42,6 +42,10 @@ blk.sim.Model = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 
+  if (goog.DEBUG) {
+    this.debugName = 'Model';
+  }
+
   // TODO(benvanik): add locals:
   // - attachments (track child add/remove)
 

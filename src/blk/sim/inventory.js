@@ -42,6 +42,10 @@ goog.require('gf.sim.Entity');
 blk.sim.Inventory = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
+
+  if (goog.DEBUG) {
+    this.debugName = 'Inventory';
+  }
 };
 goog.inherits(blk.sim.Inventory, gf.sim.Entity);
 

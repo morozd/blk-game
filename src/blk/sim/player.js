@@ -53,6 +53,10 @@ goog.require('goog.vec.Vec3');
 blk.sim.Player = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
+
+  if (goog.DEBUG) {
+    this.debugName = 'Player';
+  }
 };
 goog.inherits(blk.sim.Player, gf.sim.Entity);
 
@@ -64,16 +68,6 @@ goog.inherits(blk.sim.Player, gf.sim.Entity);
  */
 blk.sim.Player.ID = gf.sim.createTypeId(
     blk.sim.BLK_MODULE_ID, blk.sim.EntityType.PLAYER);
-
-
-/**
- * @return {!blk.sim.World} World entity.
- */
-blk.sim.Player.prototype.getWorld = function() {
-  var parent = this.getParent();
-  goog.asserts.assert(parent);
-  return /** @type {!blk.sim.World} */ (parent);
-};
 
 
 /**
@@ -163,7 +157,7 @@ if (gf.SERVER) {
     var root = blk.sim.getRoot(this);
     var world = root.getWorld();
     var map = world.getMap();
-    this.setParent(world);
+    this.setParent(root);
 
     // Create actor
     var actor = /** @type {!blk.sim.Actor} */ (
@@ -173,8 +167,9 @@ if (gf.SERVER) {
             gf.sim.EntityFlag.PREDICTED |
             gf.sim.EntityFlag.INTERPOLATED |
             gf.sim.EntityFlag.LATENCY_COMPENSATED));
-    state.setActorId(actor.getId());
+    actor.setOwner(user);
     actor.setModelId('pumpkin');
+    state.setActorId(actor.getId());
 
     // Create player controller
     var controller = /** @type {!blk.sim.controllers.FpsController} */ (
@@ -237,7 +232,6 @@ if (gf.SERVER) {
 
       if (n == 0) {
         // TODO(benvanik): make this part of the inventory task
-        blockTool.setParent(actor);
         actor.setHeldTool(blockTool);
       }
     }
@@ -250,7 +244,7 @@ if (gf.SERVER) {
   blk.sim.Player.prototype.spawn = function() {
     // Add the actor to the world
     var actor = this.getActor();
-    actor.setParent(this.getParent());
+    actor.setParent(blk.sim.getWorld(this));
 
     // Pick a spawn point
     // TODO(benvanik): be smart, take as input, etc

@@ -44,6 +44,10 @@ blk.sim.Root = function(
     simulator, entityFactory, entityId, entityFlags) {
   goog.base(this, simulator, entityFactory, entityId, entityFlags);
 
+  if (goog.DEBUG) {
+    this.debugName = 'Root';
+  }
+
   /**
    * Client/server game controller.
    * @private
