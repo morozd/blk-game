@@ -156,5 +156,5 @@ blk.assets.models.pumpkin.buildGeometryData_ = function() {
     // UV
     new gf.mdl.GeometryData.Attribute(
         2, gf.mdl.ComponentType.FLOAT, false, 32, 24)
-  ], attributeData, elementData.buffer);
+  ], attributeData.buffer, elementData);
 };
