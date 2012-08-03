@@ -40,6 +40,7 @@ goog.require('gf.net.DisconnectReason');
 goog.require('gf.net.INetworkService');
 goog.require('gf.net.SessionState');
 goog.require('gf.net.chat.ClientChatService');
+goog.require('gf.sim');
 goog.require('gf.sim.ClientSimulator');
 goog.require('gf.sim.IEntityWatcher');
 goog.require('gf.vec.Viewport');
@@ -467,18 +468,6 @@ blk.game.client.ClientController.prototype.update = function(frame) {
 
 
 /**
- * Interpolation delay time, in seconds.
- * Higher values will cause greater time shifting beheavior but help to smooth
- * out laggy players.
- * TODO(benvanik): pull from config
- * @private
- * @const
- * @type {number}
- */
-blk.game.client.ClientController.INTERPOLATION_DELAY_ = 300 / 1000;
-
-
-/**
  * Renders the screen contents.
  * @param {!gf.RenderFrame} frame Current render frame.
  */
@@ -509,7 +498,7 @@ blk.game.client.ClientController.prototype.render = function(frame) {
   // This ensures we render at the time we should be
   // (I think ;)
   var originalFrameTime = frame.time;
-  frame.time -= blk.game.client.ClientController.INTERPOLATION_DELAY_;
+  frame.time -= gf.sim.INTERPOLATION_DELAY;
   this.simulator_.interpolateEntities(frame.time);
 
   // Render the game
