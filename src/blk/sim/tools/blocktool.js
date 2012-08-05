@@ -90,8 +90,8 @@ blk.sim.tools.BlockTool.prototype.performAction = function(params, action) {
   var maxDistance = 100;
   var intersection = params.chunkView.intersectBlock(params.ray, maxDistance);
   if (intersection && intersection.distance <= maxDistance) {
-    gf.log.write('clicked block',
-        intersection.blockX, intersection.blockY, intersection.blockZ);
+    // gf.log.write('clicked block',
+    //     intersection.blockX, intersection.blockY, intersection.blockZ);
     if (action == 0) {
       this.addBlock_(params, intersection);
     } else if (action == 1) {
