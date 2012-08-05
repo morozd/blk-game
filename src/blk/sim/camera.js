@@ -148,8 +148,8 @@ blk.sim.Camera.prototype.setMap = function(map) {
   // Create view
   this.view_ = new blk.env.ChunkView(
       map,
-      blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ);
-  //blk.env.ChunkView.HIGH_CHUNK_RADIUS_XZ
+      blk.env.ChunkView.HIGH_CHUNK_RADIUS_XZ);
+      //blk.env.ChunkView.LOW_CHUNK_RADIUS_XZ);
   map.addChunkView(this.view_);
 
   if (gf.CLIENT) {
