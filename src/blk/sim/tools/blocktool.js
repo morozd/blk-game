@@ -23,7 +23,6 @@ goog.provide('blk.sim.tools.BlockTool');
 goog.require('blk.sim');
 goog.require('blk.sim.EntityType');
 goog.require('blk.sim.Tool');
-goog.require('gf.log');
 goog.require('gf.sim');
 goog.require('goog.asserts');
 
