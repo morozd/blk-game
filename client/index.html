@@ -161,9 +161,10 @@
           return !!window.webkitAudioContext || !!window.AudioContext;
         }
         function testMouseLock() {
-          return !!window.navigator.pointer ||
-              !!window.navigator.mozPointer ||
-              !!window.navigator.webkitPointer;
+          return (
+              document.pointerLockElement ||
+              document.mozPointerLockElement ||
+              document.webkitPointerLockElement) !== undefined;
         }
         function testWebSockets() {
           return !!window.WebSocket;
