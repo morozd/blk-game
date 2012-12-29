@@ -749,6 +749,12 @@ blk.game.client.ClientGame.prototype.launchLocalServer_ =
     port = worker;
   }
 
+  worker.onerror = function(e) {
+    gf.log.write(
+        'Error in worker: ' + e.message +
+        '(' + e.filename + ':' + e.lineno + ')');
+  };
+
   // Connect
   var connectDeferred = gf.net.connect(
       /** @type {gf.net.Endpoint} */ (port),

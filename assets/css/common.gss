@@ -37,9 +37,8 @@
 }
 
 @defmixin bitDropShadow() {
-  box-shadow: 0 0 5px #888;
-  /* @alternate */ -moz-box-shadow: 0 0 5px #888;
   /* @alternate */ -webkit-box-shadow: 0 0 5px #888;
+  box-shadow: 0 0 5px #888;
 }
 
 @defmixin bitFont(FONT_SIZE) {
