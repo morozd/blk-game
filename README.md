@@ -40,16 +40,20 @@ exclusively on the server isn't included in the code sent for the client and wor
 Wanna play around?
 
 ```
-# ensure you have python and easy_install!
+# ensure you have python, pip!
+# on OSX, get homebrew or macports!
 # clone the repo
-git clone https://github.com/benvanik/blk-game.git blk-game
+git clone https://github.com/benvanik/blk-game.git
 cd blk-game/
 # run the setup script to initialize the repo and dependencies
-sudo ./tools/setup.sh
+./scripts/setup.sh
+
+# this must be run each session:
+source blkrc
 # build debug
 anvil build :debug
 # start a web server, open http://localhost:8080/client/index.html?dev
-anvil serve
+anvil serve &
 # start a debug node game server
 NODE_PATH=$NODE_PATH:third_party/games-framework/third_party node server/server-uncompiled.js
 # deploy a release build

@@ -7,12 +7,19 @@
 # This script sets up the repository and dependencies.
 
 # Ensure running as root (or on Cygwin, where it doesn't matter)
-if [ "$(id -u)" -ne 0 ]; then
+if [ "$(id -u)" -eq 0 ]; then
   if [ ! -e "/Cygwin.bat" ]; then
-    echo "This script must be run as root to install Python and system packages"
-    echo "Run with sudo!"
+    echo "This script should not be run as root!"
+    echo "Run without sudo!"
     exit 1
   fi
+fi
+
+# This must currently run from the root of the repo
+# TODO(benvanik): make this runnable from anywhere (find git directory?)
+if [ ! -d ".git" ]; then
+  echo "This script must be run from the root of the repository (the folder containing .git)"
+  exit 1
 fi
 
 # ==============================================================================
@@ -20,8 +27,8 @@ fi
 # ==============================================================================
 echo "Grabbing third_party/..."
 
-sudo -u "$SUDO_USER" git submodule init
-sudo -u "$SUDO_USER" git submodule update
+git submodule init
+git submodule update
 
 echo ""
 # ==============================================================================
@@ -30,9 +37,17 @@ echo ""
 echo "Grabbing games-framework third_party/..."
 
 cd third_party/games-framework/
-sudo -u "$SUDO_USER" git submodule init
-sudo -u "$SUDO_USER" git submodule update
+git submodule init
+git submodule update
 cd ../..
+
+echo ""
+# =============================================================================
+# Node modules
+# =============================================================================
+echo "Installing node modules..."
+
+npm install
 
 echo ""
 # ==============================================================================
@@ -40,6 +55,6 @@ echo ""
 # ==============================================================================
 echo "Running games-framework setup.sh..."
 
-./third_party/games-framework/tools/setup.sh
+./third_party/games-framework/scripts/setup.sh
 
 echo ""

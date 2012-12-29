@@ -116,7 +116,9 @@
       {call blk.ui.popups.buttonSave}
         {param focusDefault: true /}
       {/call}
-      {call blk.ui.popups.buttonClose /}
+      {call blk.ui.popups.buttonClose}
+        {param focusDefault: false /}
+      {/call}
     {/param}
   {/call}
 {/template}

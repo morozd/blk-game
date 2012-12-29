@@ -90,7 +90,9 @@
       turn on 'Enable Pointer Lock' in about:flags. Restart, run the game, and use alt-enter to get FPS gaming goodness!
     {/param}
     {param buttons}
-      {call blk.ui.popups.buttonClose /}
+      {call blk.ui.popups.buttonClose}
+        {param focusDefault: true /}
+      {/call}
     {/param}
   {/call}
 {/template}
