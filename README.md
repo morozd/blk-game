@@ -40,25 +40,27 @@ exclusively on the server isn't included in the code sent for the client and wor
 Wanna play around?
 
 ```
-# ensure you have python, pip!
-# on OSX, get homebrew or macports!
-# clone the repo
+# Ensure you have python, pip - on OSX, get homebrew or macports!
 git clone https://github.com/benvanik/blk-game.git
 cd blk-game/
-# run the setup script to initialize the repo and dependencies
+# Tun the setup script to initialize the repo and dependencies
 ./scripts/setup.sh
 
-# this must be run each session:
+# This must be run each session:
 source blkrc
-# build debug
-anvil build :debug
-# start a web server, open http://localhost:8080/client/index.html?dev
+
+# Build debug - do this when changing soy/gss/glsl/etc, but js is edit-reload
+anvil build -j1 :debug
+# Start a web server, open http://localhost:8080/client/index.html?dev
 anvil serve &
-# start a debug node game server
+# Start a debug node game server
 NODE_PATH=$NODE_PATH:third_party/games-framework/third_party node server/server-uncompiled.js
-# deploy a release build
-anvil deploy -o /tmp/blk-release/ :release
+
+# Deploy a release build
+anvil deploy -j1 -o /tmp/blk-release/ :release
 ```
+
+NOTE: you *must* pass -j1 to anvil when building. I'll fix this eventually.
 
 ## Contributing
 

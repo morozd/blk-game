@@ -258,7 +258,7 @@ SHARED_JS_FLAGS=[
 
 closure_js_library(
     name='blk_js_uncompiled',
-    mode='UNCOMPILED',
+    mode='DEPS',
     entry_points=['blk.client.start', 'blk.server.start',],
     srcs=BLK_CLIENT_JS_SRCS + [
         ':blk_audio_uncompiled_all',
