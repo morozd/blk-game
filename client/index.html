@@ -42,11 +42,11 @@
       <br/>
       <br/>
       <div id="browser-line">
-        <div class="browser-logo chrome-icon"></div> Use Chrome 18+ or <a href="http://tools.google.com/dlpage/chromesxs" target="_blank">Canary</a> for the full experience!
+        <div class="browser-logo chrome-icon"></div> Use Chrome 23+ or <a href="http://tools.google.com/dlpage/chromesxs" target="_blank">Canary</a> for the full experience!
         <br/>
         <br/>
         <div style="clear: both"/>
-        <div class="browser-logo firefox-icon"></div> Firefox 12+ works too! (a bit)
+        <div class="browser-logo firefox-icon"></div> Firefox 17+ works (poorly - lots of missing features)
         <!-- <br/>
         <br/>
         <div style="clear: both"/>
@@ -68,10 +68,7 @@
           <li>O to change options (like your name)
           <li>T to chat
         </ul>
-        For the best controls, run in Chrome dev channel or
-        <a href="http://tools.google.com/dlpage/chromesxs" target="_blank">Canary</a> and
-        turn on 'Enable Pointer Lock' in about:flags. Restart, run the game,
-        and use alt-enter to get FPS gaming goodness!
+        For the best controls run in Chrome!
       </div>
       <br/>
       <br/>
@@ -162,9 +159,9 @@
         }
         function testMouseLock() {
           return (
-              document.pointerLockElement ||
-              document.mozPointerLockElement ||
-              document.webkitPointerLockElement) !== undefined;
+              document.pointerLockElement !== undefined ||
+              document.mozPointerLockElement !== undefined ||
+              document.webkitPointerLockElement !== undefined);
         }
         function testWebSockets() {
           return !!window.WebSocket;
@@ -183,7 +180,8 @@
           return false;
         }
 
-        function addStatusLine(ul, feature, critical, supportFunc, info) {
+        function addStatusLine(ul, feature, critical, supportFunc,
+            failureInfo, successInfo) {
           var supported = false;
           try {
             supported = supportFunc();
@@ -200,6 +198,13 @@
             statusSpan.className = 'status-info';
             statusSpan.appendChild(document.createTextNode('supported'));
             li.appendChild(statusSpan);
+            if (successInfo) {
+              var infoSpan = document.createElement('span');
+              infoSpan.className = 'info';
+              infoSpan.appendChild(document.createTextNode(
+                  ' (' + successInfo + ')'));
+              li.appendChild(infoSpan);
+            }
           } else {
             if (critical) {
               var statusSpan = document.createElement('span');
@@ -212,10 +217,11 @@
               statusSpan.appendChild(document.createTextNode('unsupported'));
               li.appendChild(statusSpan);
             }
-            if (info) {
+            if (failureInfo) {
               var infoSpan = document.createElement('span');
               infoSpan.className = 'info';
-              infoSpan.appendChild(document.createTextNode(' (' + info + ')'));
+              infoSpan.appendChild(document.createTextNode(
+                  ' (' + failureInfo + ')'));
               li.appendChild(infoSpan);
             }
           }
@@ -251,7 +257,10 @@
             'no sounds');
         addStatusLine(ul,
             'Mouse Lock', false,
-            testMouseLock);
+            testMouseLock,
+            undefined,
+            document.mozPointerLockElement !== undefined ?
+                'fullscreen only' : null);
       }
       makeWarnings(document.getElementById('warnings'));
 
