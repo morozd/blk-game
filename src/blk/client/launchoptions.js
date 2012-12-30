@@ -54,19 +54,19 @@ blk.client.LaunchOptions.getArgumentInfo = function() {
   // TODO(benvanik): info
   return {
     'simulatedLatency': {
-      help: 'Extra latency, in ms, to add to send/recv.',
-      type: Number,
-      defaultValue: 0
+      'help': 'Extra latency, in ms, to add to send/recv.',
+      'type': Number,
+      'defaultValue': 0
     },
     'userName': {
-      help: 'User name for multiplayer.',
-      type: String,
-      defaultValue: null
+      'help': 'User name for multiplayer.',
+      'type': String,
+      'defaultValue': null
     },
     'host': {
-      help: 'Host endpoint for connections.',
-      type: String,
-      defaultValue: null
+      'help': 'Host endpoint for connections.',
+      'type': String,
+      'defaultValue': null
     }
   };
 };

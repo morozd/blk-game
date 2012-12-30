@@ -43,7 +43,7 @@ Wanna play around?
 # Ensure you have python, pip - on OSX, get homebrew or macports!
 git clone https://github.com/benvanik/blk-game.git
 cd blk-game/
-# Tun the setup script to initialize the repo and dependencies
+# Run the setup script to initialize the repo and dependencies
 ./scripts/setup.sh
 
 # This must be run each session:
@@ -54,10 +54,15 @@ anvil build -j1 :debug
 # Start a web server, open http://localhost:8080/client/index.html?dev
 anvil serve &
 # Start a debug node game server
-NODE_PATH=$NODE_PATH:third_party/games-framework/third_party node server/server-uncompiled.js
+./server/server-uncompiled.js
 
-# Deploy a release build
-anvil deploy -j1 -o /tmp/blk-release/ :release
+# Do a release build
+anvil build -j1 :release
+# Run a release node game server
+./server/server.js
+# CD someplace else and npm install the server to get a standalone copy:
+cd /tmp/my-blk-server/
+npm install [path to git checkout]
 ```
 
 NOTE: you *must* pass -j1 to anvil when building. I'll fix this eventually.

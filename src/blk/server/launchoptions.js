@@ -89,44 +89,44 @@ goog.inherits(blk.server.LaunchOptions, gf.LaunchOptions);
 blk.server.LaunchOptions.getArgumentInfo = function() {
   return {
     'listenPort': {
-      help: 'Port to use for game connections.',
-      type: Number,
-      defaultValue: 1337
+      'help': 'Port to use for game connections.',
+      'type': Number,
+      'defaultValue': 1337
     },
     'fileSystem': {
-      help: 'File system root path.',
-      type: String,
-      defaultValue: '/tmp/blk/'
+      'help': 'File system root path.',
+      'type': String,
+      'defaultValue': '/tmp/blk/'
     },
     'mapPath': {
-      help: 'Map path.',
-      type: String,
-      defaultValue: '/maps/map01/'
+      'help': 'Map path.',
+      'type': String,
+      'defaultValue': '/maps/map01/'
     },
     'browserUrl': {
-      help: 'Server browser base API URL.',
-      type: String,
-      defaultValue: 'http://localhost:8081/'
+      'help': 'Server browser base API URL.',
+      'type': String,
+      'defaultValue': 'http://localhost:8081/'
     },
     'serverId': {
-      help: 'Server registration UUID.',
-      type: String,
-      defaultValue: null
+      'help': 'Server registration UUID.',
+      'type': String,
+      'defaultValue': null
     },
     'serverKey': {
-      help: 'Server private key.',
-      type: String,
-      defaultValue: null
+      'help': 'Server private key.',
+      'type': String,
+      'defaultValue': null
     },
     'serverName': {
-      help: 'Human-readable server name.',
-      type: String,
-      defaultValue: null
+      'help': 'Human-readable server name.',
+      'type': String,
+      'defaultValue': null
     },
     'userCount': {
-      help: 'Maximum simultaneous user count.',
-      type: Number,
-      defaultValue: 8
+      'help': 'Maximum simultaneous user count.',
+      'type': Number,
+      'defaultValue': 8
     }
   };
 };

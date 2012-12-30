@@ -17,11 +17,10 @@ SERVER_NAME="Dev Server"
 USERS=8
 
 # Path to store maps/temp data
-FILESYSTEM=/tmp/blk/
+FILESYSTEM=fs/debug/
 # Map file
 MAP_PATH=maps/map_dev/
 
-NODE_PATH=build-out/:third_party/games-framework/third_party/:$NODE_PATH \
 node server/server-uncompiled.js \
     --browserUrl=$BROWSER_URL \
     --serverId=$SERVER_ID \

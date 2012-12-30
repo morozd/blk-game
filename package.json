@@ -1,0 +1,53 @@
+{
+  "name": "blk-server",
+  "version": "2012.12.29-1",
+  "description": "BLK game server.",
+  "keywords": [
+    "javascript",
+    "game",
+    "server",
+    "blk"
+  ],
+  "license": "Apache 2.0",
+  "homepage": "https://github.com/benvank/blk-game",
+  "bugs": "https://github.com/benvanik/blk-game/issues",
+  "repository" : {
+    "type" : "git",
+    "url" : "http://github.com/benvanik/blk-game.git"
+  },
+
+  "engines": {
+    "node": ">=0.8.14"
+  },
+
+  "scripts": {
+    "prepublish": "./third_party/games-framework/third_party/anvil-build/anvil-local.sh build -j1 :release-server"
+  },
+
+  "dependencies": {
+    "abbrev": "1.0.3",
+    "options": "0.0.3",
+    "ws": "0.4.25"
+  },
+  "devDependencies": {
+  },
+  "optionalDependencies": {
+  },
+
+  "files": [
+    "server/server.js",
+    "build-out/blk_node_js_compiled.js",
+
+    "AUTHORS",
+    "LICENSE",
+    "README.md",
+
+    "run-server.sh",
+    "run-server.bat"
+  ],
+
+  "main": "build-out/blk_node_js_compiled.js",
+  "bin": {
+    "blk-server": "./server/server.js"
+  }
+}

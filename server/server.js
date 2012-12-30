@@ -15,9 +15,20 @@
  * limitations under the License.
  */
 
+var fs = require('fs');
+
 // Load compiled code
 global.require = require;
-var compiledLibrary = require('blk_node_js_compiled');
+
+var compiledRequirePath;
+if (fs.existsSync('blk_node_js_compiled.js')) {
+  compiledRequirePath = './blk_node_js_compiled';
+} else if (fs.existsSync('build-out/blk_node_js_compiled.js')) {
+  compiledRequirePath = './../build-out/blk_node_js_compiled';
+} else {
+  compiledRequirePath = 'blk-server';
+}
+var compiledLibrary = require(compiledRequirePath);
 for (var key in compiledLibrary) {
   global[key] = compiledLibrary[key]
 }
