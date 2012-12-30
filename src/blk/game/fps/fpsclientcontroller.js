@@ -385,8 +385,8 @@ blk.game.fps.FpsClientController.prototype.drawBlockTypes_ =
     return;
   }
   var inventory = localPlayer.getInventory();
-  var selectedIndex = 0;//localPlayer.blockIndex;
-  var blockTypes = [];//localPlayer.blockTypes;
+  var actor = inventory.getTarget();
+  var heldTool = actor.getHeldTool();
 
   var renderState = this.game.getRenderState();
   var viewport = this.getScreenViewport();
@@ -395,19 +395,19 @@ blk.game.fps.FpsClientController.prototype.drawBlockTypes_ =
   spriteBuffer.clear();
 
   var x = 0;
-  var width = blockTypes.length * (16 + 1);
+  var width = inventory.getChildCount() * (16 + 1);
   var height = 16;
   var texCoords = blk.game.fps.FpsClientController.tmpVec4_;
-  for (var n = 0; n < blockTypes.length; n++) {
-    var block = blockTypes[n];
+  inventory.forEachChild(function(blockTool) {
+    var block = blockTool.getBlockType();
     blockAtlas.getSlotCoords(block.atlasSlot, texCoords);
     spriteBuffer.add(
         texCoords[0], texCoords[1],
         texCoords[2] - texCoords[0], texCoords[3] - texCoords[1],
-        selectedIndex == n ? 0xFFFFFFFF : 0xFF777777,
+        blockTool == heldTool ? 0xFFFFFFFF : 0xFF777777,
         x, 0, 16, 16);
     x += 16 + 1;
-  }
+  });
 
   var worldMatrix = blk.game.fps.FpsClientController.tmpMat4_;
   goog.vec.Mat4.setFromValues(worldMatrix,
@@ -434,12 +434,11 @@ blk.game.fps.FpsClientController.prototype.hitTestBlockTypes_ =
     return;
   }
   var inventory = localPlayer.getInventory();
-  var blockTypes = [];//localPlayer.blockTypes;
 
   var viewport = this.getScreenViewport();
   var scale = 2;
   var itemSize = (16 + 1) * scale;
-  var width = blockTypes.length * itemSize;
+  var width = inventory.getChildCount() * itemSize;
   var height = 16 * scale;
   if (mouseData.clientY >= viewport.height - height - 2) {
     var left = viewport.width / 2 - width / 2;
