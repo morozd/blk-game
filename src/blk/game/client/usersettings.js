@@ -193,10 +193,17 @@ blk.game.client.UserSettings.prototype.load = function() {
  */
 blk.game.client.UserSettings.prototype.save = function() {
   var cookies = new goog.net.Cookies(this.dom_.getDocument());
-  cookies.set('s_un', goog.string.urlEncode(this.userName));
-  cookies.set('s_ms', String(this.mouseSensitivity));
-  cookies.set('s_ml', String(this.mouseLock));
-  cookies.set('s_vd', String(this.viewDistance));
-  cookies.set('s_sm', String(this.soundFxMuted));
-  cookies.set('s_mm', String(this.musicMuted));
+  var maxAge = 60 * 60 * 24 * 30 * 12;
+  cookies.set('s_un', goog.string.urlEncode(this.userName),
+      maxAge, '/');
+  cookies.set('s_ms', String(this.mouseSensitivity),
+      maxAge, '/');
+  cookies.set('s_ml', String(this.mouseLock),
+      maxAge, '/');
+  cookies.set('s_vd', String(this.viewDistance),
+      maxAge, '/');
+  cookies.set('s_sm', String(this.soundFxMuted),
+      maxAge, '/');
+  cookies.set('s_mm', String(this.musicMuted),
+      maxAge, '/');
 };
