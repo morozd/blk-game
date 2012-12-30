@@ -99,7 +99,7 @@ blk.sim.Inventory.prototype.executeCommand = function(command) {
 
   if (command instanceof blk.sim.commands.SetHeldToolCommand) {
     var target = this.getTarget();
-    var newTool = this.getChild(command.tool);
+    var newTool = this.getChild(command.toolId);
     if (newTool) {
       target.setHeldTool(newTool);
     }
@@ -163,7 +163,7 @@ if (gf.CLIENT) {
       var cmd = /** @type {!blk.sim.commands.SetHeldToolCommand} */ (
           this.createCommand(blk.sim.commands.SetHeldToolCommand.ID));
       var newTool = this.getChildAtIndex(newHeldIndex);
-      cmd.tool = newTool.getId();
+      cmd.toolId = newTool.getId();
       this.simulator.sendCommand(cmd);
 
       if (gf.CLIENT) {

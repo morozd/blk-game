@@ -23,7 +23,7 @@ goog.provide('blk.sim.commands.SetHeldToolCommand');
 goog.require('blk.sim');
 goog.require('blk.sim.commands.CommandType');
 goog.require('gf.sim');
-goog.require('gf.sim.Command');
+goog.require('gf.sim.PredictedCommand');
 
 
 
@@ -32,7 +32,7 @@ goog.require('gf.sim.Command');
  * Sent from the client to the server to request tool changes.
  *
  * @constructor
- * @extends {gf.sim.Command}
+ * @extends {gf.sim.PredictedCommand}
  * @param {!gf.sim.CommandFactory} commandFactory Command factory.
  */
 blk.sim.commands.SetHeldToolCommand = function(commandFactory) {
@@ -42,9 +42,9 @@ blk.sim.commands.SetHeldToolCommand = function(commandFactory) {
    * Tool entity ID.
    * @type {number}
    */
-  this.tool = 0;
+  this.toolId = 0;
 };
-goog.inherits(blk.sim.commands.SetHeldToolCommand, gf.sim.Command);
+goog.inherits(blk.sim.commands.SetHeldToolCommand, gf.sim.PredictedCommand);
 
 
 /**
@@ -53,7 +53,7 @@ goog.inherits(blk.sim.commands.SetHeldToolCommand, gf.sim.Command);
 blk.sim.commands.SetHeldToolCommand.prototype.read = function(reader) {
   goog.base(this, 'read', reader);
 
-  this.tool = reader.readUint32();
+  this.toolId = reader.readUint32();
 };
 
 
@@ -63,7 +63,7 @@ blk.sim.commands.SetHeldToolCommand.prototype.read = function(reader) {
 blk.sim.commands.SetHeldToolCommand.prototype.write = function(writer) {
   goog.base(this, 'write', writer);
 
-  writer.writeUint32(this.tool);
+  writer.writeUint32(this.toolId);
 };
 
 
@@ -81,4 +81,4 @@ blk.sim.commands.SetHeldToolCommand.ID = gf.sim.createTypeId(
  * @const
  * @type {number}
  */
-blk.sim.commands.SetHeldToolCommand.FLAGS = 0;
+blk.sim.commands.SetHeldToolCommand.FLAGS = gf.sim.PredictedCommand.FLAG;
