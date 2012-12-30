@@ -197,7 +197,7 @@ blk.game.fps.FpsClientController.prototype.processInput =
     this.game.playClick();
     this.game.showSettingsPopup();
     return true;
-  } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.H)) {
+  } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.SLASH)) {
     this.game.playClick();
     this.game.showHelpPopup();
     return true;
