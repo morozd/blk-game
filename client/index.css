@@ -85,15 +85,17 @@ input[type="text"] {
   padding: 3px;
 }
 
-#server-connect {
+.multiplayer-info {
   margin-left: 20px;
+}
+
+#server-connect {
 }
 #server-connect input {
   width: 262px;
 }
 
 #server-list {
-  margin-left: 20px;
 }
 #server-list table {
   width: 100%;

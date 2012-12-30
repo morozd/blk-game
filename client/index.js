@@ -301,7 +301,7 @@ function updateServers() {
     var endpoint = serverInfo['endpoint'];
     var row = document.createElement('tr');
     var c1 = document.createElement('td');
-    c1.innerHTML = '<li><a href="' + GAME_URL + '?host=' + endpoint + '" target="_blank">' + serverInfo['server_name'] + '</a>';
+    c1.innerHTML = '<li><a href="" target="_blank">' + serverInfo['server_name'] + '</a>';
     row.appendChild(c1);
     var c2 = document.createElement('td');
     c2.innerText = serverInfo['user_count'] + '/' + serverInfo['user_max'];
@@ -311,6 +311,15 @@ function updateServers() {
     // c3.innerText = serverInfo['server_location'];
     // row.appendChild(c3);
     table.appendChild(row);
+
+    c1.firstChild.onclick = function(e) {
+      e.preventDefault();
+
+      // Disclaimer
+      alert('Warning! This server is not run by or affiliated with Google and may contain scary things like trolls!');
+
+      connectToServer(endpoint);
+    };
   }
 }
 
