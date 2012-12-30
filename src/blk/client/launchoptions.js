@@ -42,6 +42,12 @@ blk.client.LaunchOptions = function(uri, opt_args) {
    * @type {?string}
    */
   this.host = this.getString('host');
+
+  /**
+   * Whether to enable shared web workers.
+   * @type {number}
+   */
+  this.sharedWorkers = this.getNumberAlways('sharedWorkers');
 };
 goog.inherits(blk.client.LaunchOptions, gf.LaunchOptions);
 
@@ -67,6 +73,11 @@ blk.client.LaunchOptions.getArgumentInfo = function() {
       'help': 'Host endpoint for connections.',
       'type': String,
       'defaultValue': null
+    },
+    'sharedWorkers': {
+      'help': 'Whether to enable shared web workers.',
+      'type': Number,
+      'defaultValue': 1
     }
   };
 };

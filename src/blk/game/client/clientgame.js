@@ -660,10 +660,11 @@ blk.game.client.ClientGame.prototype.connectToHost = function(address) {
 };
 
 
-// TODO(benvanik): make a query arg
 /**
  * Shared workers are harder to debug than dedicated workers - disable when
  * developing.
+ * This is a master toggle - the 'sharedWorkers' launch option allows the user
+ * to specify this value.
  * @private
  * @const
  * @type {boolean}
@@ -745,6 +746,7 @@ blk.game.client.ClientGame.prototype.launchLocalServer_ =
   var port;
   // HACK: SharedWorker exists in WebKit, but is not working
   if (blk.game.client.ClientGame.ENABLE_SHARED_WORKERS_ &&
+      this.launchOptions.sharedWorkers &&
       goog.userAgent.product.CHROME &&
       goog.global['SharedWorker']) {
     worker = new SharedWorker(workerUri, name);
