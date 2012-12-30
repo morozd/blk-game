@@ -50,8 +50,9 @@ closure_soy_library(
 # ----------------------------------------------------------------------------------------------------------------------
 
 COMMON_CLIENT_STATIC_FILES=[
-    'client/index.html',
-    'client/index.css',
+    'index.html',
+    'index.css',
+    'index.js',
     ]
 
 copy_files(
@@ -348,6 +349,18 @@ archive_files(
         ':blk_node_js_compiled',
         ':node_modules'
         ])
+
+file_set(
+    name='gh-pages',
+    srcs=[
+        ':blk_client_static_compiled',
+        ':blk_audio_compiled',
+        ':blk_images',
+        ':blk_css_compiled_only',
+        ':blk_client_js_compiled',
+        ':blk_server_js_compiled',
+        ],
+    src_exclude_filter='*-deps.js')
 
 file_set(
     name='release',
