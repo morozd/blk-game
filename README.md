@@ -67,6 +67,10 @@ npm install [path to git checkout]
 
 NOTE: you *must* pass -j1 to anvil when building. I'll fix this eventually.
 
+## Fun Projects
+
+* Add a map generator: [map-generators](https://github.com/benvanik/blk-game/blob/master/docs/map-generators.md)
+
 ## Contributing
 
 Have a fix or feature? Submit a pull request - I love them!

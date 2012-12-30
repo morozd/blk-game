@@ -25,6 +25,10 @@ REM Path to store maps/temp data
 SET FILESYSTEM=fs\
 REM Map file
 SET MAP_PATH=maps\map01\
+REM Map generator name; 'flat', 'noise', 'improved', or some custom value
+SET MAP_GENERATOR="improved"
+REM Map random number generator seed
+SET MAP_SEED=0
 
 node %DIR%\server\server.js ^
     --browserUrl=%BROWSER_URL% ^
@@ -34,5 +38,7 @@ node %DIR%\server\server.js ^
     --serverName=%SERVER_NAME% ^
     --userCount=%USER_COUNT% ^
     --filesystem=%FILESYSTEM% ^
-    --map=%MAP_PATH% ^
+    --mapPath=%MAP_PATH% ^
+    --mapGenerator=%MAP_GENERATOR% ^
+    --mapSeed=%MAP_SEED% ^
     %*

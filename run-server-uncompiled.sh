@@ -20,6 +20,10 @@ USER_COUNT=8
 FILESYSTEM=fs/debug/
 # Map file
 MAP_PATH=maps/map_dev/
+# Map generator name; 'flat', 'noise', 'improved', or some custom value
+MAP_GENERATOR="improved"
+# Map random number generator seed
+MAP_SEED=0
 
 node server/server-uncompiled.js \
     --browserUrl=$BROWSER_URL \
@@ -29,5 +33,7 @@ node server/server-uncompiled.js \
     --serverName=$SERVER_NAME \
     --userCount=$USER_COUNT \
     --filesystem=$FILESYSTEM \
-    --map=$MAP_PATH \
+    --mapPath=$MAP_PATH \
+    --mapGenerator=$MAP_GENERATOR \
+    --mapSeed=$MAP_SEED \
     $@

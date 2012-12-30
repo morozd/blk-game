@@ -17,7 +17,7 @@
 goog.provide('blk.env.server.ServerMap');
 
 goog.require('blk.env.Map');
-goog.require('blk.env.gen.ImprovedGenerator');
+goog.require('blk.env.gen');
 goog.require('blk.env.server.ChunkProvider');
 goog.require('blk.env.server.ChunkScheduler');
 goog.require('goog.async.DeferredList');
@@ -37,8 +37,7 @@ blk.env.server.ServerMap = function(mapParams, mapStore) {
   goog.base(this);
 
   // Create a generator
-  var generator = new blk.env.gen.ImprovedGenerator(
-      mapParams, this.blockSet);
+  var generator = blk.env.gen.createGenerator(mapParams, this.blockSet);
 
   /**
    * Map creation parameters.

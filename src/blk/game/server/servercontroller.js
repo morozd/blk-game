@@ -79,8 +79,12 @@ blk.game.server.ServerController = function(game, session, mapStore) {
   this.chatService_ = new gf.net.chat.ServerChatService(session);
   this.session.registerService(this.chatService_);
 
-  // TODO(benvanik): pull from somewhere - args?
+  // TODO(benvanik): store in map info
+  var launchOptions =
+      /** @type {!blk.server.LaunchOptions} */ (game.launchOptions);
   var mapParams = new blk.env.MapParameters();
+  mapParams.generator = launchOptions.mapGenerator;
+  mapParams.seed = launchOptions.mapSeed;
 
   /**
    * Map.

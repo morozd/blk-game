@@ -25,6 +25,10 @@ USER_COUNT=8
 FILESYSTEM=fs/
 # Map file
 MAP_PATH=maps/map01/
+# Map generator name; 'flat', 'noise', 'improved', or some custom value
+MAP_GENERATOR="improved"
+# Map random number generator seed
+MAP_SEED=0
 
 node $DIR/server/server.js \
     --browserUrl=$BROWSER_URL \
@@ -34,5 +38,7 @@ node $DIR/server/server.js \
     --serverName=$SERVER_NAME \
     --userCount=$USER_COUNT \
     --filesystem=$FILESYSTEM \
-    --map=$MAP_PATH \
+    --mapPath=$MAP_PATH \
+    --mapGenerator=$MAP_GENERATOR \
+    --mapSeed=$MAP_SEED \
     $@

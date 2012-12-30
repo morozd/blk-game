@@ -25,6 +25,12 @@ goog.provide('blk.env.MapParameters');
  */
 blk.env.MapParameters = function() {
   /**
+   * Generator to use for filling chunks.
+   * @type {string}
+   */
+  this.generator = 'improved';
+
+  /**
    * Random seed used to create the map.
    * @type {number}
    */

@@ -50,6 +50,18 @@ blk.server.LaunchOptions = function(uri, opt_args) {
   this.mapPath = this.getStringAlways('mapPath');
 
   /**
+   * Map generator.
+   * @type {string}
+   */
+  this.mapGenerator = this.getStringAlways('mapGenerator');
+
+  /**
+   * Map seed.
+   * @type {number}
+   */
+  this.mapSeed = this.getNumberAlways('mapSeed');
+
+  /**
    * Server browser URL.
    * @type {string}
    */
@@ -102,6 +114,16 @@ blk.server.LaunchOptions.getArgumentInfo = function() {
       'help': 'Map path.',
       'type': String,
       'defaultValue': '/maps/map01/'
+    },
+    'mapGenerator': {
+      'help': 'Map generator name.',
+      'type': String,
+      'defaultValue': 'improved'
+    },
+    'mapSeed': {
+      'help': 'Map generator random seed.',
+      'type': Number,
+      'defaultValue': 0
     },
     'browserUrl': {
       'help': 'Server browser base API URL.',
