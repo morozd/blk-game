@@ -27,19 +27,7 @@ fi
 # ==============================================================================
 echo "Grabbing third_party/..."
 
-git submodule init
-git submodule update
-
-echo ""
-# ==============================================================================
-# Get the dependencies in GF too
-# ==============================================================================
-echo "Grabbing games-framework third_party/..."
-
-cd third_party/games-framework/
-git submodule init
-git submodule update
-cd ../..
+git submodule update --init --recursive
 
 echo ""
 # =============================================================================
