@@ -26,7 +26,7 @@ SET FILESYSTEM=fs\
 REM Map file
 SET MAP_PATH=maps\map01\
 
-node %DIR%\server\server-uncompiled.js ^
+node %DIR%\server\server.js ^
     --browserUrl=%BROWSER_URL% ^
     --serverId=%SERVER_ID% ^
     --serverKey=%SERVER_KEY% ^
