@@ -22,6 +22,16 @@ function setupIndexPage() {
   var localLink = document.getElementById('local-link');
   localLink.href = GAME_URL + '?host=local://blk-server-0';
 
+  var joinLink = document.getElementById('server-connect-join');
+  joinLink.onclick = function(e) {
+    e.preventDefault();
+    var address = document.getElementById('server-connect-input');
+    if (!address.value.length) {
+      return;
+    }
+    connectToServer(address.value);
+  };
+
   window.setInterval(function() {
     updateServers();
   }, 30 * 1000);
@@ -270,7 +280,7 @@ function updateServers() {
           addServerRow(table, serverInfo);
         }
         if (!json.length) {
-          serverList.innerText = '\nNo servers online! Try again later!'//' or ';
+          serverList.innerText = '\nNo public servers online! Try again later!'//' or ';
           // var startLink = document.createElement('a');
           // startLink.href = 'a';
           // startLink.innerText = 'start your own!';
@@ -302,4 +312,14 @@ function updateServers() {
     // row.appendChild(c3);
     table.appendChild(row);
   }
+}
+
+
+/**
+ * Launches the game by connecting to the given server.
+ * @param {string} address Server IP.
+ */
+function connectToServer(address) {
+  var url = GAME_URL + '?host=' + address;
+  window.open(url, '_blank');
 }

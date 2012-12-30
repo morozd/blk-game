@@ -76,13 +76,20 @@ body {
   margin-right: auto;
 }
 
-#name {
+input[type="text"] {
   font-family: monospace-8bit;
   font-size: 1em;
   border: 1px solid black;
   background-color: #EEE;
   width: 160px;
   padding: 3px;
+}
+
+#server-connect {
+  margin-left: 20px;
+}
+#server-connect input {
+  width: 262px;
 }
 
 #server-list {
