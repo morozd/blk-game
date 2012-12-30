@@ -1,1 +1,156 @@
-hello!
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>BLK, a voxel world tech demo</title>
+    <link rel="stylesheet" href="index.css"/>
+    <script>
+      var DEV_MODE = window.location.search == '?dev';
+      var GAME_URL = DEV_MODE ? 'client/game-uncompiled.html' : 'client/game.html';
+      var GAME_TYPE = DEV_MODE ? 'blk-dev' : 'blk';
+      var GAME_VERSION = '0.0.1';
+      var BROWSER_URL = DEV_MODE ? 'http://localhost:8081/' : 'http://gf-browser.appspot.com/';
+      var SERVER_QUERY_URL = BROWSER_URL + 'api/query/' + GAME_TYPE + '/' + GAME_VERSION;
+    </script>
+    <script src="index.js"></script>
+  </head>
+  <body>
+    <a id="forkme_banner" href="https://github.com/benvanik/blk-game">View on GitHub</a>
+    <br/>
+    <br/>
+    <div id="column">
+      <div id="title">BLK, by <a href="http://noxa.org">Ben Vanik</a> (<a href="http://twitter.com/benvanik">@benvanik</a>)</div>
+      <br/>
+      <div class="break"/>
+      <br/>
+      <div id="about">
+        THIS IS NOT MINECRAFT. This is my 20% project attempt at creating a fully
+        modifiable multiplayer voxel world in JS that can run efficiently in the
+        browser and learning what the pain points are in doing a project of this scale.
+        It's just a tech demo of a high-fidelity 100% JavaScript game. Enjoy it for what it is!
+      </div>
+      <br/>
+      <br/>
+      <div id="go">
+        &gt; <a id="local-link" target="_blank" href="">Run Locally</a> (<a href="javascript:resetLocalStorage()">reset map</a>)
+        <br/>
+        <br/>
+        &gt; <span>Join Multiplayer</span> as <input id="name" type="text" value="User"/>
+        <br/>
+        <div class="multiplayer-info">
+          <div id="server-connect">
+            Connect: <input id="server-connect-input" type="text" placeholder="ws://x.x.x.x:1337"></input> <a id="server-connect-join" href="">join</a>
+          </div>
+          <br/>
+          Public Servers (NOT RUN BY GOOGLE!):
+          <div id="server-list">
+            loading...
+          </div>
+        </div>
+        <br/>
+        &gt; <a href="https://github.com/benvanik/blk-game/tree/master/docs/server-setup.md" target="_blank">Run a Server</a>
+      </div>
+      <br/>
+      <br/>
+      <div id="browser-line">
+        <div class="browser-logo chrome-icon"></div> Use Chrome 23+ or <a href="http://tools.google.com/dlpage/chromesxs" target="_blank">Canary</a> for the full experience!
+        <br/>
+        <br/>
+        <div style="clear: both"/>
+        <div class="browser-logo firefox-icon"></div> Firefox 17+ works (poorly - lots of missing features)
+        <!-- <br/>
+        <br/>
+        <div style="clear: both"/>
+        <div class="browser-logo safari-icon"></div> Safari 5+ w/ <span class="command">Enable WebGL</span> on in the Develop menu -->
+      </div>
+      <div id="supportList">
+      </div>
+      <br/>
+      <div id="help">
+        <span class="section">Help/Controls</span>
+        <br/>
+        <ul>
+          <li>WSAD keys to move around
+          <li>Click and drag the mouse to change the view
+          <li>1-5 keys or mouse wheel to change the current block type
+          <li>Left click to place a block of the current type
+          <li>Right click or ctrl-click to remove a block
+          <li>Alt-enter to toggle fullscreen mode/mouse lock
+          <li>O to change options (like your name)
+          <li>T to chat
+        </ul>
+        For the best controls run in Chrome or fullscreen Firefox!
+      </div>
+      <br/>
+      <br/>
+      <div id="why">
+        <span class="section">Why?!</span>
+        <br/>
+        <br/>
+        I wanted to do something productive with my 20% time at Google. I've been
+        preaching that the web is finally ready for real games, so I figured I'd
+        try to make one. This is the result. Heavy inspiration comes from Mojang,
+        of course: Minecraft is cool, but more importantly it's technically
+        difficult to get running well, especially in the browser.
+        <br/>
+        <br/>
+        All of the code for this project, including the voxel world client and server,
+        the game framework, and the build system used to produce the final output are
+        all open sourced. I'll be continuing to develop the game
+        framework and build system, and if I have time throw some more features into
+        this demo (like real gameplay, for example). Feel free to fork! Have fun!
+        <br/>
+        <br/>
+        <a href="https://github.com/benvanik/blk-game">Interested in the tech?</a>
+      </div>
+      <br/>
+      <br/>
+      <div id="code">
+        <span class="section">Code</span>
+        <br/>
+        <br/>
+        Build system (powering the whole thing):
+        <a href="https://github.com/benvanik/anvil-build">anvil-build</a>
+        <br/>
+        <br/>
+        Low-level web games framework:
+        <a href="https://github.com/benvanik/games-framework">games-framework</a>
+        <br/>
+        <br/>
+        The BLK demo code itself:
+        <a href="https://github.com/benvanik/blk-game">blk-game</a>
+      </div>
+      <br/>
+      <br/>
+      <div id="who">
+        <span class="section">Who</span>
+        <br/>
+        <br/>
+        This demo was conceptualized and coded by <a href="http://twitter.com/benvanik">@benvanik</a>
+        as a 20% project at Google, and is all copyright Google 2012.
+        <br/>
+        <br/>
+        Sound effects and punched bricks by <a href="https://twitter.com/somenotes">Sean Dunn</a>.
+        <br/>
+        <br/>
+        UI icons by <a href="https://twitter.com/KM_Alexander">@KM_Alexander</a>.
+        <br/>
+        <br/>
+        The font is <a href="http://www.dafont.com/volter-goldfish.font" target="_blank">Volter (Goldfish)</a>.
+        The bitmaped font used in the game itself is <a href="http://dwarffortresswiki.org/images/a/ae/LN_EGA8x8.png" target="_blank">Lord Nightmare/IBM's EGA Font</a> (from <a href="http://dwarffortresswiki.org/index.php/Tileset_repository" target="_blank">The Dwarf Fortress Wiki</a>).
+        <br/>
+        <br/>
+        Textures are from <a href="http://painterlypack.net" target="_blank">The Painterly Pack</a>, copyright Rhodox.
+        <br/>
+        <br/>
+        The awesome music is Knuck Beatz's <a href="http://soundcloud.com/casesensative/knuck-beatz-so-many-blocks-so" target="_blank">So Many Blocks, So Little Time (Minecraft Soundtrack)</a>.
+      </div>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+    </div>
+    <script>
+      setupIndexPage();
+    </script>
+  </body>
+</html>
