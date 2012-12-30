@@ -32,5 +32,7 @@ blk.sim.commands.CommandType = {
   /** {@see blk.sim.commands.PlayerMoveCommand} */
   PLAYER_MOVE: 1,
   /** {@see blk.sim.commands.SetBlockCommand} */
-  SET_BLOCK: 2
+  SET_BLOCK: 2,
+  /** {@see blk.sim.commands.SetHeldToolCommand} */
+  SET_HELD_TOOL: 3
 };

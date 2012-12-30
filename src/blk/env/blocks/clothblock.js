@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-goog.provide('blk.env.blocks.RedClothBlock');
-goog.provide('blk.env.blocks.GreenClothBlock');
-goog.provide('blk.env.blocks.YellowClothBlock');
 goog.provide('blk.env.blocks.BlueClothBlock');
+goog.provide('blk.env.blocks.GreenClothBlock');
+goog.provide('blk.env.blocks.RedClothBlock');
+goog.provide('blk.env.blocks.YellowClothBlock');
 
 goog.require('blk.env.BlockFlags');
 goog.require('blk.env.blocks.BlockID');

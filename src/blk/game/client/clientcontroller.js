@@ -615,6 +615,14 @@ blk.game.client.ClientController.prototype.loadSoundBank = function(
 
 
 /**
+ * Plays the 'click' sound (if sound is enabled).
+ */
+blk.game.client.ClientController.prototype.playClick = function() {
+  this.game.playClick();
+};
+
+
+/**
  * Plays the given audio cue at the position if it is within range.
  * @param {string} bankName Sound bank to play the cue from.
  * @param {string} cue Sound cue.

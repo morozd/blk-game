@@ -28,7 +28,6 @@ goog.require('blk.sim.EntityType');
 goog.require('blk.sim.Inventory');
 goog.require('blk.sim.controllers.FpsController');
 goog.require('blk.sim.tools.BlockTool');
-goog.require('blk.sim.tools.PickaxeTool');
 goog.require('gf');
 goog.require('gf.sim');
 goog.require('gf.sim.Entity');
@@ -203,12 +202,12 @@ if (gf.SERVER) {
     state.setInventoryId(inventory.getId());
 
     // Add a pickaxe to the inventory
-    var pickaxeTool = /** @type {!blk.sim.tools.PickaxeTool} */ (
-        simulator.createEntity(
-            blk.sim.tools.PickaxeTool.ID,
-            0));
-    pickaxeTool.setOwner(user);
-    pickaxeTool.setParent(inventory);
+    // var pickaxeTool = /** @type {!blk.sim.tools.PickaxeTool} */ (
+    //     simulator.createEntity(
+    //         blk.sim.tools.PickaxeTool.ID,
+    //         0));
+    // pickaxeTool.setOwner(user);
+    // pickaxeTool.setParent(inventory);
 
     // Add a few blocks to the inventory
     var blockTypes = [

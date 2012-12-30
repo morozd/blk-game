@@ -22,9 +22,12 @@ goog.provide('blk.sim.Inventory');
 
 goog.require('blk.sim');
 goog.require('blk.sim.EntityType');
+goog.require('blk.sim.commands.SetHeldToolCommand');
 goog.require('gf');
 goog.require('gf.sim');
 goog.require('gf.sim.Entity');
+goog.require('goog.events.KeyCodes');
+goog.require('goog.math');
 
 
 
@@ -94,7 +97,13 @@ blk.sim.Inventory.prototype.childRemoved = function(entity) {
 blk.sim.Inventory.prototype.executeCommand = function(command) {
   goog.base(this, 'executeCommand', command);
 
-  // TODO(benvanik): inventory commands
+  if (command instanceof blk.sim.commands.SetHeldToolCommand) {
+    var target = this.getTarget();
+    var newTool = this.getChild(command.tool);
+    if (newTool) {
+      target.setHeldTool(newTool);
+    }
+  }
 };
 
 
@@ -105,5 +114,64 @@ if (gf.CLIENT) {
    * @param {!gf.input.Data} inputData Current input data.
    * @return {boolean} True if input is valid, false if input has failed.
    */
-  blk.sim.Inventory.prototype.processInput = goog.abstractMethod;
+  blk.sim.Inventory.prototype.processInput = function(frame, inputData) {
+    var keyboardData = inputData.keyboard;
+    var mouseData = inputData.mouse;
+
+    var target = this.getTarget();
+    var heldTool = target.getHeldTool();
+
+    var count = this.getChildCount();
+    var oldHeldIndex = heldTool ? this.getIndexOfChild(heldTool) : 0;
+    var newHeldIndex = oldHeldIndex;
+
+    if (mouseData.dz) {
+      // TODO(benvanik): mac touchpad scroll
+      var dz = mouseData.dz > 0 ? 1 : -1;
+      newHeldIndex = (oldHeldIndex + dz) % count;
+      if (newHeldIndex < 0) {
+        newHeldIndex = count - 1;
+      }
+    }
+
+    if (keyboardData.didKeyGoDown(goog.events.KeyCodes.ONE)) {
+      newHeldIndex = 0;
+    } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.TWO)) {
+      newHeldIndex = 1;
+    } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.THREE)) {
+      newHeldIndex = 2;
+    } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.FOUR)) {
+      newHeldIndex = 3;
+    } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.FIVE)) {
+      newHeldIndex = 4;
+    } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.SIX)) {
+      newHeldIndex = 5;
+    } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.SEVEN)) {
+      newHeldIndex = 6;
+    } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.EIGHT)) {
+      newHeldIndex = 7;
+    } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.NINE)) {
+      newHeldIndex = 8;
+    } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.ZERO)) {
+      newHeldIndex = 9;
+    }
+
+    newHeldIndex = goog.math.clamp(newHeldIndex, 0, count - 1);
+
+    if (newHeldIndex != oldHeldIndex) {
+      // Create command
+      var cmd = /** @type {!blk.sim.commands.SetHeldToolCommand} */ (
+          this.createCommand(blk.sim.commands.SetHeldToolCommand.ID));
+      var newTool = this.getChildAtIndex(newHeldIndex);
+      cmd.tool = newTool.getId();
+      this.simulator.sendCommand(cmd);
+
+      if (gf.CLIENT) {
+        var controller = blk.sim.getClientController(this);
+        controller.playClick();
+      }
+    }
+
+    return true;
+  };
 }

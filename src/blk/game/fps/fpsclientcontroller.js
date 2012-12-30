@@ -214,48 +214,6 @@ blk.game.fps.FpsClientController.prototype.processInput =
     musicController.togglePlayback();
   }
 
-  // Block switching
-  // TODO(benvanik): move to inventory system
-  // var localPlayer = this.getLocalPlayer();
-  // var didSwitchBlock = false;
-  // if (mouseData.dz) {
-  //   didSwitchBlock = true;
-  //   // TODO(benvanik): mac touchpad scroll
-  //   var dz = mouseData.dz > 0 ? 1 : -1;
-  //   var blockTypeCount = localPlayer.blockTypes.length;
-  //   localPlayer.blockIndex = (localPlayer.blockIndex + dz) % blockTypeCount;
-  //   if (localPlayer.blockIndex < 0) {
-  //     localPlayer.blockIndex = blockTypeCount - 1;
-  //   }
-  // }
-  // if (keyboardData.didKeyGoDown(goog.events.KeyCodes.ONE)) {
-  //   didSwitchBlock = true;
-  //   localPlayer.blockIndex = 0;
-  // } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.TWO)) {
-  //   didSwitchBlock = true;
-  //   localPlayer.blockIndex = 1;
-  // } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.THREE)) {
-  //   didSwitchBlock = true;
-  //   localPlayer.blockIndex = 2;
-  // } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.FOUR)) {
-  //   didSwitchBlock = true;
-  //   localPlayer.blockIndex = 3;
-  // } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.FIVE)) {
-  //   didSwitchBlock = true;
-  //   localPlayer.blockIndex = 4;
-  // }
-  // if (didSwitchBlock) {
-  //   this.game.playClick();
-  // }
-  // if (mouseData.buttonsUp & gf.input.MouseButton.LEFT) {
-  //   var clickedIndex = this.hitTestBlockTypes_(mouseData);
-  //   if (goog.isDef(clickedIndex)) {
-  //     localPlayer.blockIndex = clickedIndex;
-  //     this.game.playClick();
-  //     return true;
-  //   }
-  // }
-
   // Always use the previous frames viewport for input processing
   // There's a very small chance it is incorrect (first frame rendered), but
   // by using the viewport that represents what the player clicked on it can
@@ -268,6 +226,9 @@ blk.game.fps.FpsClientController.prototype.processInput =
   if (localPlayer) {
     var camera = localPlayer.getCamera();
     camera.prepareFrame(viewport);
+
+    var inventory = localPlayer.getInventory();
+    inventory.processInput(frame, inputData);
 
     var controller = localPlayer.getController();
     if (!controller.processInput(frame, inputData, viewport)) {

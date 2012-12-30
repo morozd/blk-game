@@ -23,6 +23,7 @@ goog.provide('blk.sim.commands');
 goog.require('blk.sim.commands.PlayerMoveCommand');
 goog.require('blk.sim.commands.SetAspectRatioCommand');
 goog.require('blk.sim.commands.SetBlockCommand');
+goog.require('blk.sim.commands.SetHeldToolCommand');
 goog.require('gf.sim.CommandFactory');
 
 
@@ -48,4 +49,10 @@ blk.sim.commands.registerCommands = function(simulator) {
       blk.sim.commands.SetBlockCommand.ID,
       blk.sim.commands.SetBlockCommand,
       blk.sim.commands.SetBlockCommand.FLAGS));
+
+  // SET_HELD_TOOL
+  simulator.registerCommandFactory(new gf.sim.CommandFactory(
+      blk.sim.commands.SetHeldToolCommand.ID,
+      blk.sim.commands.SetHeldToolCommand,
+      blk.sim.commands.SetHeldToolCommand.FLAGS));
 };
