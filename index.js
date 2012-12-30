@@ -265,7 +265,11 @@ function saveUserName() {
   if (!value || !value.length) {
     value = 'User';
   }
-  document.cookie = 's_un=' + encodeURIComponent(value);
+  var maxAge = 60 * 60 * 24 * 30 * 12;
+  var futureDate = new Date(+(new Date()) + maxAge * 1000);
+  document.cookie =
+      's_un=' + encodeURIComponent(value) +
+      '; path=/; expires=' + futureDate.toUTCString() + ';';
 }
 
 
