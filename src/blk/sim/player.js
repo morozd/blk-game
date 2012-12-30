@@ -216,7 +216,11 @@ if (gf.SERVER) {
       map.blockSet.getBlockWithId(blk.env.blocks.BlockID.STONE),
       map.blockSet.getBlockWithId(blk.env.blocks.BlockID.BRICK),
       map.blockSet.getBlockWithId(blk.env.blocks.BlockID.WOOD),
-      map.blockSet.getBlockWithId(blk.env.blocks.BlockID.GLASS)
+      map.blockSet.getBlockWithId(blk.env.blocks.BlockID.GLASS),
+      map.blockSet.getBlockWithId(blk.env.blocks.BlockID.RED_CLOTH),
+      map.blockSet.getBlockWithId(blk.env.blocks.BlockID.GREEN_CLOTH),
+      map.blockSet.getBlockWithId(blk.env.blocks.BlockID.YELLOW_CLOTH),
+      map.blockSet.getBlockWithId(blk.env.blocks.BlockID.BLUE_CLOTH)
     ];
     for (var n = 0; n < blockTypes.length; n++) {
       var blockTool = /** @type {!blk.sim.tools.BlockTool} */ (

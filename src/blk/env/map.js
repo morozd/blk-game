@@ -20,11 +20,15 @@ goog.require('blk.env.BlockSet');
 goog.require('blk.env.Chunk');
 goog.require('blk.env.ChunkCache');
 goog.require('blk.env.Environment');
+goog.require('blk.env.blocks.BlueClothBlock');
 goog.require('blk.env.blocks.BrickBlock');
 goog.require('blk.env.blocks.DirtBlock');
 goog.require('blk.env.blocks.GlassBlock');
+goog.require('blk.env.blocks.GreenClothBlock');
+goog.require('blk.env.blocks.RedClothBlock');
 goog.require('blk.env.blocks.StoneBlock');
 goog.require('blk.env.blocks.WoodBlock');
+goog.require('blk.env.blocks.YellowClothBlock');
 goog.require('gf.log');
 goog.require('goog.Disposable');
 goog.require('goog.array');
@@ -51,6 +55,10 @@ blk.env.Map = function() {
   this.blockSet.registerBlock(new blk.env.blocks.BrickBlock());
   this.blockSet.registerBlock(new blk.env.blocks.WoodBlock());
   this.blockSet.registerBlock(new blk.env.blocks.GlassBlock());
+  this.blockSet.registerBlock(new blk.env.blocks.RedClothBlock());
+  this.blockSet.registerBlock(new blk.env.blocks.GreenClothBlock());
+  this.blockSet.registerBlock(new blk.env.blocks.YellowClothBlock());
+  this.blockSet.registerBlock(new blk.env.blocks.BlueClothBlock());
 
   /**
    * Environment.

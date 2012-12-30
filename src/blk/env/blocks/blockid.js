@@ -38,5 +38,17 @@ blk.env.blocks.BlockID = {
   WOOD: 4,
 
   /** blk.env.blocks.GlassBlock */
-  GLASS: 5
+  GLASS: 5,
+
+  /** blk.env.blocks.RedClothBlock */
+  RED_CLOTH: 6,
+
+  /** blk.env.blocks.GreenClothBlock */
+  GREEN_CLOTH: 7,
+
+  /** blk.env.blocks.YellowClothBlock */
+  YELLOW_CLOTH: 8,
+
+  /** blk.env.blocks.BlueClothBlock */
+  BLUE_CLOTH: 9
 };

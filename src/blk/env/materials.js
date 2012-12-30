@@ -60,3 +60,13 @@ blk.env.materials.glass = new blk.env.Material(
     blk.env.MaterialFlags.MERGE,
     'block_stone', undefined,
     goog.vec.Vec4.createFloat32FromValues(0, 0, 0, 0));
+
+
+/**
+ * Material used for cloth-like blocks.
+ * @type {!blk.env.Material}
+ */
+blk.env.materials.cloth = new blk.env.Material(
+    blk.env.MaterialFlags.SOLID | blk.env.MaterialFlags.OPAQUE,
+    'block_cloth', undefined,
+    goog.vec.Vec4.createFloat32FromValues(0, 0, 0, 0));
