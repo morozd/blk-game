@@ -15,24 +15,24 @@ SET SERVER_ID=""
 SET SERVER_KEY=""
 
 REM TCP port the server will be listening on
-SET PORT=1338
+SET LISTEN_PORT=1338
 REM Name for the server in the browser
 SET SERVER_NAME="Server #1"
 REM Maximum number of users allowed at any given time - limit based on CPU/RAM
-SET USERS=8
+SET USER_COUNT=8
 
 REM Path to store maps/temp data
 SET FILESYSTEM=fs\
 REM Map file
 SET MAP_PATH=maps\map01\
 
-node %DIR%\server\server.js ^
+node %DIR%\server\server-uncompiled.js ^
     --browserUrl=%BROWSER_URL% ^
     --serverId=%SERVER_ID% ^
     --serverKey=%SERVER_KEY% ^
-    --port=%PORT% ^
+    --listenPort=%LISTEN_PORT% ^
     --serverName=%SERVER_NAME% ^
-    --users=%USERS% ^
+    --userCount=%USER_COUNT% ^
     --filesystem=%FILESYSTEM% ^
     --map=%MAP_PATH% ^
     %*
