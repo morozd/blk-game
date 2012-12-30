@@ -35,7 +35,7 @@ echo ""
 cd ..
 if [ ! -d "blk-game-gh-pages" ]; then
   # Not found - create and clone
-  echo "Creating tracing-framework-gh-pages..."
+  echo "Creating blk-game-gh-pages..."
   git clone git@github.com:benvanik/blk-game.git blk-game-gh-pages
   cd blk-game-gh-pages
   git checkout gh-pages
