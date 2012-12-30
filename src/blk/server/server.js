@@ -18,6 +18,7 @@ goog.provide('blk.server.start');
 
 goog.require('blk.game.server.ServerGame');
 goog.require('blk.io.FileMapStore');
+goog.require('blk.io.IndexedDbMapStore');
 goog.require('blk.io.MemoryMapStore');
 goog.require('blk.net.packets');
 goog.require('blk.server.LaunchOptions');
@@ -92,20 +93,30 @@ blk.server.start = function(uri, args) {
   listenDeferred.addCallbacks(function(session) {
     // Setup map store
     var mapPath = launchOptions.mapPath;
-    var mapStore = new blk.io.FileMapStore(mapPath);
-    mapStore.setup().addCallbacks(
-        function() {
-          blk.server.launchServer_(launchOptions, session, mapStore, deferred);
-        },
-        function(arg) {
-          // Fallback to no storage
-          mapStore = new blk.io.MemoryMapStore();
-          mapStore.setup();
-          blk.server.launchServer_(launchOptions, session, mapStore, deferred);
-        });
+    var mapStores = [
+      blk.io.IndexedDbMapStore,
+      blk.io.FileMapStore,
+      blk.io.MemoryMapStore
+    ];
+    setupMapStore(mapPath, mapStores, function(mapStore) {
+      blk.server.launchServer_(launchOptions, session, mapStore, deferred);
+    });
   }, function(arg) {
     deferred.errback(arg);
   });
+
+  function setupMapStore(mapPath, mapStores, callback) {
+    var mapStoreType = mapStores.shift();
+    var mapStore = new mapStoreType(mapPath);
+    mapStore.setup().addCallbacks(
+        function() {
+          callback(mapStore);
+        },
+        function(arg) {
+          // Try the next store.
+          setupMapStore(mapPath, mapStores, callback);
+        });
+  };
 
   return deferred;
 };

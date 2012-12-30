@@ -660,6 +660,7 @@ blk.game.client.ClientGame.prototype.connectToHost = function(address) {
 };
 
 
+// TODO(benvanik): make a query arg
 /**
  * Shared workers are harder to debug than dedicated workers - disable when
  * developing.
@@ -681,31 +682,35 @@ blk.game.client.ClientGame.ENABLE_SHARED_WORKERS_ = true;
  */
 blk.game.client.ClientGame.prototype.connectToLocalHost_ =
     function(uri, authToken, userInfo, deferred) {
-  // Request quota
-  // TODO(benvanik): pull from somewhere?
-  var quotaSize = 4 * 1024 * 1024 * 1024;
-  gf.io.requestQuota(
-      gf.io.FileSystemType.PERSISTENT, quotaSize).addCallbacks(
-      function(grantedBytes) {
-        if (grantedBytes < quotaSize) {
-          deferred.errback(null);
-        } else {
-          this.launchLocalServer_(
-              uri,
-              authToken,
-              userInfo,
-              deferred);
-        }
-      },
-      function(arg) {
-        // TODO(benvanik): ask the user if they want to continue/etc
-        gf.log.write('unable to get quota - no saving!');
-        this.launchLocalServer_(
-            uri,
-            authToken,
-            userInfo,
-            deferred);
-      }, this);
+  // Request quota on Chrome.
+  if (goog.userAgent.product.CHROME) {
+    // TODO(benvanik): pull from somewhere?
+    var quotaSize = 4 * 1024 * 1024 * 1024;
+    gf.io.requestQuota(
+        gf.io.FileSystemType.PERSISTENT, quotaSize).addCallbacks(
+        function(grantedBytes) {
+          if (grantedBytes < quotaSize) {
+            deferred.errback(null);
+          } else {
+            launchServer.call(this);
+          }
+        },
+        function(arg) {
+          // TODO(benvanik): ask the user if they want to continue/etc
+          gf.log.write('unable to get quota - no saving!');
+          launchServer.call(this);
+        }, this);
+  } else {
+    launchServer.call(this);
+  }
+
+  function launchServer() {
+    this.launchLocalServer_(
+        uri,
+        authToken,
+        userInfo,
+        deferred);
+  };
 };
 
 

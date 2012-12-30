@@ -8,6 +8,7 @@ GF = 'third_party/games-framework'
 GSS_COMPILER_JAR=GF + ':closure_stylesheets_jar'
 SOY_COMPILER_JAR=GF + ':closure_templates_jar'
 JS_COMPILER_JAR=GF + ':closure_compiler_jar'
+CLOSURE_LINTER_PATH=GF + '/third_party/closure-linter/'
 GLSL_COMPILER_JS=GF + ':glsl_compiler_js'
 include_rules(glob(GF + '/anvil_rules/**/*_rules.py'))
 
@@ -211,7 +212,8 @@ file_set(
 closure_js_fixstyle(
     name='blk_js_fixstyle',
     namespaces=['goog', 'gf', 'blk',],
-    srcs=[':all_js'])
+    srcs=[':all_js'],
+    linter_path=CLOSURE_LINTER_PATH)
 
 closure_js_fixstyle(
     name='all_js_fixstyle',
@@ -219,17 +221,20 @@ closure_js_fixstyle(
     srcs=[
         GF + ':gf_js',
         ':all_js',
-        ])
+        ],
+    linter_path=CLOSURE_LINTER_PATH)
 
 closure_js_lint(
     name='blk_js_lint',
     namespaces=['goog', 'gf', 'blk',],
-    srcs=[':blk_js_fixstyle'])
+    srcs=[':blk_js_fixstyle'],
+    linter_path=CLOSURE_LINTER_PATH)
 
 closure_js_lint(
     name='all_js_lint',
     namespaces=['goog', 'gf', 'blk',],
-    srcs=[':all_js_fixstyle'])
+    srcs=[':all_js_fixstyle'],
+    linter_path=CLOSURE_LINTER_PATH)
 
 BLK_JS_SRCS=[
     GF + ':all_gf_js',

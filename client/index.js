@@ -15,12 +15,23 @@
  */
 
 
+var hasLocalSaving = false;
+
+
 function setupIndexPage() {
   setupSupportList();
   setupUserName();
 
   var localLink = document.getElementById('local-link');
-  localLink.href = GAME_URL + '?host=local://blk-server-0';
+  localLink.onclick = function(e) {
+    e.preventDefault();
+
+    if (!hasLocalSaving) {
+      alert('NOTE: your browser does not support the File System API or IndexedDB: your map will not be saved!');
+    }
+
+    connectToServer('local://blk-server-0');
+  };
 
   var joinLink = document.getElementById('server-connect-join');
   joinLink.onclick = function(e) {
@@ -43,6 +54,9 @@ function setupIndexPage() {
  * Generates a list of supported features and warnings.
  */
 function setupSupportList() {
+  var isChrome = window.navigator.userAgent.indexOf('Chrome') != -1;
+  var isFirefox = window.navigator.userAgent.indexOf('Firefox') != -1;
+
   function testWebGL() {
     var canvas = document.createElement('canvas');
     if (canvas) {
@@ -71,12 +85,24 @@ function setupSupportList() {
   function testFileSystem() {
     return !!window.webkitStorageInfo && !!window.webkitRequestFileSystem;
   }
+  function testIndexedDb() {
+    var indexedDB =
+        window.indexedDB ||
+        window.mozIndexedDB ||
+        window.webkitIndexedDB ||
+        window.msIndexedDB;
+    if (isFirefox) {
+      // Not supported in workers yet.
+      return false;
+    }
+    return !!indexedDB;
+  }
   function testWebWorker() {
     return !!window.Worker;
   }
   function testSharedWorker() {
     // Only supported in Chrome
-    if (window.navigator.userAgent.indexOf('Chrome') != -1) {
+    if (isChrome) {
       return !!window.SharedWorker;
     }
     return false;
@@ -150,10 +176,30 @@ function setupSupportList() {
       'SharedWorker', false,
       testSharedWorker,
       'no local multiplayer');
-  addStatusLine(ul,
-      'File System', false,
-      testFileSystem,
-      'no local saving');
+  if (testIndexedDb()) {
+    addStatusLine(ul,
+        'IndexedDB', false,
+        testIndexedDb,
+        'no local saving');
+    hasLocalSaving = true;
+  } else if (testFileSystem()) {
+    addStatusLine(ul,
+        'File System', false,
+        testFileSystem,
+        'no local saving');
+    hasLocalSaving = true;
+  } else if (isFirefox) {
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=701634
+    addStatusLine(ul,
+        'IndexedDB', false,
+        testIndexedDb,
+        'no local saving');
+  } else {
+    addStatusLine(ul,
+        'FileSystem/IndexedDB', false,
+        function() { return false; },
+        'no local saving');
+  }
   addStatusLine(ul,
       'Web Audio API', false,
       testWebAudio,
@@ -227,8 +273,18 @@ function saveUserName() {
  * Resets the local filesystem for the current domain, clearing the maps.
  */
 function resetLocalStorage() {
-  // TODO(benvanik): also clear indexeddb
+  // Clear IndexedDB.
+  var indexedDB =
+      window.indexedDB ||
+      window.mozIndexedDB ||
+      window.webkitIndexedDB ||
+      window.msIndexedDB;
+  if (indexedDB) {
+    // Always hardcoded.
+    indexedDB.deleteDatabase('/maps/map01/');
+  }
 
+  // Clear filesystem.
   function resetFS(fs) {
     var reader = fs.root.createReader();
     function removeMore(entries) {
@@ -248,8 +304,10 @@ function resetLocalStorage() {
   };
   var requestFileSystem =
       window.requestFileSystem || window.webkitRequestFileSystem;
-  requestFileSystem.call(
-      window, window.PERSISTENT, 1, resetFS);
+  if (requestFileSystem) {
+    requestFileSystem.call(
+        window, window.PERSISTENT, 1, resetFS);
+  }
 }
 
 
@@ -263,7 +321,9 @@ function updateServers() {
     if (xhr.readyState == 4) {
       if (xhr.status == 200) {
         // Succeeded
-        serverList.innerText = '';
+        while (serverList.firstChild) {
+          serverList.removeChild(serverList.firstChild);
+        }
         var table = document.createElement('table');
         var json = JSON.parse(xhr.responseText);
         if (DEV_MODE) {
