@@ -79,8 +79,7 @@ blk.server.start = function(uri, args) {
   var authToken = new gf.net.AuthToken();
   var serverInfo = new gf.net.ServerInfo();
   serverInfo.endpoint = endpointString;
-  // TODO(benvanik): give the server a name
-  serverInfo.name = 'Server';
+  serverInfo.name = launchOptions.serverName;
   serverInfo.gameType = goog.DEBUG ? 'blk-dev' : 'blk';
   serverInfo.gameVersion = '0.0.1';
   serverInfo.maximumUsers = launchOptions.userCount;
