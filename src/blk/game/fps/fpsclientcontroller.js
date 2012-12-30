@@ -175,6 +175,10 @@ blk.game.fps.FpsClientController.prototype.handlePlayersChanged =
 blk.game.fps.FpsClientController.prototype.update =
     function(frame) {
   goog.base(this, 'update', frame);
+
+  var viewport = this.playerViewport_;
+  var listener = this.game.getAudioManager().listener;
+  listener.update(viewport.inverseViewMatrix);
 };
 
 

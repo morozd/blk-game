@@ -750,12 +750,6 @@ blk.game.client.ClientController.prototype.userDisconnected =
  */
 blk.game.client.ClientController.prototype.userUpdated =
     function(user) {
-  // SIMDEPRECATED
-  var player = this.getPlayerBySessionId(user.sessionId);
-  // if (player && player.entity) {
-  //   player.entity.title = user.info.displayName;
-  // }
-
   this.handlePlayersChanged();
 };
 
@@ -811,48 +805,6 @@ blk.game.client.ClientController.prototype.handleReadyPlayer_ =
 
   return true;
 };
-
-
-// // SIMDEPRECATED
-// /**
-//  * Handles entity position packets.
-//  * @private
-//  * @param {!gf.net.Packet} packet Packet.
-//  * @param {number} packetType Packet type ID.
-//  * @param {!gf.net.PacketReader} reader Packet reader.
-//  * @return {boolean} True if the packet was handled successfully.
-//  */
-// blk.game.client.ClientController.prototype.handleEntityPosition_ =
-//     function(packet, packetType, reader) {
-//   var entityPosition = blk.net.packets.EntityPosition.read(reader);
-//   if (!entityPosition) {
-//     return false;
-//   }
-
-//   // Update local movement
-//   var localPlayer = this.getLocalPlayer();
-//   localPlayer.confirmMovementSequence(entityPosition.sequence);
-
-//   // Update entity positions
-//   var map = this.getMap();
-//   for (var n = 0; n < entityPosition.states.length; n++) {
-//     var entityState = entityPosition.states[n];
-//     entityState.time /= 1000;
-//     var entity = map.getEntity(entityState.entityId);
-//     if (entity) {
-//       if (entity.player == localPlayer) {
-//         // Update entity confirmed state
-//         entity.confirmedState.setFromState(entityState);
-//       } else {
-//         // Others
-//         // TODO(benvanik): lerp
-//         entity.updateState(entityState);
-//       }
-//     }
-//   }
-
-//   return true;
-// };
 
 
 /**
