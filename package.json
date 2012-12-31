@@ -1,6 +1,6 @@
 {
   "name": "blk-server",
-  "version": "2012.12.30-3",
+  "version": "2012.12.31-1",
   "description": "BLK game server.",
   "keywords": [
     "javascript",
