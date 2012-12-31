@@ -1,5 +1,22 @@
 # Setting up a server
 
+The engine is still very much in flux. I have no hope that servers
+will remain compatible or up to date, or that being an admin will
+be easy. There's no passwords or authentication yet, and no admin
+commands besides killing the server. It's really just for fun right
+now!
+
+Servers can run on their own in a direct connect mode or be
+registered in the server browser. It's easiest to get started with
+a server by running it and having your friends connect to your
+IP directly. You can either have them enter in the ws://[ip]:[port]
+in the main landing page connect box or link them directly to your
+server: `http://benvanik.github.com/blk-game/client/game.html?host=ws://[ip]:[port]`
+
+Getting listed in the index requires registration. In the future
+I may open it up if I add more admin commands that make
+running a public server something more interesting.
+
 ## Quickstart
 
 ### Requirements
