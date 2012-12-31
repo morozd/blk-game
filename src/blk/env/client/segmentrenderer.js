@@ -153,26 +153,16 @@ blk.env.client.SegmentRenderer = function(
   this.estimatedSize = 0;
 
   /**
-   * Whether the renderer is in the viewport.
-   * Updated infrequently and should not be trusted. Used by the build queue
-   * to prioritize.
-   * @type {boolean}
+   * Sort key used by the build queue. Don't use for anything else.
+   * @type {number}
    */
-  this.inViewport = false;
+  this.sortKey = 0;
 
   /**
    * The last frame number that the renderer was visible in the viewport.
    * @type {number}
    */
   this.lastFrameInViewport = 0;
-
-  /**
-   * Computed distance to the viewport.
-   * Updated infrequently and should not be trusted. Used by the build queue
-   * to prioritize.
-   * @type {number}
-   */
-  this.distanceToViewport = Number.MAX_VALUE;
 
   /**
    * Whether the chunk is queued for a build.

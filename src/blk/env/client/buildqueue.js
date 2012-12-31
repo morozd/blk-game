@@ -82,6 +82,17 @@ blk.env.client.BuildQueue = function() {
   this.loadList_ = [];
 
   /**
+   * Lists, in priority order.
+   * @type {!Array.<!Array.<!blk.env.client.SegmentRenderer>>}
+   * @private
+   */
+  this.lists_ = [
+    this.visibleList_,
+    this.updateList_,
+    this.loadList_
+  ];
+
+  /**
    * Total number of pending chunks.
    * @private
    * @type {number}
@@ -225,7 +236,7 @@ blk.env.client.BuildQueue.prototype.cancel = function(segmentRenderer) {
 
 
 /**
- * Sorts render chunks by distance to the viewport ascending, with special
+ * Sorts render chunks by distance to the viewport descending, with special
  * casing for chunks that are no longer in the viewport.
  * @private
  * @param {!blk.env.client.SegmentRenderer} a First chunk.
@@ -233,9 +244,7 @@ blk.env.client.BuildQueue.prototype.cancel = function(segmentRenderer) {
  * @return {number} Sort result.
  */
 blk.env.client.BuildQueue.visibleSort_ = function(a, b) {
-  var ad = (a.inViewport ? 0 : 1000) + a.distanceToViewport;
-  var bd = (b.inViewport ? 0 : 1000) + b.distanceToViewport;
-  return ad - bd;
+  return a.sortKey - b.sortKey;
 };
 
 
@@ -288,43 +297,20 @@ blk.env.client.BuildQueue.prototype.update = function(frame, viewport) {
     this.sortLists_ = false;
   }
 
-  while (segmentsRemaining && this.visibleList_.length) {
-    var elapsed = gf.now() - startTime;
-    if (elapsed > blk.env.client.BuildQueue.MAX_BUILD_TIME_PER_FRAME_) {
-      return totalSizeDelta;
+  for (var n = 0; n < this.lists_.length; n++) {
+    var list = this.lists_[n];
+    while (segmentsRemaining && list.length) {
+      var elapsed = gf.now() - startTime;
+      if (elapsed > blk.env.client.BuildQueue.MAX_BUILD_TIME_PER_FRAME_) {
+        return totalSizeDelta;
+      }
+
+      var segmentRenderer = list.shift();
+      totalSizeDelta += segmentRenderer.build();
+      segmentRenderer.queuedForBuild = false;
+      this.totalCount_--;
+      segmentsRemaining--;
     }
-
-    var segmentRenderer = this.visibleList_.shift();
-    totalSizeDelta += segmentRenderer.build();
-    segmentRenderer.queuedForBuild = false;
-    this.totalCount_--;
-    segmentsRemaining--;
-  }
-
-  while (segmentsRemaining && this.updateList_.length) {
-    var elapsed = gf.now() - startTime;
-    if (elapsed > blk.env.client.BuildQueue.MAX_BUILD_TIME_PER_FRAME_) {
-      return totalSizeDelta;
-    }
-
-    var segmentRenderer = this.updateList_.shift();
-    totalSizeDelta += segmentRenderer.build();
-    segmentRenderer.queuedForBuild = false;
-    this.totalCount_--;
-    segmentsRemaining--;
-  }
-
-  while (segmentsRemaining && this.loadList_.length) {
-    var elapsed = gf.now() - startTime;
-    if (elapsed > blk.env.client.BuildQueue.MAX_BUILD_TIME_PER_FRAME_) {
-      return totalSizeDelta;
-    }
-
-    var segmentRenderer = this.loadList_.shift();
-    totalSizeDelta += segmentRenderer.build();
-    segmentRenderer.queuedForBuild = false;
-    this.totalCount_--;
-    segmentsRemaining--;
   }
 
   return totalSizeDelta;
@@ -345,12 +331,16 @@ blk.env.client.BuildQueue.prototype.sortListByDistance_ =
 
   // Compute distances
   var frameNumber = frame.frameNumber;
+  var vp = viewport.position;
   for (var n = 0; n < list.length; n++) {
     var segmentRenderer = list[n];
-    segmentRenderer.distanceToViewport = goog.vec.Vec3.distance(
-        viewport.position, segmentRenderer.centerCoordinates);
-    segmentRenderer.inViewport =
-        segmentRenderer.lastFrameInViewport == frameNumber;
+    var sp = segmentRenderer.centerCoordinates;
+    var x = vp[0] - sp[0];
+    var y = vp[1] - sp[1];
+    var z = vp[2] - sp[2];
+    segmentRenderer =
+        (segmentRenderer.lastFrameInViewport == frameNumber) ? 0 : 10000 +
+        (x * x + y * y + z * z);
   }
 
   // Sort - split between those in viewport and those out
