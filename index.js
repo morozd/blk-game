@@ -50,6 +50,30 @@ function setupIndexPage() {
 };
 
 
+function testWebGL() {
+  var canvas = document.createElement('canvas');
+  if (canvas) {
+    var names = ['webgl', 'experimental-webgl'];
+    for (var n = 0; n < names.length; n++) {
+      var gl = canvas.getContext(names[n]);
+      if (gl) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+
+/**
+ * Gets a value indicating, roughly, whether the game is playable.
+ * @return {boolean} True if the game is (probably) playable.
+ */
+function isPlayable() {
+  return testWebGL();
+}
+
+
 /**
  * Generates a list of supported features and warnings.
  */
@@ -57,19 +81,6 @@ function setupSupportList() {
   var isChrome = window.navigator.userAgent.indexOf('Chrome') != -1;
   var isFirefox = window.navigator.userAgent.indexOf('Firefox') != -1;
 
-  function testWebGL() {
-    var canvas = document.createElement('canvas');
-    if (canvas) {
-      var names = ['webgl', 'experimental-webgl'];
-      for (var n = 0; n < names.length; n++) {
-        var gl = canvas.getContext(names[n]);
-        if (gl) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
   function testWebAudio() {
     return !!window.webkitAudioContext || !!window.AudioContext;
   }
@@ -393,6 +404,9 @@ function updateServers() {
  * @param {string} address Server IP.
  */
 function connectToServer(address) {
+  _gaq.push(['_trackEvent', 'index',
+      'connect_to_server', address]);
+
   var url = GAME_URL + '?host=' + address;
   window.open(url, '_blank');
 }
