@@ -107,7 +107,7 @@ blk.env.server.ChunkSendQueue.QUEUE_SORT_INTERVAL_ = 3;
  * @type {number}
  */
 blk.env.server.ChunkSendQueue.MAX_CHUNK_SENDS_ =
-    gf.NODE ? 4 : 20;
+    gf.NODE ? 2 : 20;
 
 
 // TODO(benvanik): make this dynamic somehow, perhaps by adjusting by RTT

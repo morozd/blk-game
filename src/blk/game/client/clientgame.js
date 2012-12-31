@@ -60,6 +60,7 @@ goog.require('wtfapi.trace');
  */
 blk.game.client.ClientGame = function(dom, launchOptions, settings) {
   goog.base(this, launchOptions);
+  this.fixedTimestep = false;
 
   /**
    * DOM helper.
