@@ -109,6 +109,15 @@ blk.env.Chunk = function(map, x, y, z) {
   this.blockData = new Uint16Array(blk.env.Chunk.TOTAL_BLOCKS);
 
   /**
+   * Serialized data of the chunk.
+   * This is a cache - the server will keep the serialized form here
+   * to send out to clients or write to disk.
+   * This should be cleared when the chunk is modified.
+   * @type {ArrayBuffer}
+   */
+  this.serializedData = null;
+
+  /**
    * Render data stash.
    * @type {Object}
    */
@@ -288,6 +297,7 @@ blk.env.Chunk.prototype.isDirty = function() {
 blk.env.Chunk.prototype.markDirty = function() {
   var wasDirty = this.dirty_;
   this.dirty_ = true;
+  this.serializedData = null;
   if (!wasDirty) {
     // Newly dirty
     this.map.addDirtyChunk(this);

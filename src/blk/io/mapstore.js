@@ -150,6 +150,7 @@ blk.io.MapStore.prototype.update = function(frame) {
         !error && data && entry.chunk &&
         this.chunkSerializer_.deserialize(entry.chunk, data);
     if (succeeded) {
+      entry.chunk.serializedData = data;
       entry.deferred.callback(null);
     } else {
       entry.deferred.errback(error);
@@ -285,7 +286,12 @@ blk.io.MapStore.prototype.writeChunk = function(chunk) {
       chunk.x, chunk.y, chunk.z);
   entry.version = chunk.version;
   // Snapshot the data right now in case it changes later
-  entry.data = this.chunkSerializer_.serialize(chunk);
+  if (chunk.serializedData) {
+    entry.data = chunk.serializedData;
+  } else {
+    entry.data = this.chunkSerializer_.serialize(chunk);
+    chunk.serializedData = entry.data;
+  }
   if (entry.data) {
     this.queueEntry_(entry);
   } else {
@@ -370,34 +376,9 @@ blk.io.MapStore.prototype.pump_ = function() {
   }
 
   // Sort, if needed.
-  if (this.needsSort_) {
+  if (!this.inProgress_ && this.needsSort_) {
     this.needsSort_ = false;
-
-    // TODO(benvanik): make this a million times more efficient
-    // Sort the head of the queue up until the first unprioritized entry
-    var sortEnd = this.queue_.length - 1;
-    for (var n = 0; n < this.queue_.length; n++) {
-      if (this.queue_[n].priority == Number.MAX_VALUE) {
-        sortEnd = n - 1;
-        break;
-      }
-    }
-    if (sortEnd) {
-      // Sort by priority
-      if (sortEnd == this.queue_.length - 1) {
-        // Sorting entire array
-        goog.array.sort(this.queue_,
-            blk.io.MapStore.QueueEntry.comparePriority);
-      } else {
-        // Sorting subregion
-        // TODO(benvanik): find a nice way to do a sub-region sort
-        var region = this.queue_.slice(0, sortEnd);
-        goog.array.sort(region, blk.io.MapStore.QueueEntry.comparePriority);
-        for (var n = 0; n < region.length; n++) {
-          this.queue_[n] = region[n];
-        }
-      }
-    }
+    this.resortQueue_();
   }
 
   // Don't remove items so that we keep blocking against them
@@ -406,6 +387,39 @@ blk.io.MapStore.prototype.pump_ = function() {
     var nextEntry = this.queue_[0];
     this.inProgress_++;
     this.processEntry(nextEntry);
+  }
+};
+
+
+/**
+ * Resorts the queue.
+ * @private
+ */
+blk.io.MapStore.prototype.resortQueue_ = function() {
+  // TODO(benvanik): make this a million times more efficient
+  // Sort the head of the queue up until the first unprioritized entry
+  var sortEnd = this.queue_.length - 1;
+  for (var n = 0; n < this.queue_.length; n++) {
+    if (this.queue_[n].priority == Number.MAX_VALUE) {
+      sortEnd = n - 1;
+      break;
+    }
+  }
+  if (sortEnd) {
+    // Sort by priority
+    if (sortEnd == this.queue_.length - 1) {
+      // Sorting entire array
+      goog.array.sort(this.queue_,
+          blk.io.MapStore.QueueEntry.comparePriority);
+    } else {
+      // Sorting subregion
+      // TODO(benvanik): find a nice way to do a sub-region sort
+      var region = this.queue_.slice(0, sortEnd);
+      goog.array.sort(region, blk.io.MapStore.QueueEntry.comparePriority);
+      for (var n = 0; n < region.length; n++) {
+        this.queue_[n] = region[n];
+      }
+    }
   }
 };
 
@@ -528,5 +542,6 @@ blk.io.MapStore.QueueEntry.comparePriority = function(a, b) {
 blk.io.MapStore = wtfapi.trace.instrumentType(
     blk.io.MapStore, 'blk.io.MapStore',
     goog.reflect.object(blk.io.MapStore, {
-      pump_: 'pump_'
+      pump_: 'pump_',
+      resortQueue_: 'resortQueue_'
     }));

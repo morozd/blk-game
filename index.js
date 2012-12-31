@@ -182,11 +182,11 @@ function setupSupportList() {
   addStatusLine(ul,
       'Web Workers', false,
       testWebWorker,
-      'no local play');
-  addStatusLine(ul,
-      'SharedWorker', false,
-      testSharedWorker,
-      'no local multiplayer');
+      'no singleplayer');
+  // addStatusLine(ul,
+  //     'SharedWorker', false,
+  //     testSharedWorker,
+  //     'no local multiplayer');
   if (testIndexedDb()) {
     addStatusLine(ul,
         'IndexedDB', false,

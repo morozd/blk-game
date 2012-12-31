@@ -677,7 +677,7 @@ blk.game.client.ClientGame.prototype.connectToHost = function(address) {
  * @const
  * @type {boolean}
  */
-blk.game.client.ClientGame.ENABLE_SHARED_WORKERS_ = true;
+blk.game.client.ClientGame.ENABLE_SHARED_WORKERS_ = false;
 
 
 /**

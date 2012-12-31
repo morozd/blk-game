@@ -174,10 +174,12 @@ blk.env.server.ChunkSendQueue.prototype.process = function(time, center) {
     packet.z = chunk.z;
     if (blk.net.packets.ChunkData.write(writer, packet)) {
       // Serialize chunk data
-      if (chunkSerializer.serializeToWriter(chunk, writer)) {
-        // Send to user
-        this.session_.send(writer.finish(), this.user_);
+      if (!chunk.serializedData) {
+        chunk.serializedData = chunkSerializer.serialize(chunk);
       }
+      writer.writeRawUint8Array(chunk.serializedData);
+      // Send to user
+      this.session_.send(writer.finish(), this.user_);
     }
 
     // Always drop (in case an error occurred above)
