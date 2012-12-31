@@ -94,6 +94,9 @@ blk.env.server.ServerMap.prototype.update = function(frame) {
 
   // Process dirty list
   this.processDirtyChunks_(frame);
+
+  // Tick the map store.
+  this.mapStore_.update(frame);
 };
 
 

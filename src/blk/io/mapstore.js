@@ -49,6 +49,19 @@ blk.io.MapStore = function() {
   this.queue_ = [];
 
   /**
+   * An ordered list of all queued actions, waiting to be postprocessed.
+   * All deserialization is performed in this queue. Once ready the items are
+   * called back.
+   * @private
+   * @type {!Array.<!{
+   *   entry: !blk.io.MapStore.QueueEntry,
+   *   error: Object,
+   *   data: ArrayBuffer
+   * }>}
+   */
+  this.postQueue_ = [];
+
+  /**
    * Whether the queue needs to be sorted by priority.
    * @private
    * @type {boolean}
@@ -102,6 +115,46 @@ blk.io.MapStore.prototype.pause = function() {
 blk.io.MapStore.prototype.resume = function() {
   this.paused_ = false;
   this.pump_();
+};
+
+
+/**
+ * Max time, per update, to spend processing the post queue.
+ * @const
+ * @type {number}
+ * @private
+ */
+blk.io.MapStore.MAX_POST_QUEUE_TIME_ = 8;
+
+
+/**
+ * Updates the map store.
+ * This is called frequently from the main loop.
+ * @param {!gf.UpdateFrame} frame Update frame.
+ */
+blk.io.MapStore.prototype.update = function(frame) {
+  this.pump_();
+
+  var startTime = gf.now();
+  while (this.postQueue_.length) {
+    var elapsed = gf.now() - startTime;
+    if (elapsed > blk.io.MapStore.MAX_POST_QUEUE_TIME_) {
+      break;
+    }
+
+    var postItem = this.postQueue_.shift();
+    var entry = postItem.entry;
+    var error = postItem.error;
+    var data = postItem.data;
+    var succeeded =
+        !error && data && entry.chunk &&
+        this.chunkSerializer_.deserialize(entry.chunk, data);
+    if (succeeded) {
+      entry.deferred.callback(null);
+    } else {
+      entry.deferred.errback(error);
+    }
+  }
 };
 
 
@@ -210,14 +263,11 @@ blk.io.MapStore.prototype.readChunk = function(chunk, priority) {
 blk.io.MapStore.prototype.finishReadChunk = function(entry, error, data) {
   this.completeEntry_(entry);
 
-  var succeeded =
-      !error && data && entry.chunk &&
-      this.chunkSerializer_.deserialize(entry.chunk, data);
-  if (succeeded) {
-    entry.deferred.callback(null);
-  } else {
-    entry.deferred.errback(error);
-  }
+  this.postQueue_.push({
+    entry: entry,
+    error: error,
+    data: data
+  });
 };
 
 
@@ -315,39 +365,44 @@ blk.io.MapStore.prototype.queueEntry_ = function(entry) {
  * @private
  */
 blk.io.MapStore.prototype.pump_ = function() {
-  // Don't remove items so that we keep blocking against them
-  // They will be removed on completion
-  if (!this.inProgress_ && this.queue_.length) {
-    if (this.needsSort_) {
-      this.needsSort_ = false;
+  if (this.paused_) {
+    return;
+  }
 
-      // TODO(benvanik): make this a million times more efficient
-      // Sort the head of the queue up until the first unprioritized entry
-      var sortEnd = this.queue_.length - 1;
-      for (var n = 0; n < this.queue_.length; n++) {
-        if (this.queue_[n].priority == Number.MAX_VALUE) {
-          sortEnd = n - 1;
-          break;
-        }
+  // Sort, if needed.
+  if (this.needsSort_) {
+    this.needsSort_ = false;
+
+    // TODO(benvanik): make this a million times more efficient
+    // Sort the head of the queue up until the first unprioritized entry
+    var sortEnd = this.queue_.length - 1;
+    for (var n = 0; n < this.queue_.length; n++) {
+      if (this.queue_[n].priority == Number.MAX_VALUE) {
+        sortEnd = n - 1;
+        break;
       }
-      if (sortEnd) {
-        // Sort by priority
-        if (sortEnd == this.queue_.length - 1) {
-          // Sorting entire array
-          goog.array.sort(this.queue_,
-              blk.io.MapStore.QueueEntry.comparePriority);
-        } else {
-          // Sorting subregion
-          // TODO(benvanik): find a nice way to do a sub-region sort
-          var region = this.queue_.slice(0, sortEnd);
-          goog.array.sort(region, blk.io.MapStore.QueueEntry.comparePriority);
-          for (var n = 0; n < region.length; n++) {
-            this.queue_[n] = region[n];
-          }
+    }
+    if (sortEnd) {
+      // Sort by priority
+      if (sortEnd == this.queue_.length - 1) {
+        // Sorting entire array
+        goog.array.sort(this.queue_,
+            blk.io.MapStore.QueueEntry.comparePriority);
+      } else {
+        // Sorting subregion
+        // TODO(benvanik): find a nice way to do a sub-region sort
+        var region = this.queue_.slice(0, sortEnd);
+        goog.array.sort(region, blk.io.MapStore.QueueEntry.comparePriority);
+        for (var n = 0; n < region.length; n++) {
+          this.queue_[n] = region[n];
         }
       }
     }
+  }
 
+  // Don't remove items so that we keep blocking against them
+  // They will be removed on completion
+  while (this.inProgress_ < 1 && this.queue_.length) {
     var nextEntry = this.queue_[0];
     this.inProgress_++;
     this.processEntry(nextEntry);
@@ -374,9 +429,7 @@ blk.io.MapStore.prototype.completeEntry_ = function(entry) {
   goog.array.remove(this.queue_, entry);
 
   // Pump the queue
-  if (!this.paused_) {
-    this.pump_();
-  }
+  this.pump_();
 };
 
 
