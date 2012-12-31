@@ -28,6 +28,8 @@ goog.require('gf');
 goog.require('gf.net.PacketWriter');
 goog.require('goog.Disposable');
 goog.require('goog.array');
+goog.require('goog.reflect');
+goog.require('wtfapi.trace');
 
 
 
@@ -104,7 +106,8 @@ blk.env.server.ChunkSendQueue.QUEUE_SORT_INTERVAL_ = 3;
  * @const
  * @type {number}
  */
-blk.env.server.ChunkSendQueue.MAX_CHUNK_SENDS_ = 1;
+blk.env.server.ChunkSendQueue.MAX_CHUNK_SENDS_ =
+    gf.NODE ? 4 : 20;
 
 
 // TODO(benvanik): make this dynamic somehow, perhaps by adjusting by RTT
@@ -141,6 +144,8 @@ blk.env.server.ChunkSendQueue.prototype.enqueue = function(chunk) {
 blk.env.server.ChunkSendQueue.prototype.process = function(time, center) {
   var sendCount = Math.min(blk.env.server.ChunkSendQueue.MAX_CHUNK_SENDS_,
       this.sendQueue_.length);
+
+  wtfapi.trace.appendScopeData('count', this.sendQueue_.length);
 
   // Re-sort the send list
   if (time - this.lastSortTime_ >
@@ -224,3 +229,10 @@ blk.env.server.ChunkSendQueue.prototype.invalidateBlock = goog.nullFunction;
  */
 blk.env.server.ChunkSendQueue.prototype.invalidateBlockRegion =
     goog.nullFunction;
+
+
+blk.env.server.ChunkSendQueue = wtfapi.trace.instrumentType(
+    blk.env.server.ChunkSendQueue, 'blk.env.server.ChunkSendQueue',
+    goog.reflect.object(blk.env.server.ChunkSendQueue, {
+      process: 'process'
+    }));

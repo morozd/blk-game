@@ -18,6 +18,7 @@ goog.provide('blk.io.MapStore');
 
 goog.require('blk.env.MapInfo');
 goog.require('blk.io.ChunkSerializer');
+goog.require('gf');
 goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.asserts');
@@ -542,6 +543,7 @@ blk.io.MapStore.QueueEntry.comparePriority = function(a, b) {
 blk.io.MapStore = wtfapi.trace.instrumentType(
     blk.io.MapStore, 'blk.io.MapStore',
     goog.reflect.object(blk.io.MapStore, {
+      update: 'update',
       pump_: 'pump_',
       resortQueue_: 'resortQueue_'
     }));

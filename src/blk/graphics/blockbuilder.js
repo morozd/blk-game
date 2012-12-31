@@ -462,6 +462,6 @@ blk.graphics.BlockBuilder = wtfapi.trace.instrumentType(
     goog.reflect.object(blk.graphics.BlockBuilder, {
       createIndexBuffer: 'createIndexBuffer',
       expand_: 'expand_',
-      finish: 'finish',
-      draw: 'draw'
+      finish: 'finish'
+      //draw: 'draw'
     }));

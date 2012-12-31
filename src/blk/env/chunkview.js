@@ -850,7 +850,6 @@ blk.env.ChunkView = wtfapi.trace.instrumentType(
       rebuildCube_: 'rebuildCube_',
       pullChunks_: 'pullChunks_',
       forEachChunk: 'forEachChunk',
-      forEachInViewport: 'forEachInViewport',
-      forEachInBoundingBox: 'forEachInBoundingBox'
+      forEachInViewport: 'forEachInViewport'
     }));
 
