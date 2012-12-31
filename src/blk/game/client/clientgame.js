@@ -333,10 +333,14 @@ blk.game.client.ClientGame.prototype.setupSucceeded_ = function() {
   // Start ticking the game
   this.startTicking();
 
+  _gaq.push(['_trackEvent', 'game', 'setup_succeeded']);
+
   // Determine if we are launching directly into a game or if we should drop to
   // the main menu
   if (this.launchOptions.host) {
     // Connect to host
+    _gaq.push(['_trackEvent',
+        'game', 'connect_to_host', this.launchOptions.host]);
     this.connectToHost(this.launchOptions.host);
   } else {
     // Main menu
@@ -352,6 +356,8 @@ blk.game.client.ClientGame.prototype.setupSucceeded_ = function() {
  * @param {*} arg Deferred callback error argument.
  */
 blk.game.client.ClientGame.prototype.setupFailed_ = function(message, arg) {
+  _gaq.push(['_trackEvent', 'game', 'setup_fail', message]);
+
   // Clear all screens (should be just the splash)
   this.screenManager_.popAllScreens();
 
