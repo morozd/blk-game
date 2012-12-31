@@ -53,7 +53,7 @@ COMMON_CLIENT_STATIC_FILES=[
     'index.html',
     'index.css',
     'index.js',
-    ]
+    ] + glob('assets/index/**/*')
 
 copy_files(
     name='blk_client_static_uncompiled',
