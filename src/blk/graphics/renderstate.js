@@ -33,8 +33,10 @@ goog.require('gf.graphics.Resource');
 goog.require('gf.graphics.SpriteBuffer');
 goog.require('goog.asserts');
 goog.require('goog.async.DeferredList');
+goog.require('goog.reflect');
 goog.require('goog.vec.Vec3');
 goog.require('goog.webgl');
+goog.require('wtfapi.trace');
 
 
 
@@ -747,3 +749,15 @@ blk.graphics.RenderState.LightingInfo.prototype.setModelUniforms =
       this.fogColor[1],
       this.fogColor[2]);
 };
+
+
+blk.graphics.RenderState = wtfapi.trace.instrumentType(
+    blk.graphics.RenderState, 'blk.graphics.RenderState',
+    goog.reflect.object(blk.graphics.RenderState, {
+      reset: 'reset',
+      beginChunkPass1: 'beginChunkPass1',
+      beginChunkPass2: 'beginChunkPass2',
+      beginModels: 'beginModels',
+      beginLines: 'beginLines',
+      beginSprites: 'beginSprites'
+    }));

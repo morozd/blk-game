@@ -48,6 +48,8 @@ goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.asserts');
 goog.require('goog.async.Deferred');
+goog.require('goog.reflect');
+goog.require('wtfapi.trace');
 
 
 
@@ -502,6 +504,22 @@ blk.game.client.ClientController.prototype.render = function(frame) {
   this.simulator_.interpolateEntities(frame.time);
 
   // Render the game
+  this.renderFrame_(frame);
+
+  // Restore time
+  frame.time = originalFrameTime;
+
+  // Reset input data cache
+  this.inputData_.reset();
+};
+
+
+/**
+ * Renders a frame.
+ * @param {!gf.RenderFrame} frame Current render frame.
+ * @private
+ */
+blk.game.client.ClientController.prototype.renderFrame_ = function(frame) {
   var graphicsContext = this.game.getGraphicsContext();
   if (graphicsContext.begin()) {
     // Draw the frame
@@ -512,12 +530,6 @@ blk.game.client.ClientController.prototype.render = function(frame) {
 
     graphicsContext.end();
   }
-
-  // Restore time
-  frame.time = originalFrameTime;
-
-  // Reset input data cache
-  this.inputData_.reset();
 };
 
 
@@ -817,3 +829,17 @@ blk.game.client.ClientController.prototype.connected = goog.nullFunction;
  * @override
  */
 blk.game.client.ClientController.prototype.disconnected = goog.nullFunction;
+
+
+blk.game.client.ClientController = wtfapi.trace.instrumentType(
+    blk.game.client.ClientController, 'blk.game.client.ClientController',
+    goog.reflect.object(blk.game.client.ClientController, {
+      update: 'update',
+      render: 'render',
+      renderFrame_: 'renderFrame_',
+      drawOverlays: 'drawOverlays',
+      entityAdded: 'entityAdded',
+      entityRemoved: 'entityRemoved',
+      handleChunkData_: 'handleChunkData_',
+      handleReadyPlayer_: 'handleReadyPlayer_'
+    }));

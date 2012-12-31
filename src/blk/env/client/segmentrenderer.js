@@ -22,9 +22,12 @@ goog.require('blk.env.UpdatePriority');
 goog.require('blk.graphics.LineBuffer');
 goog.require('gf.graphics.Resource');
 goog.require('gf.vec.BoundingBox');
+goog.require('goog.reflect');
 goog.require('goog.vec.Mat4');
 goog.require('goog.vec.Vec3');
 goog.require('goog.vec.Vec4');
+goog.require('wtfapi.trace');
+goog.require('wtfapi.trace.events');
 
 
 
@@ -290,6 +293,12 @@ blk.env.client.SegmentRenderer.prototype.invalidate = function() {
 };
 
 
+blk.env.client.SegmentRenderer.build0_ = wtfapi.trace.events.createScope(
+    'blk.env.client.SegmentRenderer#build:fast');
+blk.env.client.SegmentRenderer.build1_ = wtfapi.trace.events.createScope(
+    'blk.env.client.SegmentRenderer#build:slow');
+
+
 /**
  * Rebuilds the chunk geometry.
  * @return {number} Size delta (e.g., +5 = new size is 5b larger than before).
@@ -303,6 +312,7 @@ blk.env.client.SegmentRenderer.prototype.build = function() {
   var texCoords = blk.env.client.SegmentRenderer.tmpVec4_;
   var neighbors = blk.env.client.SegmentRenderer.tmpFaces_;
 
+  var scope = blk.env.client.SegmentRenderer.build0_();
   // Optimized path for interior blocks (that are known not to be affected
   // by other chunks)
   // This reduces the complexity and massively speeds things up
@@ -315,39 +325,42 @@ blk.env.client.SegmentRenderer.prototype.build = function() {
       for (var bx = 1; bx < blk.env.client.SegmentRenderer.SIZE - 1; bx++) {
         var bo = bx + bz * blk.env.Chunk.STRIDE_Z + by * blk.env.Chunk.STRIDE_Y;
         var data = blockData[bo];
-        if (data >> 8) {
-          neighbors[0] = blockData[bo + blk.env.Chunk.STRIDE_Z] >> 8;
-          neighbors[1] = blockData[bo - blk.env.Chunk.STRIDE_Z] >> 8;
-          neighbors[2] = (by >= blk.env.Chunk.SIZE_Y - 1) ?
-              0 : blockData[bo + blk.env.Chunk.STRIDE_Y] >> 8;
-          neighbors[3] = (by <= 0 ?
-              data : blockData[bo - blk.env.Chunk.STRIDE_Y]) >> 8;
-          neighbors[4] = blockData[bo + 1] >> 8;
-          neighbors[5] = blockData[bo - 1] >> 8;
-          var block = blockSet.getBlockWithId(data >> 8);
-          for (var n = 0; n < 6; n++) {
-            if (!neighbors[n] ||
-                (neighbors[n] != data >> 8 &&
-                    (blockSet.getBlockWithId(neighbors[n]).material.flags &
-                        blk.env.MaterialFlags.MERGE))) {
-              var slot = block.getFaceSlot(
-                  bx, by, bz,
-                  /** @type {blk.env.Face} */ (n),
-                  (data >> 16) & 0xFF,
-                  data & 0xFFFF);
-              // TODO(benvanik): more efficient texCoord lookup
-              blockAtlas.getSlotCoords(slot, texCoords);
-              this.blockBuilder_.addFace(
-                  /** @type {blk.env.Face} */ (n),
-                  bx, by - this.by, bz,
-                  texCoords);
-            }
+        if (!(data >> 8)) {
+          continue;
+        }
+        neighbors[0] = blockData[bo + blk.env.Chunk.STRIDE_Z] >> 8;
+        neighbors[1] = blockData[bo - blk.env.Chunk.STRIDE_Z] >> 8;
+        neighbors[2] = (by >= blk.env.Chunk.SIZE_Y - 1) ?
+            0 : blockData[bo + blk.env.Chunk.STRIDE_Y] >> 8;
+        neighbors[3] = (by <= 0 ?
+            data : blockData[bo - blk.env.Chunk.STRIDE_Y]) >> 8;
+        neighbors[4] = blockData[bo + 1] >> 8;
+        neighbors[5] = blockData[bo - 1] >> 8;
+        var block = blockSet.getBlockWithId(data >> 8);
+        for (var n = 0; n < 6; n++) {
+          if (!neighbors[n] ||
+              (neighbors[n] != data >> 8 &&
+                  (blockSet.getBlockWithId(neighbors[n]).material.flags &
+                      blk.env.MaterialFlags.MERGE))) {
+            var slot = block.getFaceSlot(
+                bx, by, bz,
+                /** @type {blk.env.Face} */ (n),
+                (data >> 16) & 0xFF,
+                data & 0xFFFF);
+            // TODO(benvanik): more efficient texCoord lookup
+            blockAtlas.getSlotCoords(slot, texCoords);
+            this.blockBuilder_.addFace(
+                /** @type {blk.env.Face} */ (n),
+                bx, by - this.by, bz,
+                texCoords);
           }
         }
       }
     }
   }
+  wtfapi.trace.leaveScope(scope);
 
+  scope = blk.env.client.SegmentRenderer.build1_();
   /** @type {!Array.<blk.env.Chunk>} */
   var neighborChunks = new Array(4);
   neighborChunks[0] = this.viewRenderer.view.getChunk(
@@ -383,6 +396,7 @@ blk.env.client.SegmentRenderer.prototype.build = function() {
   for (bx = 1; bx < blk.env.client.SegmentRenderer.SIZE; bx++) {
     this.addFaces_(bx, bymin, bymax, bz, neighborChunks);
   }
+  wtfapi.trace.leaveScope(scope);
 
   // Finish the build
   var gl = this.graphicsContext.gl;
@@ -568,3 +582,10 @@ blk.env.client.SegmentRenderer.tmpVec4_ = goog.vec.Vec4.createFloat32();
  * @type {!Uint16Array}
  */
 blk.env.client.SegmentRenderer.tmpFaces_ = new Uint16Array(6);
+
+
+blk.env.client.SegmentRenderer = wtfapi.trace.instrumentType(
+    blk.env.client.SegmentRenderer, 'blk.env.client.SegmentRenderer',
+    goog.reflect.object(blk.env.client.SegmentRenderer, {
+      build: 'build'
+    }));

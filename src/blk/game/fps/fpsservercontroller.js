@@ -25,6 +25,8 @@ goog.require('blk.sim');
 goog.require('blk.sim.Player');
 goog.require('blk.sim.World');
 goog.require('goog.asserts');
+goog.require('goog.reflect');
+goog.require('wtfapi.trace');
 
 
 
@@ -115,3 +117,11 @@ blk.game.fps.FpsServerController.prototype.deletePlayer =
   // TODO(benvanik): make hotkey
   blk.sim.getRoot(player).dumpInfo(0);
 };
+
+
+blk.game.fps.FpsServerController = wtfapi.trace.instrumentType(
+    blk.game.fps.FpsServerController, 'blk.game.fps.FpsServerController',
+    goog.reflect.object(blk.game.fps.FpsServerController, {
+      setupSimulation: 'setupSimulation',
+      createPlayer: 'createPlayer'
+    }));

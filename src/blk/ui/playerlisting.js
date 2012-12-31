@@ -20,9 +20,11 @@ goog.require('blk.ui.Widget');
 goog.require('blk.ui.playerlisting');
 goog.require('goog.array');
 goog.require('goog.dom');
+goog.require('goog.reflect');
 goog.require('goog.soy');
 goog.require('goog.string');
 goog.require('goog.style');
+goog.require('wtfapi.trace');
 
 
 
@@ -116,3 +118,10 @@ blk.ui.PlayerListing.prototype.refresh = function() {
     goog.dom.appendChild(this.bodyEl_, playerEl);
   }
 };
+
+
+blk.ui.PlayerListing = wtfapi.trace.instrumentType(
+    blk.ui.PlayerListing, 'blk.ui.PlayerListing',
+    goog.reflect.object(blk.ui.PlayerListing, {
+      refresh: 'refresh'
+    }));

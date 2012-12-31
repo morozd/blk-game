@@ -20,7 +20,9 @@ goog.require('blk.env.UpdatePriority');
 goog.require('gf');
 goog.require('goog.Disposable');
 goog.require('goog.array');
+goog.require('goog.reflect');
 goog.require('goog.vec.Vec3');
+goog.require('wtfapi.trace');
 
 
 
@@ -287,8 +289,8 @@ blk.env.client.BuildQueue.prototype.update = function(frame, viewport) {
   }
 
   while (segmentsRemaining && this.visibleList_.length) {
-    if (gf.now() - startTime >
-        blk.env.client.BuildQueue.MAX_BUILD_TIME_PER_FRAME_) {
+    var elapsed = gf.now() - startTime;
+    if (elapsed > blk.env.client.BuildQueue.MAX_BUILD_TIME_PER_FRAME_) {
       return totalSizeDelta;
     }
 
@@ -300,8 +302,8 @@ blk.env.client.BuildQueue.prototype.update = function(frame, viewport) {
   }
 
   while (segmentsRemaining && this.updateList_.length) {
-    if (gf.now() - startTime >
-        blk.env.client.BuildQueue.MAX_BUILD_TIME_PER_FRAME_) {
+    var elapsed = gf.now() - startTime;
+    if (elapsed > blk.env.client.BuildQueue.MAX_BUILD_TIME_PER_FRAME_) {
       return totalSizeDelta;
     }
 
@@ -313,8 +315,8 @@ blk.env.client.BuildQueue.prototype.update = function(frame, viewport) {
   }
 
   while (segmentsRemaining && this.loadList_.length) {
-    if (gf.now() - startTime >
-        blk.env.client.BuildQueue.MAX_BUILD_TIME_PER_FRAME_) {
+    var elapsed = gf.now() - startTime;
+    if (elapsed > blk.env.client.BuildQueue.MAX_BUILD_TIME_PER_FRAME_) {
       return totalSizeDelta;
     }
 
@@ -339,6 +341,7 @@ blk.env.client.BuildQueue.prototype.update = function(frame, viewport) {
 blk.env.client.BuildQueue.prototype.sortListByDistance_ =
     function(frame, viewport, list) {
   // TODO(benvanik): more efficient sort
+  wtfapi.trace.appendScopeData('length', list.length);
 
   // Compute distances
   var frameNumber = frame.frameNumber;
@@ -353,3 +356,11 @@ blk.env.client.BuildQueue.prototype.sortListByDistance_ =
   // Sort - split between those in viewport and those out
   goog.array.sort(list, blk.env.client.BuildQueue.visibleSort_);
 };
+
+
+blk.env.client.BuildQueue = wtfapi.trace.instrumentType(
+    blk.env.client.BuildQueue, 'blk.env.client.BuildQueue',
+    goog.reflect.object(blk.env.client.BuildQueue, {
+      update: 'update',
+      sortListByDistance_: 'sortListByDistance_'
+    }));

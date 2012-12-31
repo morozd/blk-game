@@ -23,6 +23,8 @@ goog.require('gf');
 goog.require('gf.net.PacketReader');
 goog.require('gf.net.PacketWriter');
 goog.require('goog.asserts');
+goog.require('goog.reflect');
+goog.require('wtfapi.trace');
 
 
 
@@ -230,3 +232,11 @@ blk.io.ChunkSerializer.getSharedSerializer = function() {
   }
   return blk.io.ChunkSerializer.sharedSerializer_;
 };
+
+
+blk.io.ChunkSerializer = wtfapi.trace.instrumentType(
+    blk.io.ChunkSerializer, 'blk.io.ChunkSerializer',
+    goog.reflect.object(blk.io.ChunkSerializer, {
+      serializeToWriter: 'serializeToWriter',
+      deserializeFromReader: 'deserializeFromReader'
+    }));

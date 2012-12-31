@@ -27,6 +27,8 @@ goog.require('gf.vec.Containment');
 goog.require('goog.Disposable');
 goog.require('goog.asserts');
 goog.require('goog.async.Deferred');
+goog.require('goog.reflect');
+goog.require('wtfapi.trace');
 
 
 /**
@@ -487,22 +489,48 @@ blk.env.client.ViewRenderer.prototype.render = function(frame, viewport) {
   // Draw map chunks (pass 1)
   // Note that we clear the segment list so that we don't retain them forever
   if (this.lastVisibleSegmentPass1Count_) {
-    renderState.beginChunkPass1();
-    for (var n = 0; n < this.lastVisibleSegmentPass1Count_; n++) {
-      var segment = this.visibleSegmentsPass1_[n];
-      segment.render(frame, viewport);
-      this.visibleSegmentsPass1_[n] = null;
-    }
+    this.drawChunkPass1_(frame, viewport, renderState);
   }
 
   // Draw map chunks (pass 2)
   if (this.lastVisibleSegmentPass2Count_) {
-    renderState.beginChunkPass2();
-    for (var n = 0; n < this.lastVisibleSegmentPass2Count_; n++) {
-      var segment = this.visibleSegmentsPass2_[n];
-      segment.render(frame, viewport);
-      this.visibleSegmentsPass2_[n] = null;
-    }
+    this.drawChunkPass2_(frame, viewport, renderState);
+  }
+};
+
+
+/**
+ * Draws chunk pass 1.
+ * @param {!gf.RenderFrame} frame Render frame.
+ * @param {!gf.vec.Viewport} viewport Current viewport.
+ * @param {!blk.graphics.RenderState} renderState Render state.
+ * @private
+ */
+blk.env.client.ViewRenderer.prototype.drawChunkPass1_ = function(
+    frame, viewport, renderState) {
+  renderState.beginChunkPass1();
+  for (var n = 0; n < this.lastVisibleSegmentPass1Count_; n++) {
+    var segment = this.visibleSegmentsPass1_[n];
+    segment.render(frame, viewport);
+    this.visibleSegmentsPass1_[n] = null;
+  }
+};
+
+
+/**
+ * Draws chunk pass 2.
+ * @param {!gf.RenderFrame} frame Render frame.
+ * @param {!gf.vec.Viewport} viewport Current viewport.
+ * @param {!blk.graphics.RenderState} renderState Render state.
+ * @private
+ */
+blk.env.client.ViewRenderer.prototype.drawChunkPass2_ = function(
+    frame, viewport, renderState) {
+  renderState.beginChunkPass2();
+  for (var n = 0; n < this.lastVisibleSegmentPass2Count_; n++) {
+    var segment = this.visibleSegmentsPass2_[n];
+    segment.render(frame, viewport);
+    this.visibleSegmentsPass2_[n] = null;
   }
 };
 
@@ -547,3 +575,17 @@ blk.env.client.ViewRenderer.prototype.handleVisibleChunk_ = function(chunk) {
     }
   }
 };
+
+
+blk.env.client.ViewRenderer = wtfapi.trace.instrumentType(
+    blk.env.client.ViewRenderer, 'blk.env.client.ViewRenderer',
+    goog.reflect.object(blk.env.client.ViewRenderer, {
+      ensureChunkRenderData_: 'ensureChunkRenderData_',
+      invalidateBlock: 'invalidateBlock',
+      invalidateBlockRegion: 'invalidateBlockRegion',
+      invalidateSegment: 'invalidateSegment',
+      buildChunks_: 'buildChunks_',
+      render: 'render',
+      drawChunkPass1_: 'drawChunkPass1_',
+      drawChunkPass2_: 'drawChunkPass2_'
+    }));

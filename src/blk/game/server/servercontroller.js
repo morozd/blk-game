@@ -38,6 +38,8 @@ goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.asserts');
 goog.require('goog.async.Deferred');
+goog.require('goog.reflect');
+goog.require('wtfapi.trace');
 
 
 
@@ -396,3 +398,12 @@ blk.game.server.ServerController.prototype.connected = goog.nullFunction;
  * @override
  */
 blk.game.server.ServerController.prototype.disconnected = goog.nullFunction;
+
+
+blk.game.server.ServerController = wtfapi.trace.instrumentType(
+    blk.game.server.ServerController, 'blk.game.server.ServerController',
+    goog.reflect.object(blk.game.server.ServerController, {
+      load: 'load',
+      update: 'update',
+      render: 'render'
+    }));

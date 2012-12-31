@@ -42,7 +42,9 @@ goog.require('gf.ui.ScreenManager');
 goog.require('goog.Uri');
 goog.require('goog.asserts');
 goog.require('goog.async.Deferred');
+goog.require('goog.reflect');
 goog.require('goog.userAgent.product');
+goog.require('wtfapi.trace');
 
 
 
@@ -340,7 +342,7 @@ blk.game.client.ClientGame.prototype.setupSucceeded_ = function() {
   if (this.launchOptions.host) {
     // Connect to host
     _gaq.push(['_trackEvent',
-        'game', 'connect_to_host', this.launchOptions.host]);
+      'game', 'connect_to_host', this.launchOptions.host]);
     this.connectToHost(this.launchOptions.host);
   } else {
     // Main menu
@@ -864,3 +866,13 @@ blk.game.client.ClientGame.prototype.getGameScreen_ = function() {
   });
   return gameScreen;
 };
+
+
+blk.game.client.ClientGame = wtfapi.trace.instrumentType(
+    blk.game.client.ClientGame, 'blk.game.client.ClientGame',
+    goog.reflect.object(blk.game.client.ClientGame, {
+      connectToHost: 'connectToHost',
+      connectToLocalHost_: 'connectToLocalHost_',
+      launchLocalServer_: 'launchLocalServer_',
+      connectToRemoteHost_: 'connectToRemoteHost_'
+    }));

@@ -212,13 +212,13 @@ file_set(
 
 closure_js_fixstyle(
     name='blk_js_fixstyle',
-    namespaces=['goog', 'gf', 'blk',],
+    namespaces=['goog', 'gf', 'blk', 'wtfapi',],
     srcs=[':all_js'],
     linter_path=CLOSURE_LINTER_PATH)
 
 closure_js_fixstyle(
     name='all_js_fixstyle',
-    namespaces=['goog', 'gf', 'blk',],
+    namespaces=['goog', 'gf', 'blk', 'wtfapi',],
     srcs=[
         GF + ':gf_js',
         ':all_js',
@@ -227,13 +227,13 @@ closure_js_fixstyle(
 
 closure_js_lint(
     name='blk_js_lint',
-    namespaces=['goog', 'gf', 'blk',],
+    namespaces=['goog', 'gf', 'blk', 'wtfapi',],
     srcs=[':blk_js_fixstyle'],
     linter_path=CLOSURE_LINTER_PATH)
 
 closure_js_lint(
     name='all_js_lint',
-    namespaces=['goog', 'gf', 'blk',],
+    namespaces=['goog', 'gf', 'blk', 'wtfapi',],
     srcs=[':all_js_fixstyle'],
     linter_path=CLOSURE_LINTER_PATH)
 

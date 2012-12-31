@@ -22,6 +22,8 @@ goog.require('gf.assets.AssetManager');
 goog.require('gf.log');
 goog.require('gf.net.SessionType');
 goog.require('gf.net.browser.BrowserClient');
+goog.require('goog.reflect');
+goog.require('wtfapi.trace');
 
 
 
@@ -175,3 +177,11 @@ blk.game.server.ServerGame.prototype.update = function(frame) {
 blk.game.server.ServerGame.prototype.render = function(frame) {
   this.controller_.render(frame);
 };
+
+
+blk.game.server.ServerGame = wtfapi.trace.instrumentType(
+    blk.game.server.ServerGame, 'blk.game.server.ServerGame',
+    goog.reflect.object(blk.game.server.ServerGame, {
+      update: 'update',
+      render: 'render'
+    }));

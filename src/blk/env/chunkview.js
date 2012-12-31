@@ -26,7 +26,9 @@ goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.asserts');
 goog.require('goog.math');
+goog.require('goog.reflect');
 goog.require('goog.vec.Vec3');
+goog.require('wtfapi.trace');
 
 
 
@@ -838,3 +840,17 @@ blk.env.ChunkView.tmpVec3_ = [
  * @type {!gf.vec.BoundingBox}
  */
 blk.env.ChunkView.tmpAabb_ = gf.vec.BoundingBox.create();
+
+
+blk.env.ChunkView = wtfapi.trace.instrumentType(
+    blk.env.ChunkView, 'blk.env.ChunkView',
+    goog.reflect.object(blk.env.ChunkView, {
+      initialize: 'initialize',
+      update: 'update',
+      rebuildCube_: 'rebuildCube_',
+      pullChunks_: 'pullChunks_',
+      forEachChunk: 'forEachChunk',
+      forEachInViewport: 'forEachInViewport',
+      forEachInBoundingBox: 'forEachInBoundingBox'
+    }));
+

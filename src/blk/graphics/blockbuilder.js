@@ -18,8 +18,10 @@ goog.provide('blk.graphics.BlockBuilder');
 
 goog.require('goog.Disposable');
 goog.require('goog.asserts');
+goog.require('goog.reflect');
 goog.require('goog.vec.Mat4');
 goog.require('goog.webgl');
+goog.require('wtfapi.trace');
 
 
 
@@ -453,3 +455,13 @@ blk.graphics.BlockBuilder.prototype.draw = function(viewport, worldMatrix,
  * @type {!goog.vec.Mat4.Type}
  */
 blk.graphics.BlockBuilder.tmpMat4_ = goog.vec.Mat4.createFloat32();
+
+
+blk.graphics.BlockBuilder = wtfapi.trace.instrumentType(
+    blk.graphics.BlockBuilder, 'blk.graphics.BlockBuilder',
+    goog.reflect.object(blk.graphics.BlockBuilder, {
+      createIndexBuffer: 'createIndexBuffer',
+      expand_: 'expand_',
+      finish: 'finish',
+      draw: 'draw'
+    }));

@@ -29,8 +29,10 @@ goog.require('blk.ui.Menubar');
 goog.require('blk.ui.PlayerListing');
 goog.require('gf.vec.Viewport');
 goog.require('goog.events.KeyCodes');
+goog.require('goog.reflect');
 goog.require('goog.vec.Mat4');
 goog.require('goog.vec.Vec4');
+goog.require('wtfapi.trace');
 
 
 
@@ -467,3 +469,17 @@ blk.game.fps.FpsClientController.tmpMat4_ =
  */
 blk.game.fps.FpsClientController.tmpVec4_ =
     goog.vec.Vec4.createFloat32();
+
+
+blk.game.fps.FpsClientController = wtfapi.trace.instrumentType(
+    blk.game.fps.FpsClientController, 'blk.game.fps.FpsClientController',
+    goog.reflect.object(blk.game.fps.FpsClientController, {
+      entityAdded: 'entityAdded',
+      update: 'update',
+      processInput: 'processInput',
+      beginDrawing: 'beginDrawing',
+      drawWorld: 'drawWorld',
+      drawOverlays: 'drawOverlays',
+      drawInputUI_: 'drawInputUI_',
+      drawBlockTypes_: 'drawBlockTypes_'
+    }));
