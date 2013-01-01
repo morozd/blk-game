@@ -81,4 +81,4 @@ blk.sim.commands.SetHeldToolCommand.ID = gf.sim.createTypeId(
  * @const
  * @type {number}
  */
-blk.sim.commands.SetHeldToolCommand.FLAGS = gf.sim.PredictedCommand.FLAG;
+blk.sim.commands.SetHeldToolCommand.FLAGS = gf.sim.PredictedCommand.FLAGS;

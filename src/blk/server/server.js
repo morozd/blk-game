@@ -31,6 +31,8 @@ goog.require('gf.net.AuthToken');
 goog.require('gf.net.ServerInfo');
 goog.require('goog.asserts');
 goog.require('goog.async.Deferred');
+/** @suppress {extraRequire} */
+goog.require('goog.debug.ErrorHandler');
 
 
 /**

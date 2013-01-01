@@ -24,7 +24,7 @@ goog.require('blk.env.gen.NoiseGenerator');
 /**
  * Generators, by name.
  * @type {!Object.<function(new:blk.env.gen.Generator,
- *     blk.env.MapParameters, !blk.env.BlockSet)}
+ *     blk.env.MapParameters, !blk.env.BlockSet)>}
  * @private
  */
 blk.env.gen.generators_ = {

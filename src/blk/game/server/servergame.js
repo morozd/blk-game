@@ -45,7 +45,7 @@ blk.game.server.ServerGame = function(launchOptions, session, mapStore) {
    * @private
    * @type {!gf.assets.AssetManager}
    */
-  this.assetManager_ = new gf.assets.AssetManager(this, this.dom);
+  this.assetManager_ = new gf.assets.AssetManager(this);
   this.registerDisposable(this.assetManager_);
   this.addComponent(this.assetManager_);
 

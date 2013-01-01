@@ -24,6 +24,8 @@ goog.require('blk.sim.commands.PlayerMoveAction');
 goog.require('blk.sim.commands.PlayerMoveCommand');
 goog.require('blk.sim.commands.PlayerMoveTranslation');
 goog.require('blk.sim.controllers.FpsController');
+/** @suppress {extraRequire} */
+goog.require('gf.input.Data');
 goog.require('gf.input.MouseButton');
 goog.require('goog.events.KeyCodes');
 

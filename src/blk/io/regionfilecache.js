@@ -58,7 +58,7 @@ blk.io.RegionFileCache = function(maxOpenFiles, rootEntry) {
    * All opened region files in a list.
    * This is used to quickly sort by access time to find files to close.
    * @private
-   * @type {!Array.<blk.io.RegionFile>}
+   * @type {!Array.<!blk.io.RegionFile>}
    */
   this.list_ = [];
 

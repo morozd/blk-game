@@ -21,6 +21,8 @@ goog.require('blk.game.client.ClientGame');
 goog.require('blk.game.client.UserSettings');
 goog.require('gf');
 goog.require('goog.asserts');
+/** @suppress {extraRequire} */
+goog.require('goog.debug.ErrorHandler');
 goog.require('goog.dom.DomHelper');
 
 
