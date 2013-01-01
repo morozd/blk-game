@@ -209,7 +209,7 @@ if (gf.CLIENT) {
 
     // Queue for rendering
     var transformMatrix = renderList.drawModelInstance(
-        this.modelInstance_);
+        /** @type {!gf.mdl.RenderInstance} */ (this.modelInstance_));
     this.getTransform(transformMatrix);
 
     // TODO(benvanik): render attachments

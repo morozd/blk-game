@@ -22,7 +22,8 @@ goog.provide('blk.sim.Controller');
 
 goog.require('gf');
 goog.require('gf.sim.Entity');
-
+/** @suppress {extraRequire} */
+goog.require('gf.input.InputManager');
 
 
 /**
