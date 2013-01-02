@@ -211,6 +211,11 @@ blk.game.fps.FpsClientController.prototype.processInput =
     this.game.playClick();
     this.playerListing_.toggleVisibility();
     return true;
+  } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.V)) {
+    if (this.viewRenderer_) {
+      this.viewRenderer_.setDebugVisuals(!this.viewRenderer_.debugVisuals);
+    }
+    return true;
   }
 
   // Toggle audio
