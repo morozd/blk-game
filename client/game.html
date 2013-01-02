@@ -9,6 +9,10 @@
     <script type="text/javascript">
       var _gaq = _gaq || [];
       (function() {
+        if (window.location.hostname == 'localhost') {
+          return;
+        }
+
         _gaq.push(['_setAccount', 'UA-37349406-1']);
         _gaq.push(['_setSessionCookieTimeout', 1800000]);
         _gaq.push(['_trackPageview', '/game']);
