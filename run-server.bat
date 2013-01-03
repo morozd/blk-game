@@ -30,7 +30,12 @@ SET MAP_GENERATOR="improved"
 REM Map random number generator seed
 SET MAP_SEED=0
 
-node %DIR%\server\server.js ^
+SET JSFILE="server.js"
+IF NOT "%1" == "--debug" GOTO NOT_DEBUG
+SET JSFILE="server-uncompiled.js"
+:NOT_DEBUG
+
+node %DIR%\server\\%JSFILE% ^
     --browserUrl=%BROWSER_URL% ^
     --serverId=%SERVER_ID% ^
     --serverKey=%SERVER_KEY% ^
