@@ -121,6 +121,16 @@ blk.game.fps.FpsClientController = function(game, session) {
    * @type {blk.env.client.ViewRenderer}
    */
   this.viewRenderer_ = null;
+
+  /**
+   * Whether to show debug info/visuals.
+   * 0: none
+   * 1: regular info
+   * 2: regular info + debug visuals
+   * @type {number}
+   * @private
+   */
+  this.showDebugInfo_ = 0;
 };
 goog.inherits(blk.game.fps.FpsClientController,
     blk.game.client.ClientController);
@@ -146,6 +156,7 @@ blk.game.fps.FpsClientController.prototype.entityAdded =
       this.viewRenderer_ = new blk.env.client.ViewRenderer(
           this.game.getRenderState(), this.getMap(), entity.getView());
       this.registerDisposable(this.viewRenderer_);
+      this.viewRenderer_.setDebugVisuals(this.showDebugInfo_ >= 2);
     }
   }
 };
@@ -212,8 +223,12 @@ blk.game.fps.FpsClientController.prototype.processInput =
     this.playerListing_.toggleVisibility();
     return true;
   } else if (keyboardData.didKeyGoDown(goog.events.KeyCodes.V)) {
+    this.showDebugInfo_++;
+    if (this.showDebugInfo_ > 2) {
+      this.showDebugInfo_ = 0;
+    }
     if (this.viewRenderer_) {
-      this.viewRenderer_.setDebugVisuals(!this.viewRenderer_.debugVisuals);
+      this.viewRenderer_.setDebugVisuals(this.showDebugInfo_ >= 2);
     }
     return true;
   }
@@ -331,8 +346,18 @@ blk.game.fps.FpsClientController.prototype.drawOverlays =
 /**
  * @override
  */
-blk.game.fps.FpsClientController.prototype.getDebugInfo = function() {
-  return this.viewRenderer_ ? this.viewRenderer_.getStatisticsString() : null;
+blk.game.fps.FpsClientController.prototype.getDebugInfo = function(frame) {
+  if (!this.showDebugInfo_) {
+    return null;
+  }
+
+  var sim = this.getSimulator();
+  var simInfo = 'Sim: ' + sim.statistics.getDebugInfo();
+  sim.statistics.update(frame.time);
+  var mapStats = this.map_.getStatisticsString();
+  var extraInfo = this.viewRenderer_ ?
+      this.viewRenderer_.getStatisticsString() : null
+  return [simInfo, mapStats, extraInfo];
 };
 
 

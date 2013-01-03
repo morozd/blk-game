@@ -582,21 +582,22 @@ blk.game.client.ClientController.prototype.drawWorld = function(frame) {
  */
 blk.game.client.ClientController.prototype.drawOverlays =
     function(frame, inputData) {
-  var simInfo = 'Sim: ' + this.simulator_.statistics.getDebugInfo();
-  this.simulator_.statistics.update(frame.time);
-  var mapStats = this.map_.getStatisticsString();
-  var extraInfo = this.getDebugInfo();
-  this.console_.render(
-      frame, this.screenViewport_, simInfo, mapStats, extraInfo);
+  var args = [frame, this.screenViewport_];
+  var extraArgs = this.getDebugInfo(frame);
+  if (extraArgs) {
+    goog.array.extend(args, extraArgs);
+  }
+  this.console_.render.apply(this.console_, args);
 };
 
 
 /**
  * Gets additional debugging information that will be printed to the console.
+ * @param {!gf.RenderFrame} frame Render frame.
  * @protected
- * @return {string?} Extra debugging information for the console.
+ * @return {Array.<string>?} Extra debugging information for the console.
  */
-blk.game.client.ClientController.prototype.getDebugInfo = function() {
+blk.game.client.ClientController.prototype.getDebugInfo = function(frame) {
   return null;
 };
 

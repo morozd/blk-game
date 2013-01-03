@@ -1,7 +1,9 @@
 Before Release
 ================================================================================
 
-* new sounds
+* add names above heads
+* add banning (by ip/etc)
+* add lighting
 
 * skip block building if any neighbors missing
 * lighting
