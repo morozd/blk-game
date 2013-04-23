@@ -55,9 +55,9 @@ goog.inherits(blk.io.IndexedDbMapStore, blk.io.MapStore);
  * @type {IDBFactory|undefined}
  */
 blk.io.IndexedDbMapStore.indexedDB =
-    goog.global.indexedDB ||
-    goog.global.mozIndexedDB ||
-    goog.global.webkitIndexedDB ||
+    goog.global['indexedDB'] ||
+    goog.global['mozIndexedDB'] ||
+    goog.global['webkitIndexedDB'] ||
     goog.global['msIndexedDB'];
 
 

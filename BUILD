@@ -274,6 +274,7 @@ closure_js_library(
 closure_js_library(
     name='blk_client_js_compiled',
     mode='ADVANCED',
+    #pretty_print=True,
     entry_points='blk.client.start',
     srcs=BLK_CLIENT_JS_SRCS + [
         ':blk_audio_compiled_all',
@@ -281,6 +282,7 @@ closure_js_library(
     externs=[GF + ':closure_externs'],
     compiler_jar=JS_COMPILER_JAR,
     compiler_flags=SHARED_JS_FLAGS + [
+        #'--debug',
         '--define=gf.SERVER=false',
         '--define=gf.NODE=false',
         ])
@@ -288,11 +290,13 @@ closure_js_library(
 closure_js_library(
     name='blk_server_js_compiled',
     mode='ADVANCED',
+    #pretty_print=True,
     entry_points='blk.server.start',
     srcs=BLK_SERVER_JS_SRCS,
     externs=[GF + ':closure_externs'],
     compiler_jar=JS_COMPILER_JAR,
     compiler_flags=SHARED_JS_FLAGS + [
+        #'--debug',
         '--define=gf.SERVER=true',
         '--define=gf.NODE=false',
         ])
