@@ -48,6 +48,12 @@ blk.client.LaunchOptions = function(uri, opt_args) {
    * @type {number}
    */
   this.sharedWorkers = this.getNumberAlways('sharedWorkers');
+
+  /**
+   * Demo mode - hide UI/etc.
+   * @type {boolean}
+   */
+  this.demo = this.getFlag('demo') || false;
 };
 goog.inherits(blk.client.LaunchOptions, gf.LaunchOptions);
 
@@ -78,6 +84,11 @@ blk.client.LaunchOptions.getArgumentInfo = function() {
       'help': 'Whether to enable shared web workers.',
       'type': Number,
       'defaultValue': 1
+    },
+    'demo': {
+      'help': 'Run in demo mode.',
+      'type': Boolean,
+      'defaultValue': false
     }
   };
 };

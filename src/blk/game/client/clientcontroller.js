@@ -185,10 +185,12 @@ blk.game.client.ClientController = function(game, session) {
   this.session.socket.simulatedLatency = launchOptions.simulatedLatency;
 
   // Say hi
-  this.console_.log('wsad to move');
-  this.console_.log('left click to place blocks, right click to remove');
-  if (!this.session.isLocal()) {
-    this.console_.log('t to chat');
+  if (!launchOptions.demo) {
+    this.console_.log('wsad to move');
+    this.console_.log('left click to place blocks, right click to remove');
+    if (!this.session.isLocal()) {
+      this.console_.log('t to chat');
+    }
   }
 };
 goog.inherits(blk.game.client.ClientController, goog.Disposable);
