@@ -636,9 +636,11 @@ blk.game.client.ClientGame.prototype.connectToHost = function(address) {
     }
   }
 
+  var timeRange = WTF.trace.beginTimeRange('connectToHost:wait');
   deferred.addCallbacks(
       function(session) {
         gf.log.write('Connection established to ' + address);
+        WTF.trace.endTimeRange(timeRange);
 
         // Connection ready!
         dialogDeferred.cancel();
@@ -647,6 +649,7 @@ blk.game.client.ClientGame.prototype.connectToHost = function(address) {
         this.gotoGameScreen_(session);
       }, function(arg) {
         gf.log.write('Error connecting to ' + address, arg);
+        WTF.trace.endTimeRange(timeRange);
 
         // Connection failed
         dialogDeferred.cancel();
@@ -772,12 +775,15 @@ blk.game.client.ClientGame.prototype.launchLocalServer_ =
   };
 
   // Connect
+  var timeRange = WTF.trace.beginTimeRange('launchLocalServer_:connect');
   var connectDeferred = gf.net.connect(
       /** @type {gf.net.Endpoint} */ (port),
       blk.net.packets.PROTOCOL_VERSION,
       authToken,
       userInfo);
   connectDeferred.addCallbacks(function(session) {
+    WTF.trace.endTimeRange(timeRange);
+
     // Wait until here otherwise it will steal events from the session
     // TODO(benvanik): avoid adding extra listeners to the socket port
     gf.log.installListener(port, '{server}');
@@ -786,6 +792,7 @@ blk.game.client.ClientGame.prototype.launchLocalServer_ =
 
     deferred.callback(session);
   }, function(arg) {
+    WTF.trace.endTimeRange(timeRange);
     deferred.errback(arg);
   });
 };

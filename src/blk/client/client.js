@@ -24,6 +24,7 @@ goog.require('goog.asserts');
 /** @suppress {extraRequire} */
 goog.require('goog.debug.ErrorHandler');
 goog.require('goog.dom.DomHelper');
+goog.require('WTF.trace');
 
 
 /**
@@ -33,25 +34,26 @@ goog.require('goog.dom.DomHelper');
  * @param {string} uri Invoking URI.
  * @param {Object.<*>=} opt_args Key-value argument map.
  */
-blk.client.start = function(doc, sourceMode, uri, opt_args) {
-  goog.asserts.assert(!gf.SERVER);
-  var dom = new goog.dom.DomHelper(doc);
+blk.client.start = WTF.trace.instrument(function(
+    doc, sourceMode, uri, opt_args) {
+      goog.asserts.assert(!gf.SERVER);
+      var dom = new goog.dom.DomHelper(doc);
 
-  // Parse options and load user settings
-  var launchOptions = new blk.client.LaunchOptions(uri, opt_args);
-  var settings = new blk.game.client.UserSettings(dom);
-  settings.load();
+      // Parse options and load user settings
+      var launchOptions = new blk.client.LaunchOptions(uri, opt_args);
+      var settings = new blk.game.client.UserSettings(dom);
+      settings.load();
 
-  // Create the game
-  var game = new blk.game.client.ClientGame(dom, launchOptions, settings);
+      // Create the game
+      var game = new blk.game.client.ClientGame(dom, launchOptions, settings);
 
-  // HACK: debug root - useful for inspecting the game state
-  if (goog.DEBUG) {
-    goog.global['blk_client'] = game;
-  }
+      // HACK: debug root - useful for inspecting the game state
+      if (goog.DEBUG) {
+        goog.global['blk_client'] = game;
+      }
 
-  // Start the game - it will decide what to do based on launchOptions/etc
-  game.start();
-};
+      // Start the game - it will decide what to do based on launchOptions/etc
+      game.start();
+    }, 'blk.client.start');
 
 goog.exportSymbol('blk.client.start', blk.client.start);

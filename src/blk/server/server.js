@@ -33,6 +33,7 @@ goog.require('goog.asserts');
 goog.require('goog.async.Deferred');
 /** @suppress {extraRequire} */
 goog.require('goog.debug.ErrorHandler');
+goog.require('WTF.trace');
 
 
 /**
@@ -41,7 +42,7 @@ goog.require('goog.debug.ErrorHandler');
  * @param {!Array.<string>} args A list of command line arguments.
  * @return {!goog.async.Deferred} A deferred fulfilled when the server is ready.
  */
-blk.server.start = function(uri, args) {
+blk.server.start = WTF.trace.instrument(function(uri, args) {
   goog.asserts.assert(gf.SERVER);
   var deferred = new goog.async.Deferred();
 
@@ -99,7 +100,9 @@ blk.server.start = function(uri, args) {
       blk.io.FileMapStore,
       blk.io.MemoryMapStore
     ];
+    var mapStoreTimeRange = WTF.trace.beginTimeRange('MapStore:setup');
     setupMapStore(mapPath, mapStores, function(mapStore) {
+      WTF.trace.endTimeRange(mapStoreTimeRange);
       blk.server.launchServer_(launchOptions, session, mapStore, deferred);
     });
   }, function(arg) {
@@ -120,7 +123,7 @@ blk.server.start = function(uri, args) {
   };
 
   return deferred;
-};
+}, 'blk.server.start');
 
 
 /**
@@ -131,27 +134,28 @@ blk.server.start = function(uri, args) {
  * @param {!blk.io.MapStore} mapStore Map storage provider.
  * @param {!goog.async.Deferred} deferred Deferred to signal when ready.
  */
-blk.server.launchServer_ = function(launchOptions, session, mapStore,
-    deferred) {
-  // Create game
-  var game = new blk.game.server.ServerGame(launchOptions, session, mapStore);
+blk.server.launchServer_ = WTF.trace.instrument(function(
+    launchOptions, session, mapStore, deferred) {
+      // Create game
+      var game = new blk.game.server.ServerGame(
+          launchOptions, session, mapStore);
 
-  // HACK: debug root - useful for inspecting the game state
-  if (goog.DEBUG) {
-    goog.global['blk_server'] = game;
-  }
+      // HACK: debug root - useful for inspecting the game state
+      if (goog.DEBUG) {
+        goog.global['blk_server'] = game;
+      }
 
-  // Load the game
-  game.load().addCallbacks(
-      function() {
-        // Start ticking
-        game.startTicking();
+      // Load the game
+      game.load().addCallbacks(
+          function() {
+            // Start ticking
+            game.startTicking();
 
-        deferred.callback(game);
-      }, function(arg) {
-        deferred.errback(arg);
-      });
-};
+            deferred.callback(game);
+          }, function(arg) {
+            deferred.errback(arg);
+          });
+    }, 'blk.server.launchServer_');
 
 
 goog.exportSymbol('blk.server.start', blk.server.start);

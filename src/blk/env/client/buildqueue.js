@@ -21,7 +21,6 @@ goog.require('gf');
 goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.reflect');
-goog.require('goog.vec.Vec3');
 goog.require('WTF.trace');
 
 

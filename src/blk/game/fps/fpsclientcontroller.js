@@ -356,7 +356,7 @@ blk.game.fps.FpsClientController.prototype.getDebugInfo = function(frame) {
   sim.statistics.update(frame.time);
   var mapStats = this.map_.getStatisticsString();
   var extraInfo = this.viewRenderer_ ?
-      this.viewRenderer_.getStatisticsString() : null
+      this.viewRenderer_.getStatisticsString() : null;
   return [simInfo, mapStats, extraInfo];
 };
 
