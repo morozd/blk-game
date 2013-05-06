@@ -32,7 +32,7 @@ goog.require('goog.events.KeyCodes');
 goog.require('goog.reflect');
 goog.require('goog.vec.Mat4');
 goog.require('goog.vec.Vec4');
-goog.require('wtfapi.trace');
+goog.require('WTF.trace');
 
 
 
@@ -501,7 +501,7 @@ blk.game.fps.FpsClientController.tmpVec4_ =
     goog.vec.Vec4.createFloat32();
 
 
-blk.game.fps.FpsClientController = wtfapi.trace.instrumentType(
+blk.game.fps.FpsClientController = WTF.trace.instrumentType(
     blk.game.fps.FpsClientController, 'blk.game.fps.FpsClientController',
     goog.reflect.object(blk.game.fps.FpsClientController, {
       entityAdded: 'entityAdded',

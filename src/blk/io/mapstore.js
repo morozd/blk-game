@@ -24,7 +24,7 @@ goog.require('goog.array');
 goog.require('goog.asserts');
 goog.require('goog.async.Deferred');
 goog.require('goog.reflect');
-goog.require('wtfapi.trace');
+goog.require('WTF.trace');
 
 
 
@@ -540,7 +540,7 @@ blk.io.MapStore.QueueEntry.comparePriority = function(a, b) {
 };
 
 
-blk.io.MapStore = wtfapi.trace.instrumentType(
+blk.io.MapStore = WTF.trace.instrumentType(
     blk.io.MapStore, 'blk.io.MapStore',
     goog.reflect.object(blk.io.MapStore, {
       update: 'update',

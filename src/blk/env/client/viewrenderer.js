@@ -28,7 +28,7 @@ goog.require('goog.Disposable');
 goog.require('goog.asserts');
 goog.require('goog.async.Deferred');
 goog.require('goog.reflect');
-goog.require('wtfapi.trace');
+goog.require('WTF.trace');
 
 
 /**
@@ -577,7 +577,7 @@ blk.env.client.ViewRenderer.prototype.handleVisibleChunk_ = function(chunk) {
 };
 
 
-blk.env.client.ViewRenderer = wtfapi.trace.instrumentType(
+blk.env.client.ViewRenderer = WTF.trace.instrumentType(
     blk.env.client.ViewRenderer, 'blk.env.client.ViewRenderer',
     goog.reflect.object(blk.env.client.ViewRenderer, {
       ensureChunkRenderData_: 'ensureChunkRenderData_',

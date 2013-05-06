@@ -24,7 +24,7 @@ goog.require('goog.reflect');
 goog.require('goog.soy');
 goog.require('goog.string');
 goog.require('goog.style');
-goog.require('wtfapi.trace');
+goog.require('WTF.trace');
 
 
 
@@ -120,7 +120,7 @@ blk.ui.PlayerListing.prototype.refresh = function() {
 };
 
 
-blk.ui.PlayerListing = wtfapi.trace.instrumentType(
+blk.ui.PlayerListing = WTF.trace.instrumentType(
     blk.ui.PlayerListing, 'blk.ui.PlayerListing',
     goog.reflect.object(blk.ui.PlayerListing, {
       refresh: 'refresh'

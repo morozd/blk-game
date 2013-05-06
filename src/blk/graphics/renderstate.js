@@ -36,7 +36,7 @@ goog.require('goog.async.DeferredList');
 goog.require('goog.reflect');
 goog.require('goog.vec.Vec3');
 goog.require('goog.webgl');
-goog.require('wtfapi.trace');
+goog.require('WTF.trace');
 
 
 
@@ -751,7 +751,7 @@ blk.graphics.RenderState.LightingInfo.prototype.setModelUniforms =
 };
 
 
-blk.graphics.RenderState = wtfapi.trace.instrumentType(
+blk.graphics.RenderState = WTF.trace.instrumentType(
     blk.graphics.RenderState, 'blk.graphics.RenderState',
     goog.reflect.object(blk.graphics.RenderState, {
       reset: 'reset',

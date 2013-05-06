@@ -26,7 +26,7 @@ goog.require('blk.sim.Player');
 goog.require('blk.sim.World');
 goog.require('goog.asserts');
 goog.require('goog.reflect');
-goog.require('wtfapi.trace');
+goog.require('WTF.trace');
 
 
 
@@ -119,7 +119,7 @@ blk.game.fps.FpsServerController.prototype.deletePlayer =
 };
 
 
-blk.game.fps.FpsServerController = wtfapi.trace.instrumentType(
+blk.game.fps.FpsServerController = WTF.trace.instrumentType(
     blk.game.fps.FpsServerController, 'blk.game.fps.FpsServerController',
     goog.reflect.object(blk.game.fps.FpsServerController, {
       setupSimulation: 'setupSimulation',

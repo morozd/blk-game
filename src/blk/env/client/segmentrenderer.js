@@ -26,8 +26,8 @@ goog.require('goog.reflect');
 goog.require('goog.vec.Mat4');
 goog.require('goog.vec.Vec3');
 goog.require('goog.vec.Vec4');
-goog.require('wtfapi.trace');
-goog.require('wtfapi.trace.events');
+goog.require('WTF.trace');
+goog.require('WTF.trace.events');
 
 
 
@@ -283,9 +283,9 @@ blk.env.client.SegmentRenderer.prototype.invalidate = function() {
 };
 
 
-blk.env.client.SegmentRenderer.build0_ = wtfapi.trace.events.createScope(
+blk.env.client.SegmentRenderer.build0_ = WTF.trace.events.createScope(
     'blk.env.client.SegmentRenderer#build:fast');
-blk.env.client.SegmentRenderer.build1_ = wtfapi.trace.events.createScope(
+blk.env.client.SegmentRenderer.build1_ = WTF.trace.events.createScope(
     'blk.env.client.SegmentRenderer#build:slow');
 
 
@@ -348,7 +348,7 @@ blk.env.client.SegmentRenderer.prototype.build = function() {
       }
     }
   }
-  wtfapi.trace.leaveScope(scope);
+  WTF.trace.leaveScope(scope);
 
   scope = blk.env.client.SegmentRenderer.build1_();
   /** @type {!Array.<blk.env.Chunk>} */
@@ -386,7 +386,7 @@ blk.env.client.SegmentRenderer.prototype.build = function() {
   for (bx = 1; bx < blk.env.client.SegmentRenderer.SIZE; bx++) {
     this.addFaces_(bx, bymin, bymax, bz, neighborChunks);
   }
-  wtfapi.trace.leaveScope(scope);
+  WTF.trace.leaveScope(scope);
 
   // Finish the build
   var gl = this.graphicsContext.gl;
@@ -574,7 +574,7 @@ blk.env.client.SegmentRenderer.tmpVec4_ = goog.vec.Vec4.createFloat32();
 blk.env.client.SegmentRenderer.tmpFaces_ = new Uint16Array(6);
 
 
-blk.env.client.SegmentRenderer = wtfapi.trace.instrumentType(
+blk.env.client.SegmentRenderer = WTF.trace.instrumentType(
     blk.env.client.SegmentRenderer, 'blk.env.client.SegmentRenderer',
     goog.reflect.object(blk.env.client.SegmentRenderer, {
       build: 'build'

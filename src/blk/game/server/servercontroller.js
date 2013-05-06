@@ -39,7 +39,7 @@ goog.require('goog.array');
 goog.require('goog.asserts');
 goog.require('goog.async.Deferred');
 goog.require('goog.reflect');
-goog.require('wtfapi.trace');
+goog.require('WTF.trace');
 
 
 
@@ -400,7 +400,7 @@ blk.game.server.ServerController.prototype.connected = goog.nullFunction;
 blk.game.server.ServerController.prototype.disconnected = goog.nullFunction;
 
 
-blk.game.server.ServerController = wtfapi.trace.instrumentType(
+blk.game.server.ServerController = WTF.trace.instrumentType(
     blk.game.server.ServerController, 'blk.game.server.ServerController',
     goog.reflect.object(blk.game.server.ServerController, {
       load: 'load',

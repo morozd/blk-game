@@ -24,7 +24,7 @@ goog.require('gf.net.PacketReader');
 goog.require('gf.net.PacketWriter');
 goog.require('goog.asserts');
 goog.require('goog.reflect');
-goog.require('wtfapi.trace');
+goog.require('WTF.trace');
 
 
 
@@ -234,7 +234,7 @@ blk.io.ChunkSerializer.getSharedSerializer = function() {
 };
 
 
-blk.io.ChunkSerializer = wtfapi.trace.instrumentType(
+blk.io.ChunkSerializer = WTF.trace.instrumentType(
     blk.io.ChunkSerializer, 'blk.io.ChunkSerializer',
     goog.reflect.object(blk.io.ChunkSerializer, {
       serializeToWriter: 'serializeToWriter',

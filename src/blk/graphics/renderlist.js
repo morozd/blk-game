@@ -23,7 +23,7 @@ goog.provide('blk.graphics.RenderList');
 goog.require('goog.Disposable');
 goog.require('goog.reflect');
 goog.require('goog.vec.Mat4');
-goog.require('wtfapi.trace');
+goog.require('WTF.trace');
 
 
 
@@ -106,7 +106,7 @@ blk.graphics.RenderList.prototype.flush = function(viewport) {
 };
 
 
-blk.graphics.RenderList = wtfapi.trace.instrumentType(
+blk.graphics.RenderList = WTF.trace.instrumentType(
     blk.graphics.RenderList, 'blk.graphics.RenderList',
     goog.reflect.object(blk.graphics.RenderList, {
       flush: 'flush'

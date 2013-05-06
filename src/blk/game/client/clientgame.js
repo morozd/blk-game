@@ -44,7 +44,7 @@ goog.require('goog.asserts');
 goog.require('goog.async.Deferred');
 goog.require('goog.reflect');
 goog.require('goog.userAgent.product');
-goog.require('wtfapi.trace');
+goog.require('WTF.trace');
 
 
 
@@ -869,7 +869,7 @@ blk.game.client.ClientGame.prototype.getGameScreen_ = function() {
 };
 
 
-blk.game.client.ClientGame = wtfapi.trace.instrumentType(
+blk.game.client.ClientGame = WTF.trace.instrumentType(
     blk.game.client.ClientGame, 'blk.game.client.ClientGame',
     goog.reflect.object(blk.game.client.ClientGame, {
       connectToHost: 'connectToHost',

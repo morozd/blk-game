@@ -22,7 +22,7 @@ goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.reflect');
 goog.require('goog.vec.Vec3');
-goog.require('wtfapi.trace');
+goog.require('WTF.trace');
 
 
 
@@ -327,7 +327,7 @@ blk.env.client.BuildQueue.prototype.update = function(frame, viewport) {
 blk.env.client.BuildQueue.prototype.sortListByDistance_ =
     function(frame, viewport, list) {
   // TODO(benvanik): more efficient sort
-  wtfapi.trace.appendScopeData('length', list.length);
+  WTF.trace.appendScopeData('length', list.length);
 
   // Compute distances
   var frameNumber = frame.frameNumber;
@@ -348,7 +348,7 @@ blk.env.client.BuildQueue.prototype.sortListByDistance_ =
 };
 
 
-blk.env.client.BuildQueue = wtfapi.trace.instrumentType(
+blk.env.client.BuildQueue = WTF.trace.instrumentType(
     blk.env.client.BuildQueue, 'blk.env.client.BuildQueue',
     goog.reflect.object(blk.env.client.BuildQueue, {
       update: 'update',

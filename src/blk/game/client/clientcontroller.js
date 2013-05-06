@@ -49,7 +49,7 @@ goog.require('goog.array');
 goog.require('goog.asserts');
 goog.require('goog.async.Deferred');
 goog.require('goog.reflect');
-goog.require('wtfapi.trace');
+goog.require('WTF.trace');
 
 
 
@@ -834,7 +834,7 @@ blk.game.client.ClientController.prototype.connected = goog.nullFunction;
 blk.game.client.ClientController.prototype.disconnected = goog.nullFunction;
 
 
-blk.game.client.ClientController = wtfapi.trace.instrumentType(
+blk.game.client.ClientController = WTF.trace.instrumentType(
     blk.game.client.ClientController, 'blk.game.client.ClientController',
     goog.reflect.object(blk.game.client.ClientController, {
       update: 'update',
